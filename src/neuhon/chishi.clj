@@ -164,7 +164,7 @@
 					(set-complex result i signal 
 						(bit-shift-right (reverse-bits i) (- 32 abs-nbits)))
 					(recur (inc i))))
-			(loop [p 1]
+      (loop [p 1]
 				(when (<= p abs-nbits)
 					(let [step (bit-shift-left 0x1 p)
 						  theta (* 2 (* Math/PI (if toinverse -1 1)))
