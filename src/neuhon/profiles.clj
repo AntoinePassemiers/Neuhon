@@ -18,4 +18,3 @@
 			(when (< i N)
 				(aset new_arr i (- (aget arr_A i) (aget arr_B i)))
 				(recur (inc i)))) (Profile. new_arr fondamental))))
-

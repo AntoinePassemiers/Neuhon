@@ -171,5 +171,4 @@
 						  wk (complex-from-angle theta)]
 						  (loop [offset 0]
 						  	(when (< offset N))))
-					(recur (inc p))))
-))))
+					(recur (inc p))))))))
