@@ -1,9 +1,17 @@
 (require '[clojure.data.csv :as csv]
          '[clojure.java.io :as io])
 
+(load-file "src/neuhon/wav.clj") ;; TODO
+
 (def db-base-path (str "D://KeyFinderDB/"))
 (def csv-path (str "D://KeyFinderDB/DOC/KeyFinderV2Dataset.csv"))
 (def out-path (str "output.txt"))
+
+(defn find-key [filepath]
+  (do
+    (load-wav filepath)
+    ;; TODO
+    (str "Em")))
 
 (use 'clojure.java.io)
 (clojure.java.io/file out-path)
@@ -13,14 +21,15 @@
           tp (atom 0)
           fp (atom 0)]
   		(do (loop [i 1] ;; skip header
-  			(when (< i (count csv-seq))
+  			;; (when (< i (count csv-seq))
+        (when (< i 2)
           (let [line (nth csv-seq i)
                 artist (nth line 0)
                 title (nth line 1)
                 target-key (nth line 2)
                 audio-filename (nth line 3)
-                aufio-filepath (clojure.string/join [db-base-path audio-filename])
-                predicted-key "Em"] ;; TODO : call (find-key aufio-filepath)
+                audio-filepath (clojure.string/join [db-base-path audio-filename])
+                predicted-key (find-key audio-filepath)]
             (do 
               (if (= 0 (compare predicted-key target-key)) (swap! tp inc) (swap! fp inc))
               (.write wrtr (format "File number %4d\n" i))

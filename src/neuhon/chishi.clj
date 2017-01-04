@@ -1,7 +1,10 @@
-(defn log2 [n] (/ (Math/log n) (Math/log 2)))
+(use 'overtone.core)
+(connect-external-server)
+
+(defn log_2 [n] (/ (Math/log n) (Math/log 2)))
 	
 ;; (def song-sample (load-sample "C://H Projects/Prosody/samples/ahhcut.wav"))
-(def song-sample (load-sample "C://H Projects/Components/Uppermost - Born Limitless.wav" :start 400000))
+(def song-sample (load-sample "C://H Projects/Components/Uppermost - Born Limitless.wav"))
 
 ;; (def song-buffer (buffer-alloc-read "C://H Projects/Components/Uppermost - Born Limitless.wav" 0 1024))
 ;; (buffer-get song-sample 15745)
@@ -26,7 +29,7 @@
 ;; http://introcs.cs.princeton.edu/java/97data/FFT.java.html
 ;; http://introcs.cs.princeton.edu/java/97data/Complex.java.html
 
-;; (complex-to-real (FFT (new-complex-array (buffer-read song-sample 0 1024) 1024) 1024))
+;; (complex-to-real (FFT (new-complex-array (buffer-re(loopsad song-sample 0 1024) 1024) 1024))
 
 ;; http://asymmetrical-view.com/2009/07/02/clojure-primitive-arrays.html
 ;; https://equilibriumofnothing.wordpress.com/2013/10/14/algorithm-iterative-fft/
@@ -101,7 +104,7 @@
 
 (defn FFT 
 	([signal N]
-	(if-not (= (mod (log2 N) 1) 0.0)
+	(if-not (= (mod (log_2 N) 1) 0.0)
 		(throw (Exception. (str "Window size is not a power of 2")))
 		(let [half      (/ N 2)
 			  in_real   (.real signal)
@@ -155,7 +158,7 @@
 (defn iterativeFFT
 	([signal]
 		(let [N (alength signal)
-			  nbits (log2 N)
+			  nbits (log_2 N)
 			  toinverse (< nbits 0)
 			  abs-nbits (Math/abs nbits)
 			  result (make-array )] (do 
