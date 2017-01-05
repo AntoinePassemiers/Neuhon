@@ -14,43 +14,62 @@
 (def number-of-bytes-loc (int 4))
 (def sampling-frequency-loc (int 24))
 
-(defn le-bytes-to-int8 [^bytes arr ^double ith] ;; little endian
-  (int (aget arr ith)))
+(def complement-int8  (bit-shift-left 1 7))  ;; TODO
+(def complement-int16 (bit-shift-left 1 15)) ;; TODO
+(def complement-int24 (bit-shift-left 1 23)) ;; TODO
+(def complement-int32 (bit-shift-left 1 31)) ;; TODO
 
-(defn le-bytes-to-int16 [^bytes arr ^double ith] ;; little endian
-  (bit-or (bit-and (aget arr ith) 0x000000ff)
-    (bit-and (bit-shift-left (aget arr (+ ith 1)) 8) 0x0000ff00)))
+(defn apply-complement [compl condition value]
+  (if condition value (- value compl)))
 
-(defn le-bytes-to-int24 [^bytes arr ^double ith] ;; little endian
-  (bit-or (bit-and (aget arr ith) 0x000000ff)
-    (bit-and (bit-shift-left (aget arr (+ ith 1)) 8) 0x0000ff00)
-    (bit-and (bit-shift-left (aget arr (+ ith 2)) 16) 0x00ff0000)))
+(defn le2c-bytes-to-int8 [^bytes arr ^double ith] ;; little endian, 2's complement
+  (apply-complement complement-int8 
+    (= 0 (bit-and (aget arr ith) 0x00000080))
+    (bit-and (aget arr ith) 0x0000007f)))
 
-(defn le-bytes-to-int32 [^bytes arr ^double ith] ;; little endian
-  (bit-or (bit-and (aget arr ith) 0x000000ff)
-    (bit-and (bit-shift-left (aget arr (+ ith 1)) 8) 0x0000ff00)
-    (bit-and (bit-shift-left (aget arr (+ ith 2)) 16) 0x00ff0000)
-    (bit-and (bit-shift-left (aget arr (+ ith 3)) 24) 0xff000000)))
+(defn le2c-bytes-to-int16 [^bytes arr ^double ith] ;; little endian, 2's complement
+  (apply-complement complement-int16
+    (= 0 (bit-and (aget arr (+ ith 1)) 0x00008000))
+    (bit-or (bit-and (aget arr (+ ith 0)) 0x000000ff)
+      (bit-and (bit-shift-left (aget arr (+ ith 1)) 8) 0x00007f00))))
+
+(defn le2c-bytes-to-int24 [^bytes arr ^double ith] ;; little endian, 2's complement
+  (apply-complement complement-int24
+    (= 0 (bit-and (aget arr (+ ith 2)) 0x00800000))
+    (bit-or (bit-and (aget arr (+ ith 0)) 0x000000ff)
+      (bit-and (bit-shift-left (aget arr (+ ith 1)) 8) 0x0000ff00)
+      (bit-and (bit-shift-left (aget arr (+ ith 2)) 16) 0x007f0000))))
+
+(defn le2c-bytes-to-int32 [^bytes arr ^double ith] ;; little endian, 2's complement
+  (apply-complement complement-int32
+    (= 0 (bit-and (aget arr (+ ith 3)) 0x80000000))
+    (bit-or (bit-and (aget arr (+ ith 0)) 0x000000ff)
+      (bit-and (bit-shift-left (aget arr (+ ith 1)) 8) 0x0000ff00)
+      (bit-and (bit-shift-left (aget arr (+ ith 2)) 16) 0x00ff0000)
+      (bit-and (bit-shift-left (aget arr (+ ith 3)) 24) 0x7f000000))))
 
 (defn load-wav [filepath & {:keys [rate] :or {rate 44100}}]
   (with-open [r (io/input-stream filepath)]
     (let [data (IOUtils/toByteArray (DataInputStream. r))
           bytes-per-sample (/ (int (aget data bits-per-sample-loc)) 8)
-          bytes-per-bloc (le-bytes-to-int16 data bytes-per-bloc-loc)
+          bytes-per-bloc (le2c-bytes-to-int16 data bytes-per-bloc-loc)
           number-of-channels (int (aget data number-of-channels-loc))
-          number-of-bytes (le-bytes-to-int32 data number-of-bytes-loc)
-          sampling-frequency (le-bytes-to-int32 data sampling-frequency-loc)
+          number-of-bytes (le2c-bytes-to-int32 data number-of-bytes-loc)
+          sampling-frequency (le2c-bytes-to-int32 data sampling-frequency-loc)
           relative-rate (float (/ rate sampling-frequency))
           bytes-step (* bytes-per-sample number-of-channels)
-          number-of-elements (int (* relative-rate (float (/ number-of-bytes bytes-per-sample number-of-channels))))
+          number-of-elements (int (* relative-rate 
+            (float (/ number-of-bytes bytes-per-sample number-of-channels))))
           int-converter (cond
-                          (= bytes-per-sample 3) le-bytes-to-int24
-                          (= bytes-per-sample 2) le-bytes-to-int16
-                          (= bytes-per-sample 1) le-bytes-to-int8
+                          (= bytes-per-sample 3) le2c-bytes-to-int24
+                          (= bytes-per-sample 2) le2c-bytes-to-int16
+                          (= bytes-per-sample 1) le2c-bytes-to-int8
                           :else le-bytes-to-int24)
           signal (make-array wav-data-type number-of-elements)]
       (do 
         (println bytes-per-bloc)
+        (println number-of-bytes)
+        (println sampling-frequency)
         (loop [i (/ wav-header-size bytes-step)] ;; skip header
           (when (< i number-of-elements) 
             (aset signal i 
