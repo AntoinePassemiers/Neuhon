@@ -9,7 +9,7 @@
 
 (defn find-key [filepath]
   (do
-    (load-wav filepath)
+    (println (seq (load-wav filepath :rate 4410)))
     ;; TODO
     (str "Em")))
 
