@@ -64,7 +64,7 @@
                           (= bytes-per-sample 3) le2c-bytes-to-int24
                           (= bytes-per-sample 2) le2c-bytes-to-int16
                           (= bytes-per-sample 1) le2c-bytes-to-int8
-                          :else le-bytes-to-int24)
+                          :else le2c-bytes-to-int16)
           signal (make-array wav-data-type number-of-elements)]
       (do 
         (println bytes-per-bloc)
