@@ -4,6 +4,8 @@
 (use 'cfft.core
      'cfft.matrix
      'cfft.complex)
+	 
+;; https://github.com/kedean/cfft
 
 (load-file "src/neuhon/wav.clj") ;; TODO
 
@@ -13,7 +15,7 @@
 
 (defn find-key [filepath]
   (do
-    (seq (load-wav filepath :rate 4410))
+    (println (seq (load-wav filepath :rate 4410)))
     ;; TODO
     (str "Em")))
 

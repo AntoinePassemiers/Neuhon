@@ -61,18 +61,14 @@
           number-of-elements (int (* relative-rate 
             (float (/ number-of-bytes bytes-per-sample number-of-channels))))
           int-converter (cond
-                          (= bytes-per-sample 3) le2c-bytes-to-int24
-                          (= bytes-per-sample 2) le2c-bytes-to-int16
-                          (= bytes-per-sample 1) le2c-bytes-to-int8
-                          :else le2c-bytes-to-int16)
-          signal (make-array wav-data-type number-of-elements)]
+            (= bytes-per-sample 3) le2c-bytes-to-int24
+            (= bytes-per-sample 2) le2c-bytes-to-int16
+            (= bytes-per-sample 1) le2c-bytes-to-int8
+            :else le2c-bytes-to-int16)]
       (do 
-        (println bytes-per-bloc)
-        (println number-of-bytes)
-        (println sampling-frequency)
-        (loop [i (/ wav-header-size bytes-step)] ;; skip header
-          (when (< i number-of-elements) 
-            (aset signal i 
-              (int-converter data (* i bytes-step)))
-            (recur (inc i))))
-        signal))))
+        (println (/ wav-header-size bytes-step))
+        (println number-of-elements)
+        (println bytes-step)
+
+        (doall (map (fn [i] (int-converter data i))
+          (range (+ (/ wav-header-size bytes-step) 1) number-of-elements bytes-step)))))))
