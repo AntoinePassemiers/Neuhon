@@ -57,18 +57,12 @@
           number-of-bytes (le2c-bytes-to-int32 data number-of-bytes-loc)
           sampling-frequency (le2c-bytes-to-int32 data sampling-frequency-loc)
           relative-rate (float (/ rate sampling-frequency))
-          bytes-step (* bytes-per-sample number-of-channels)
-          number-of-elements (int (* relative-rate 
-            (float (/ number-of-bytes bytes-per-sample number-of-channels))))
+          bytes-step (int (* bytes-per-sample number-of-channels (Math/round (/ 1.0 relative-rate))))
           int-converter (cond
             (= bytes-per-sample 3) le2c-bytes-to-int24
             (= bytes-per-sample 2) le2c-bytes-to-int16
             (= bytes-per-sample 1) le2c-bytes-to-int8
             :else le2c-bytes-to-int16)]
-      (do 
-        (println (/ wav-header-size bytes-step))
-        (println number-of-elements)
-        (println bytes-step)
 
         (doall (map (fn [i] (int-converter data i))
-          (range (+ (/ wav-header-size bytes-step) 1) number-of-elements bytes-step)))))))
+          (range wav-header-size number-of-bytes bytes-step))))))
