@@ -1,7 +1,7 @@
+
 File number    1
 ----------------
 Artist        : 10CC
 Title         : Dreadlock Holiday
 Target key    : Gm
-Predicted key : Em
-
+Predicted key : Bbm

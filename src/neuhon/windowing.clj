@@ -1,6 +1,36 @@
+(def lowest-midi-note-default (int 0))
+(def highest-midi-note-default (int 97))
+(def spectrum-size-default (int 2048))
+(def sampling-freq-default (float 4410.0))
+
+(defn midi-to-hertz [d]
+  (* 440.0 (Math/pow 2 (float (/ (- d 69.0) 12.0)))))
+
 (def win-coef-type Double/TYPE)
 
 (deftype Window [coefs lk rk])
+
+(deftype WindowMatrix [coefs lks rks]
+  clojure.lang.IPersistentCollection
+  (seq [self] (if (seq coefs) self nil))
+  (cons [self o] (WindowMatrix. coefs (conj lks o) (conj rks o)))
+  (empty [self] (WindowMatrix. [] [] []))
+  (equiv
+    [self o]
+    (if (instance? WindowMatrix o)
+      (and (= lks (.lks o))
+           (= rks (.rks o)))
+     false))
+  clojure.lang.ISeq
+  (first [self] (Window. (first coefs) (first lks) (first rks)))
+  (next [self] (Window. (next coefs) (next lks) (next rks)))
+  (more [self] (Window. (rest coefs) (rest lks) (rest rks)))
+  Object
+  (toString [self] 
+    (str "WindowMatrix type")))
+
+(defn win-nth [matrix n]
+  (Window. (nth (.coefs matrix) n) (nth (.lks matrix) n) (nth (.rks matrix) n)))
 
 (defn get-Q-from-p [p]
   (* p (- (long (Math/pow 2 (/ 1.0 12))) 1)))
@@ -20,8 +50,43 @@
         rk (win-right-bound Q fk N sampling-rate)
         win-size (- rk lk)
         win (make-array win-coef-type win-size)]
-    (do (loop [i 0]
-      (when (< i win-size)
-        (aset win i (cosine-win-element (+ lk i) lk rk))
-        (recur (inc i))))
-    (Window. win lk rk))))
+    (Window. (map (fn [i] (cosine-win-element (+ lk i) lk rk)) (range 0 win-size)) lk rk)))
+
+(def cosine-windows (doall (map 
+  (fn [d] 
+    (cosine-win 0.1 (midi-to-hertz d) spectrum-size-default sampling-freq-default))
+    (range lowest-midi-note-default highest-midi-note-default))))
+
+(def winmat (WindowMatrix. 
+  (doall (map (fn [win] (.coefs win)) cosine-windows))
+  (doall (map (fn [win] (.lk win)) cosine-windows)) 
+  (doall (map (fn [win] (.rk win)) cosine-windows))))
+
+(defn apply-win-on-spectrum [spectrum k]
+  (let [win (win-nth winmat k)
+        lk (.lk win)
+        rk (.rk win)
+        coefs (.coefs win)
+        convolution (fn [i] (* (nth spectrum (+ lk i)) (nth coefs i)))]
+    (reduce + (map convolution (range (- rk lk))))))
+
+(defn arg-max 
+  ([data] (arg-max data 0 Double/MIN_VALUE 0))
+  ([data begin end] (arg-max data begin Double/MIN_VALUE 0))
+  ([data begin max-value best-index] 
+  (do (if (= (count data) begin)
+    best-index
+    (if (> (nth data begin) max-value)
+      (arg-max data (+ begin 1) (nth data begin) begin)
+      (arg-max data (+ begin 1) max-value best-index))))))
+
+(defn sum [data]
+  (reduce + data))
+
+(defn note-subset [chromatic-vector note-index]
+  (doall (map (fn [i] (nth chromatic-vector (+ note-index i))) 
+    (range 0 (- (count chromatic-vector) 12) 12))))
+
+(defn note-score [chromatic-vector note-index]
+  (let [subset (note-subset chromatic-vector note-index)]
+    (+ (* 0.8 (apply max subset)) (* 0.2 (sum subset)))))

@@ -1,40 +1,9 @@
-(use 'overtone.core)
-(connect-external-server)
-
 (defn log_2 [n] (/ (Math/log n) (Math/log 2)))
-	
-;; (def song-sample (load-sample "C://H Projects/Prosody/samples/ahhcut.wav"))
-(def song-sample (load-sample "C://H Projects/Components/Uppermost - Born Limitless.wav"))
-
-;; (def song-buffer (buffer-alloc-read "C://H Projects/Components/Uppermost - Born Limitless.wav" 0 1024))
-;; (buffer-get song-sample 15745)
-;; (sample-player song-sample)
-
-
-(use 'vizard.core)
-(require '[vizard [core :refer :all] [plot :as plot] [lite :as lite]])
-;; (start-plot-server!)
-(defn plot-buffer
-	([arr]
-		(for [x (range (count arr))]
-			{:x x :y (get arr x)}))
-	([buf begin offset]
-		(let [list (buffer-read buf begin offset)]
-			(for [x (range (count list))]
-				{:x x :y (get list x)})))
-)
-;; (plot! (plot/vizard {:mark-type :line} (plot-buffer buffer begin end)))
-
-;; BIBLIOGRAPHIE
-;; http://introcs.cs.princeton.edu/java/97data/FFT.java.html
-;; http://introcs.cs.princeton.edu/java/97data/Complex.java.html
-
-;; (complex-to-real (FFT (new-complex-array (buffer-re(loopsad song-sample 0 1024) 1024) 1024))
 
 ;; http://asymmetrical-view.com/2009/07/02/clojure-primitive-arrays.html
 ;; https://equilibriumofnothing.wordpress.com/2013/10/14/algorithm-iterative-fft/
 
-(set! *warn-on-reflection* true)
+(set! *warn-on-reflection* false)
 (set! *unchecked-math* true)
 
 (def data-type Double/TYPE)
@@ -141,8 +110,7 @@
 		 					result))))))))
 
 
-(defn reverse-bits 
-	([k]
+(defn reverse-bits [k]
 		(let [k-1sp (bit-or (bit-shift-left (bit-and k 0x55555555) 1) 
 							(bit-and (bit-shift-right k 1) 0x55555555))
 			  k-2sp (bit-or (bit-shift-left (bit-and k-1sp 0x33333333) 2) 
@@ -153,7 +121,7 @@
 							(bit-and (bit-shift-right k-4sp 8) 0x00ff00ff))
 			  k-16sp (bit-or (bit-shift-left k-8sp 16) 
 							(bit-shift-right k-8sp 16) 0x00ff00ff)]
-			k-16sp)))
+			k-16sp))
 
 (defn iterativeFFT
 	([signal]
