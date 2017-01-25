@@ -8,6 +8,33 @@
 
 (def win-coef-type Double/TYPE)
 
+(defn generic-blackman-window [N a0 a1 a2 a3]
+  (fn [n]
+    (+ a0
+      (- (* a1 (Math/cos (/ (* 2 Math/PI n) (- N 1))))
+        (+ (* a2 (Math/cos (/ (* 4 Math/PI n) (- N 1))))
+          (- (* a3 (Math/cos (/ (* 6 Math/PI n) (- N 1))))))))))
+
+(defn blackman-window-func [N]
+  (blackman-window N 0.42659 0.49656 0.076849 0.0))
+
+(defn nuttall-window-func [N]
+  (blackman-window N 0.355768 0.487396 0.144232 0.012604))
+
+(defn blackman-nuttall-window-func [N]
+  (blackman-window N 0.3635819 0.4891775 0.1365995 0.0106411))
+
+(defn blackman-harris-window-func [N]
+  (blackman-window N 0.35875 0.48829 0.14128 0.01168))
+
+(defn create-window [N window-func]
+  (let [f (window-func N)]
+    (map f (range N))))
+
+(defn convolute [signal window]
+  (let [convolution (fn [i] (* (nth signal i) (nth window i)))]
+    (map convolution (range (count window)))))
+
 (deftype Window [coefs lk rk])
 
 (deftype WindowMatrix [coefs lks rks]

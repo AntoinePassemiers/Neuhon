@@ -24,13 +24,13 @@
 (def all-minor-profiles
   (doall (map (fn [i] (rotate-left minor-base-profile i)) (range 12))))
 
-(defn convolute [chromatic-vector profile]
+(defn dot-product [chromatic-vector profile]
   (let [convolution (fn [i] (* (nth chromatic-vector i) (nth profile i)))]
     (reduce + (map convolution (range 12)))))
 
 (defn match-with-profiles [chromatic-vector profiles]
   (doall (map
-    (fn [i] (convolute chromatic-vector (nth profiles i)))
+    (fn [i] (dot-product chromatic-vector (nth profiles i)))
     (range 12))))
 
 (defn find-best-profile [chromatic-vector]

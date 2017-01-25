@@ -16,23 +16,25 @@
 (deftype Metadata [file-id artist title target-key predicted-key])
 
 (defn display-result [metadata print-function]
-  (print-function (format "\nFile number %4d\n" (.file-id metadata)))
+  (print-function (format "File number %4d\n" (.file-id metadata)))
   (print-function "----------------\n")
   (print-function (format "Artist        : %s\n" (.artist metadata)))
   (print-function (format "Title         : %s\n" (.title metadata)))
   (print-function (format "Target key    : %s\n" (.target-key metadata)))
-  (print-function (format "Predicted key : %s\n" (.predicted-key metadata))))
+  (print-function (format "Predicted key : %s\n\n" (.predicted-key metadata))))
 
 (defn find-key [filepath]
   (let [signal (load-wav filepath :rate sampling-freq-default)
         N (count signal)
-        test-signal (drop 370000 signal)
+        test-signal (drop 460000 signal)
+        window (create-window spectrum-size-default nuttall-window-func) ;; Not working
         c (complex-to-real (FFT 
           (new-complex-array test-signal spectrum-size-default) spectrum-size-default))
         cqt (doall (map (fn [i] (apply-win-on-spectrum c i)) 
           (range (count cosine-windows))))
         chromatic-vector (map (fn [i] (note-score cqt i)) (range 12))]
-    (find-best-profile chromatic-vector)))
+    (do 
+      (find-best-profile chromatic-vector))))
 
 (use 'clojure.java.io)
 (clojure.java.io/file out-path)
@@ -44,7 +46,7 @@
             fp (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 2)
+        (when (< i 15)
           (let [line (nth csv-seq i)
                 artist (nth line 0)
                 title (nth line 1)

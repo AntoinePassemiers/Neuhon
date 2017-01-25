@@ -1,7 +1,98 @@
-
 File number    1
 ----------------
 Artist        : 10CC
 Title         : Dreadlock Holiday
 Target key    : Gm
 Predicted key : Bbm
+
+File number    2
+----------------
+Artist        : 187 Lockdown
+Title         : Gunman (Natural Born Chillers Remix)
+Target key    : Ebm
+Predicted key : F#
+
+File number    3
+----------------
+Artist        : 4hero
+Title         : Star Chasers (Masters At Work Main Mix)
+Target key    : Am
+Predicted key : Bbm
+
+File number    4
+----------------
+Artist        : 50 Cent
+Title         : In Da Club
+Target key    : C#m
+Predicted key : Am
+
+File number    5
+----------------
+Artist        : 808 State
+Title         : Pacific State
+Target key    : Ebm
+Predicted key : Bbm
+
+File number    6
+----------------
+Artist        : A Guy Called Gerald
+Title         : Voodoo Ray
+Target key    : A
+Predicted key : Bbm
+
+File number    7
+----------------
+Artist        : A Tribe Called Quest
+Title         : Can I Kick It? (Boilerhouse Mix)
+Target key    : Em
+Predicted key : B
+
+File number    8
+----------------
+Artist        : A Tribe Called Quest
+Title         : Find A Way
+Target key    : Ebm
+Predicted key : Am
+
+File number    9
+----------------
+Artist        : A Tribe Called Quest
+Title         : Vivrant Thing (feat Violator)
+Target key    : Bbm
+Predicted key : Bb
+
+File number   10
+----------------
+Artist        : A-Skillz
+Title         : Drop The Funk
+Target key    : Em
+Predicted key : Bb
+
+File number   11
+----------------
+Artist        : Aaliyah
+Title         : Are You That Somebody?
+Target key    : Dm
+Predicted key : B
+
+File number   12
+----------------
+Artist        : AC-DC
+Title         : Back In Black
+Target key    : Em
+Predicted key : Bb
+
+File number   13
+----------------
+Artist        : AC-DC
+Title         : You Shook Me All Night Long
+Target key    : G
+Predicted key : Bbm
+
+File number   14
+----------------
+Artist        : Acid District
+Title         : Keep On Searching
+Target key    : G#m
+Predicted key : Am
+
