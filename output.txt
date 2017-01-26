@@ -61,38 +61,3 @@ Title         : Vivrant Thing (feat Violator)
 Target key    : Bbm
 Predicted key : Bb
 
-File number   10
-----------------
-Artist        : A-Skillz
-Title         : Drop The Funk
-Target key    : Em
-Predicted key : Bb
-
-File number   11
-----------------
-Artist        : Aaliyah
-Title         : Are You That Somebody?
-Target key    : Dm
-Predicted key : B
-
-File number   12
-----------------
-Artist        : AC-DC
-Title         : Back In Black
-Target key    : Em
-Predicted key : Bb
-
-File number   13
-----------------
-Artist        : AC-DC
-Title         : You Shook Me All Night Long
-Target key    : G
-Predicted key : Bbm
-
-File number   14
-----------------
-Artist        : Acid District
-Title         : Keep On Searching
-Target key    : G#m
-Predicted key : Am
-

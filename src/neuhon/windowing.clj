@@ -16,16 +16,16 @@
           (- (* a3 (Math/cos (/ (* 6 Math/PI n) (- N 1))))))))))
 
 (defn blackman-window-func [N]
-  (blackman-window N 0.42659 0.49656 0.076849 0.0))
+  (generic-blackman-window N 0.42659 0.49656 0.076849 0.0))
 
 (defn nuttall-window-func [N]
-  (blackman-window N 0.355768 0.487396 0.144232 0.012604))
+  (generic-blackman-window N 0.355768 0.487396 0.144232 0.012604))
 
 (defn blackman-nuttall-window-func [N]
-  (blackman-window N 0.3635819 0.4891775 0.1365995 0.0106411))
+  (generic-blackman-window N 0.3635819 0.4891775 0.1365995 0.0106411))
 
 (defn blackman-harris-window-func [N]
-  (blackman-window N 0.35875 0.48829 0.14128 0.01168))
+  (generic-blackman-window N 0.35875 0.48829 0.14128 0.01168))
 
 (defn create-window [N window-func]
   (let [f (window-func N)]
