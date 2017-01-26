@@ -22,6 +22,11 @@
   (hash-map "C" 0 "C#" 0 "D" 0 "Eb" 0 "E" 0 "F" 0 "F#" 0 "G" 0 "G#" 0 "A" 0 "Bb" 0 "B" 0
     "Cm" 1 "C#m" 1 "Dm" 1 "Ebm" 1 "Em" 1 "Fm" 1 "F#m" 1 "Gm" 1 "G#m" 1 "Am" 1 "Bbm" 1 "Bm" 1))
 
+(defn key-distance [key-a key-b]
+    (let [value-a (get key-values key-a)
+          value-b (get key-values key-b)]
+      (mod (+ 12 (- value-a value-b)) 12)))
+
 (defn is-same-key? [key-a key-b]
   (= 0 (compare key-a key-b)))
 
@@ -33,10 +38,8 @@
       (= (get key-types key-a) (get key-types key-b))
       (or (= distance 5) (= distance 7)))))
 
-(defn is-radial-neighboor? [key-a key-b]
-  (let [value-a (get key-values key-a)
-        value-b (get key-values key-b)
-        distance (mod (+ 12 (- value-a value-b)) 12)]
+(defn is-radial-neighboor? [key-a key-b] ;; TODO
+  (let [distance (key-distance key-a key-b)]
     (and 
       (= (get key-types key-a) (get key-types key-b))
       (or (= distance 5) (= distance 7)))))

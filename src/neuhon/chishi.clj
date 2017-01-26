@@ -62,39 +62,6 @@
 (defn complex-from-angle [angle] 
     (Complex. (Math/cos angle) (Math/sin angle)))
 
-(defn FFT
-  ([signal N]
-    (if-not (= (mod (log_2 N) 1) 0.0)
-      (throw (Exception. (str "Window size is not a power of 2")))
-      (let [half      (/ N 2)
-            in_real   (.real signal)
-            in_imag   (.imag signal)
-            even_arr  (new-complex-array half)
-            odd_arr   (new-complex-array half)]
-        (if (= N 1)
-          (ComplexArray. in_real in_imag)
-          (do 
-            (loop [i 0]
-              (when (< i half) (do
-                (aset (.real even_arr) i (aget in_real (* 2 i)))
-                (aset (.imag even_arr) i (aget in_imag (* 2 i)))
-                (aset (.real odd_arr) i (aget in_real (+ 1 (* 2 i))))
-                (aset (.imag odd_arr) i (aget in_imag (+ 1 (* 2 i)))))
-                (recur (inc i))))
-            (let [q (FFT even_arr half)
-                  r (FFT odd_arr half)
-                  result (new-complex-array N)]
-              (do (loop [i 0] 
-                (when (< i half) (do
-                  (let [wk (complex-from-angle (- (/ (* (* 2 Math/PI) i) N)))
-                        rk (complex-mult wk (get-complex r i))
-                        ya (complex-plus (get-complex q i) rk)
-                        yb (complex-minus (get-complex q i) rk)]
-                    (do (set-complex result i ya)
-                      (set-complex result (+ i half) yb))))
-                      (recur (inc i))))
-                result))))))))
-
 (defn seq-drop [n complex-seq]
   (let [real-part (drop n (.real complex-seq))
         imag-part (drop n (.imag complex-seq))]
