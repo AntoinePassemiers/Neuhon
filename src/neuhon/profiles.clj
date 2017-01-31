@@ -5,11 +5,11 @@
       (rotate-left (concat (drop 1 profile) [(first profile)]) (- n 1))
       profile)))
 
-(defn sum [data]
+(defn apply-sum [data]
   (reduce + data))
 
 (defn normalize [data]
-  (let [total (sum data)]
+  (let [total (apply-sum data)]
     (map (fn [i] (/ (nth data i) total)) (range (count data)))))
 
 (def key-names ["C" "C#" "D" "Eb" "E" "F" "F#" "G" "G#" "A" "Bb" "B"])

@@ -1,6 +1,10 @@
 (require '[clojure.data.csv :as csv]
          '[clojure.java.io :as io])
 
+
+(use 'cfft.core)
+(use 'cfft.complex)
+(use 'cfft.matrix)
 	 
 ;; https://github.com/kedean/cfft
 
@@ -29,9 +33,9 @@
         N (count signal)
         test-signal (drop 460000 signal)
         window (create-window spectrum-size-default nuttall-window-func) ;; Not working
-        c (complex-seq-to-real 
-            (seq-FFT 
-              (new-complex-seq test-signal spectrum-size-default) spectrum-size-default))
+        ;; c (complex-seq-to-real (seq-FFT 
+        ;;    (new-complex-seq test-signal spectrum-size-default) spectrum-size-default))
+        c (matrix-apply real (fft test-signal))
         cqt (doall (map (fn [i] (apply-win-on-spectrum c i)) 
           (range (count cosine-windows))))
         chromatic-vector (map (fn [i] (note-score cqt i)) (range 12))]
@@ -50,7 +54,7 @@
             fp (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 10)
+        (when (< i 2)
           (let [line (nth csv-seq i)
                 artist (nth line 0)
                 title (nth line 1)

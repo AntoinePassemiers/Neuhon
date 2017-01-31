@@ -50,7 +50,7 @@
           new_imag (- (.imag c2) (.imag c2))]
         (Complex. new_real new_imag)))
 
-(defn complex-mult [c c2]
+(defn apply-complex-mult [c c2]
     (let [a_real   (.real c)
           a_imag   (.imag c)
           b_real   (.real c2)
@@ -101,7 +101,7 @@
               (loop [i 0] 
                 (when (< i half) (do
                   (let [wk (complex-from-angle (- (/ (* (* 2 Math/PI) i) N)))
-                        rk (complex-mult wk (get-complex r i))
+                        rk (apply-complex-mult wk (get-complex r i))
                         ya (complex-plus (get-complex q i) rk)
                         yb (complex-minus (get-complex q i) rk)]
                     (do 

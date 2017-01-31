@@ -2,6 +2,7 @@
 (def highest-midi-note-default (int 97))
 (def spectrum-size-default (int 2048))
 (def sampling-freq-default (float 4410.0))
+(def Q-default (float 0.1))
 
 (defn midi-to-hertz [d]
   (* 440.0 (Math/pow 2 (float (/ (- d 69.0) 12.0)))))
@@ -81,7 +82,7 @@
 
 (def cosine-windows (doall (map 
   (fn [d] 
-    (cosine-win 0.1 (midi-to-hertz d) spectrum-size-default sampling-freq-default))
+    (cosine-win Q-default (midi-to-hertz d) spectrum-size-default sampling-freq-default))
     (range lowest-midi-note-default highest-midi-note-default))))
 
 (def winmat (WindowMatrix. 
@@ -107,7 +108,7 @@
       (arg-max data (+ begin 1) (nth data begin) begin)
       (arg-max data (+ begin 1) max-value best-index))))))
 
-(defn sum [data]
+(defn apply-sum [data]
   (reduce + data))
 
 (defn note-subset [chromatic-vector note-index]
@@ -116,4 +117,4 @@
 
 (defn note-score [chromatic-vector note-index]
   (let [subset (note-subset chromatic-vector note-index)]
-    (+ (* 0.8 (apply max subset)) (* 0.2 (sum subset)))))
+    (+ (* 0.8 (apply max subset)) (* 0.2 (apply-sum subset)))))
