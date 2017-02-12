@@ -2,12 +2,6 @@
          '[clojure.java.io :as io])
 
 
-(use 'cfft.core)
-(use 'cfft.complex)
-(use 'cfft.matrix)
-	 
-;; https://github.com/kedean/cfft
-
 (load-file "src/neuhon/wav.clj") ;; TODO
 (load-file "src/neuhon/chishi.clj") ;; TODO
 (load-file "src/neuhon/windowing.clj") ;; TODO
@@ -33,9 +27,7 @@
         N (count signal)
         test-signal (drop 460000 signal)
         window (create-window spectrum-size-default nuttall-window-func) ;; Not working
-        ;; c (complex-seq-to-real (seq-FFT 
-        ;;    (new-complex-seq test-signal spectrum-size-default) spectrum-size-default))
-        c (matrix-apply real (fft test-signal))
+        c (complex-seq-to-real (iterative-FFT (new-complex-seq test-signal)))
         cqt (doall (map (fn [i] (apply-win-on-spectrum c i)) 
           (range (count cosine-windows))))
         chromatic-vector (map (fn [i] (note-score cqt i)) (range 12))]
@@ -48,10 +40,11 @@
   (with-open [in-file (io/reader csv-path)]
     (with-open [wrtr (writer out-path)]
       (let [csv-seq (csv/read-csv in-file :separator (first ";"))
-            tp (atom 0)
-            radial (atom 0)
-            lr (atom 0)
-            fp (atom 0)]
+            perfect-matches (atom 0)
+            relative-matches (atom 0)
+            parallel-matches (atom 0)
+            out-of-a-fifth-matches (atom 0)
+            wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
         (when (< i 2)
@@ -66,17 +59,21 @@
                   (key-distance predicted-key target-key))]
             (do
               (cond
-                (is-same-key? predicted-key target-key) (swap! tp inc)
-                (is-left-right-neighboor? predicted-key target-key) (swap! lr inc)
-                (is-radial-neighboor? predicted-key target-key) (swap! radial inc)
-                :else (swap! fp inc))
+                (is-same-key? predicted-key target-key) 
+                  (swap! perfect-matches inc)
+                (is-left-right-neighboor? predicted-key target-key) 
+                  (swap! out-of-a-fifth-matches inc)
+                (is-radial-neighboor? predicted-key target-key) 
+                  (swap! relative-matches inc)
+                :else (swap! wrong-keys inc))
               (display-result metadata print)
               (flush)
               (display-result metadata (fn [s] (.write wrtr s)))))
           (recur (inc i))))
-        (println @tp)
-        (println @radial)
-        (println @lr)
-        (println @fp))))))
+        (println @perfect-matches)
+        (println @out-of-a-fifth-matches)
+        (println @relative-matches)
+        (println @parallel-matches)
+        (println @wrong-keys))))))
 
 (process-all)

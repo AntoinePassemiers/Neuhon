@@ -6,7 +6,6 @@
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [org.clojure/clojure "1.8.0"]
                  [commons-io "2.5"]
-                 [cfft "0.1.0"]
                  [org.clojure/data.csv "0.1.3"]]
 :javac-options {:destdir "classes/"}
 :java-source-path "src/neuhon")

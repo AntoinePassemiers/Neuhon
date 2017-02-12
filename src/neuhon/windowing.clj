@@ -1,8 +1,8 @@
-(def lowest-midi-note-default (int 0))
-(def highest-midi-note-default (int 97))
-(def spectrum-size-default (int 2048))
+(def lowest-midi-note-default (int 9))
+(def highest-midi-note-default (int 81))
+(def spectrum-size-default (int 16384))
 (def sampling-freq-default (float 4410.0))
-(def Q-default (float 0.1))
+(def p-default (float 0.8))
 
 (defn midi-to-hertz [d]
   (* 440.0 (Math/pow 2 (float (/ (- d 69.0) 12.0)))))
@@ -82,7 +82,7 @@
 
 (def cosine-windows (doall (map 
   (fn [d] 
-    (cosine-win Q-default (midi-to-hertz d) spectrum-size-default sampling-freq-default))
+    (cosine-win (get-Q-from-p p-default) (midi-to-hertz d) spectrum-size-default sampling-freq-default))
     (range lowest-midi-note-default highest-midi-note-default))))
 
 (def winmat (WindowMatrix. 

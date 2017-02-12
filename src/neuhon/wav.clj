@@ -54,15 +54,21 @@
           bytes-per-sample (/ (int (aget data bits-per-sample-loc)) 8)
           bytes-per-bloc (le2c-bytes-to-int16 data bytes-per-bloc-loc)
           number-of-channels (int (aget data number-of-channels-loc))
-          number-of-bytes (le2c-bytes-to-int32 data number-of-bytes-loc)
+          number-of-bytes (- (le2c-bytes-to-int32 data number-of-bytes-loc) wav-header-size)
           sampling-frequency (le2c-bytes-to-int32 data sampling-frequency-loc)
           relative-rate (float (/ rate sampling-frequency))
           bytes-step (int (* bytes-per-sample number-of-channels (Math/round (/ 1.0 relative-rate))))
+          half-bytes-step (/ bytes-step 2)
           int-converter (cond
             (= bytes-per-sample 3) le2c-bytes-to-int24
             (= bytes-per-sample 2) le2c-bytes-to-int16
             (= bytes-per-sample 1) le2c-bytes-to-int8
             :else le2c-bytes-to-int16)]
-
-        (doall (map (fn [i] (int-converter data i))
-          (range wav-header-size number-of-bytes bytes-step))))))
+      (do
+        (assert (= number-of-channels 2))
+        (doall 
+          (map 
+            (fn [i] (/ 
+              (+ (int-converter data i) 
+                (int-converter data (+ i half-bytes-step))) 2))
+            (range wav-header-size number-of-bytes bytes-step)))))))
