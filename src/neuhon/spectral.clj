@@ -1,3 +1,5 @@
+(ns neuhon.spectral)
+
 (defn log_2 [n] (/ (Math/log n) (Math/log 2)))
 
 ;; http://asymmetrical-view.com/2009/07/02/clojure-primitive-arrays.html
@@ -12,6 +14,7 @@
 ;; Sha'ath profiles
 ;; 
 
+(def long-n-bits (int 14))
 (def data-type Double/TYPE)
 
 (deftype ComplexSeq [real imag length])
@@ -19,7 +22,7 @@
 (deftype Complex [^doubles real ^doubles imag])
 
 (defn new-complex-array 
-  ([N] 
+  ([N]
     (ComplexArray. (make-array data-type N) (make-array data-type N)))
   ([^doubles signal N] 
     (ComplexArray. (into-array data-type signal) (make-array data-type N))))
@@ -42,7 +45,7 @@
 (defn set-complex 
   ([arr k source kk]
     (do
-      (println k (alength (.real arr)))
+      ;; (println kk)
       (aset (.real arr) k (double (nth (.real source) kk)))
       (aset (.imag arr) k (double (nth (.imag source) kk)))))
   ([arr k c] 
@@ -77,8 +80,11 @@
         imag-part (drop n (.imag complex-seq))]
     (ComplexSeq. real-part imag-part (- (.length complex-seq) n))))
 
-(defn new-complex-seq [signal] 
-  (let [N (count signal)]
+(defn new-complex-seq 
+  ([signal] 
+    (let [N (count signal)]
+      (ComplexSeq. signal (replicate N 0) N)))
+  ([signal N]
     (ComplexSeq. signal (replicate N 0) N)))
 
 (defn complex-seq-to-real [data]
@@ -92,19 +98,19 @@
           (Math/pow (nth imag-part i) 2))))
       (range N))))
 
-(defn seq-FFT 
-  ([signal] (seq-FFT signal (count signal) 1))
-  ([signal N] (seq-FFT signal N 1))
+(defn recursive-fft 
+  ([signal] (recursive-fft signal (count signal) 1))
+  ([signal N] (recursive-fft signal N 1))
   ([signal N s]
     (let [half      (/ N 2)
           in_real   (.real signal)
           in_imag   (.imag signal)]
       (if (= N 1)
-        (ComplexArray. 
+        (ComplexArray.
           (to-array [(first in_real)])
           (to-array [(first in_imag)]))
-        (let [q (seq-FFT signal half (* 2 s))
-              r (seq-FFT (seq-drop s signal) half (* 2 s))
+        (let [q (recursive-fft signal half (* 2 s))
+              r (recursive-fft (seq-drop s signal) half (* 2 s))
               result (new-complex-array N)]
           (do
             (loop [i 0]
@@ -119,32 +125,41 @@
                     (recur (inc i))))
             result))))))
 
+(defn unsigned-int [k]
+  (if 
+    (< k 0)
+    (+ (+ 1 Integer/MAX_VALUE) k)
+    k))
 
 (defn reverse-bits [k]
   (let [k-1sp (bit-or (bit-shift-left (bit-and k 0x55555555) 1) 
-          (bit-and (bit-shift-right k 1) 0x55555555))
+          (bit-and (unsigned-bit-shift-right k 1) 0x55555555))
         k-2sp (bit-or (bit-shift-left (bit-and k-1sp 0x33333333) 2) 
-          (bit-and (bit-shift-right k-1sp 2) 0x33333333))
+          (bit-and (unsigned-bit-shift-right k-1sp 2) 0x33333333))
         k-4sp (bit-or (bit-shift-left (bit-and k-2sp 0x0f0f0f0f) 4) 
-          (bit-and (bit-shift-right k-2sp 4) 0x0f0f0f0f))
+          (bit-and (unsigned-bit-shift-right k-2sp 4) 0x0f0f0f0f))
         k-8sp (bit-or (bit-shift-left (bit-and k-4sp 0x00ff00ff) 8) 
-          (bit-and (bit-shift-right k-4sp 8) 0x00ff00ff))
+          (bit-and (unsigned-bit-shift-right k-4sp 8) 0x00ff00ff))
         k-16sp (bit-or (bit-shift-left k-8sp 16) 
-          (bit-shift-right k-8sp 16) 0x00ff00ff)]
-    k-16sp))
+          (unsigned-bit-shift-right k-8sp 16) 0x00ff00ff)]
+    k))
 
-(defn iterative-FFT [signal]
+(defn reset-complex-atom [a]
+  (complex-from-angle 0))
+
+(defn iterative-fft [signal]
   (let [N (.length signal)
         nbits (log_2 N)
         toinverse (< nbits 0)
         abs-nbits (Math/abs nbits)
         result (new-complex-array N)
-        omega (atom 1)]
+        omega (atom (complex-from-angle 0))]
     (do
       (loop [i 0]
         (when (< i N)
           (set-complex result i signal
-            (bit-shift-right (int (reverse-bits (int i))) (int (- 32 abs-nbits))))
+            (unsigned-bit-shift-right (int (reverse-bits (int i))) 
+              (int (- long-n-bits abs-nbits))))
           (recur (inc i))))
       (println "End of first loop !")
       (loop [p 1]
@@ -154,7 +169,12 @@
                 wk (complex-from-angle theta)]
             (loop [offset 0]
               (when (< offset N)
-                () ;; TODO
-                (recur (offset + step)))))
+                (do
+                  (swap! omega reset-complex-atom)
+                  (loop [k 0]
+                    (when (< (/ step 2))
+                      (do) ;; Rage quit
+                      (recur (inc k)))))
+                (recur (+ offset step)))))
           (recur (inc p))))
       result)))

@@ -1,3 +1,5 @@
+(ns neuhon.windowing)
+
 (def lowest-midi-note-default (int 9))
 (def highest-midi-note-default (int 81))
 (def spectrum-size-default (int 16384))
@@ -97,16 +99,6 @@
         coefs (.coefs win)
         convolution (fn [i] (* (nth spectrum (+ lk i)) (nth coefs i)))]
     (reduce + (map convolution (range (- rk lk))))))
-
-(defn arg-max 
-  ([data] (arg-max data 0 Double/MIN_VALUE 0))
-  ([data begin end] (arg-max data begin Double/MIN_VALUE 0))
-  ([data begin max-value best-index] 
-  (do (if (= (count data) begin)
-    best-index
-    (if (> (nth data begin) max-value)
-      (arg-max data (+ begin 1) (nth data begin) begin)
-      (arg-max data (+ begin 1) max-value best-index))))))
 
 (defn apply-sum [data]
   (reduce + data))

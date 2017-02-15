@@ -1,3 +1,5 @@
+(ns neuhon.profiles)
+
 (defn rotate-left 
   ([profile] (rotate-left profile 1))
   ([profile n]
@@ -5,11 +7,8 @@
       (rotate-left (concat (drop 1 profile) [(first profile)]) (- n 1))
       profile)))
 
-(defn apply-sum [data]
-  (reduce + data))
-
 (defn normalize [data]
-  (let [total (apply-sum data)]
+  (let [total (reduce + data)]
     (map (fn [i] (/ (nth data i) total)) (range (count data)))))
 
 (def key-names ["C" "C#" "D" "Eb" "E" "F" "F#" "G" "G#" "A" "Bb" "B"])
@@ -62,6 +61,16 @@
   (doall (map
     (fn [i] (dot-product chromatic-vector (nth profiles i)))
     (range 12))))
+
+(defn arg-max 
+  ([data] (arg-max data 0 Double/MIN_VALUE 0))
+  ([data begin end] (arg-max data begin Double/MIN_VALUE 0))
+  ([data begin max-value best-index] 
+  (do (if (= (count data) begin)
+    best-index
+    (if (> (nth data begin) max-value)
+      (arg-max data (+ begin 1) (nth data begin) begin)
+      (arg-max data (+ begin 1) max-value best-index))))))
 
 (defn find-best-profile [chromatic-vector]
   (let [major-scores (match-with-profiles chromatic-vector all-major-profiles)

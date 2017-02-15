@@ -1,7 +1,7 @@
-(require '[clojure.java.io :as io])
-
-(import '[java.io DataInputStream DataOutputStream])
-(import '[org.apache.commons.io IOUtils])
+(ns neuhon.wav
+  (:require [clojure.java.io :as io])
+  (:import [java.io DataInputStream DataOutputStream]
+           [org.apache.commons.io IOUtils]))
 
 
 (def wav-data-type Integer/TYPE)
