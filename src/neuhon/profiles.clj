@@ -1,30 +1,42 @@
 (ns neuhon.profiles)
 
-(defn rotate-left 
+;; Key signature names 
+(def key-names ["C" "C#" "D" "Eb" "E" "F" "F#" "G" "G#" "A" "Bb" "B"])
+
+;; Mapping the key signature names to fixed constants, expressed in semi-tones
+(def key-values 
+  (hash-map "C" 0 "C#" 1 "D" 2 "Eb" 3 "E" 4 "F" 5 "F#" 6 "G" 7 "G#" 8 "A" 9 "Bb" 10 "B" 11
+    "Cm" 0 "C#m" 1 "Dm" 2 "Ebm" 3 "Em" 4 "Fm" 5 "F#m" 6 "Gm" 7 "G#m" 8 "Am" 9 "Bbm" 10 "Bm" 11))
+
+;; Mapping the key signature names to 0 or 1
+;; 0 corresponds to a major scale
+;; 1 corresponds to a minor scale
+(def key-types
+  (hash-map "C" 0 "C#" 0 "D" 0 "Eb" 0 "E" 0 "F" 0 "F#" 0 "G" 0 "G#" 0 "A" 0 "Bb" 0 "B" 0
+    "Cm" 1 "C#m" 1 "Dm" 1 "Ebm" 1 "Em" 1 "Fm" 1 "F#m" 1 "Gm" 1 "G#m" 1 "Am" 1 "Bbm" 1 "Bm" 1))
+
+(defn rotate-left
+  "Rotates the element of a sequence to the left"
   ([profile] (rotate-left profile 1))
   ([profile n]
     (if (> n 0) 
       (rotate-left (concat (drop 1 profile) [(first profile)]) (- n 1))
       profile)))
 
-(defn normalize [data]
+(defn normalize
+  "Normalize the elements of an input sequence,
+  after computing their sum"
+  [data]
   (let [total (reduce + data)]
     (map (fn [i] (/ (nth data i) total)) (range (count data)))))
 
-(def key-names ["C" "C#" "D" "Eb" "E" "F" "F#" "G" "G#" "A" "Bb" "B"])
-
-(def key-values 
-  (hash-map "C" 0 "C#" 1 "D" 2 "Eb" 3 "E" 4 "F" 5 "F#" 6 "G" 7 "G#" 8 "A" 9 "Bb" 10 "B" 11
-    "Cm" 0 "C#m" 1 "Dm" 2 "Ebm" 3 "Em" 4 "Fm" 5 "F#m" 6 "Gm" 7 "G#m" 8 "Am" 9 "Bbm" 10 "Bm" 11))
-
-(def key-types
-  (hash-map "C" 0 "C#" 0 "D" 0 "Eb" 0 "E" 0 "F" 0 "F#" 0 "G" 0 "G#" 0 "A" 0 "Bb" 0 "B" 0
-    "Cm" 1 "C#m" 1 "Dm" 1 "Ebm" 1 "Em" 1 "Fm" 1 "F#m" 1 "Gm" 1 "G#m" 1 "Am" 1 "Bbm" 1 "Bm" 1))
-
-(defn key-distance [key-a key-b]
-    (let [value-a (get key-values key-a)
-          value-b (get key-values key-b)]
-      (mod (+ 12 (- value-a value-b)) 12)))
+(defn key-distance 
+  "Computes the distance between two key signatures,
+  expressed in semi-tones"
+  [key-a key-b]
+  (let [value-a (get key-values key-a)
+        value-b (get key-values key-b)]
+    (mod (+ 12 (- value-a value-b)) 12)))
 
 (defn is-same-key? [key-a key-b]
   (= 0 (compare key-a key-b)))

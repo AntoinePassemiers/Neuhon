@@ -1,18 +1,15 @@
 (ns neuhon.spectral)
 
-(defn log_2 [n] (/ (Math/log n) (Math/log 2)))
-
-;; http://asymmetrical-view.com/2009/07/02/clojure-primitive-arrays.html
-;; https://equilibriumofnothing.wordpress.com/2013/10/14/algorithm-iterative-fft/
-
-(set! *warn-on-reflection* false)
+(set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
 
-;; Wav.clj : mean of the two channels / add assertions
-;; iterative fft
-;; low pass filter
-;; Sha'ath profiles
-;; 
+(comment "Disclaimer :
+  ")
+
+(defn log_2 
+  "Applies a binary logarithm on an input number"
+  [n] 
+  (/ (Math/log n) (Math/log 2)))
 
 (def long-n-bits (int 14))
 (def data-type Double/TYPE)
@@ -27,17 +24,20 @@
   ([^doubles signal N] 
     (ComplexArray. (into-array data-type signal) (make-array data-type N))))
 
-(defn complex-to-real [arr]
-  (let [N (alength (.real arr))
-        new_arr (make-array data-type N)]
-    (do 
-      (loop [i 0]
-      (when (< i N)
-        (aset new_arr i (Math/sqrt 
-          (+ (Math/pow (aget (.real arr) i) 2) 
-            (Math/pow (aget (.imag arr) i) 2))))
-        (recur (inc i))))
-      new_arr)))
+(defn complex-to-real 
+  ([^ComplexArray arr]
+    (complex-to-real (.real arr) (.imag arr)))
+  ([^doubles real ^doubles imag]
+    (let [N (alength real)
+          new_arr (make-array data-type N)]
+      (do 
+        (loop [i 0]
+          (when (< i N)
+            (aset new_arr i (Math/sqrt 
+              (+ (Math/pow (aget real i) 2) 
+                (Math/pow (aget imag i) 2))))
+            (recur (inc i))))
+        new_arr))))
 
 (defn get-complex [arr k]
   (Complex. (aget (.real arr) k) (aget (.imag arr) k)))
@@ -125,13 +125,18 @@
                     (recur (inc i))))
             result))))))
 
-(defn unsigned-int [k]
+(defn unsigned-int 
+  "Converts a signed to an unsigned integer"
+  [k]
   (if 
     (< k 0)
     (+ (+ 1 Integer/MAX_VALUE) k)
     k))
 
-(defn reverse-bits [k]
+(defn reverse-bits
+  "Flips the bits of an unsigned integer and stores the result
+  in an unsigned integer"
+  [k]
   (let [k-1sp (bit-or (bit-shift-left (bit-and k 0x55555555) 1) 
           (bit-and (unsigned-bit-shift-right k 1) 0x55555555))
         k-2sp (bit-or (bit-shift-left (bit-and k-1sp 0x33333333) 2) 
@@ -144,10 +149,14 @@
           (unsigned-bit-shift-right k-8sp 16) 0x00ff00ff)]
     k))
 
-(defn reset-complex-atom [a]
+(defn reset-complex-atom 
+  "Resets a complex number atom to 0 + 0.i"
+  [a]
   (complex-from-angle 0))
 
-(defn iterative-fft [signal]
+(defn iterative-fft 
+  "Extremely slow implementation of the iterative FFT"
+  [signal]
   (let [N (.length signal)
         nbits (log_2 N)
         toinverse (< nbits 0)
@@ -161,7 +170,6 @@
             (unsigned-bit-shift-right (int (reverse-bits (int i))) 
               (int (- long-n-bits abs-nbits))))
           (recur (inc i))))
-      (println "End of first loop !")
       (loop [p 1]
         (when (<= p abs-nbits)
           (let [step (bit-shift-left 0x1 p)

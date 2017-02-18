@@ -3,44 +3,67 @@
   (:import [java.io DataInputStream DataOutputStream]
            [org.apache.commons.io IOUtils]))
 
-
+;; Primitive type of the audio raw samples
 (def wav-data-type Integer/TYPE)
 
-;; Header structure
-(def wav-header-size (int 44)) ;; total size : 44 bytes
-(def bits-per-sample-loc (int 34))
-(def bytes-per-bloc-loc (int 32))
-(def number-of-channels-loc (int 22))
-(def number-of-bytes-loc (int 4))
-(def sampling-frequency-loc (int 24))
+;; Header structure, with a default total size of 44 bytes
+;; Each of the values below indicates the location (in bytes) of
+;; its corresponding parameter in the raw header
+(def wav-header-size (int 44))        ;; Total size (44 bytes)
+(def bits-per-sample-loc (int 34))    ;; Number of bits per audio sample
+(def bytes-per-bloc-loc (int 32))     ;; Number of bytes per audio block
+(def number-of-channels-loc (int 22)) ;; Number of channels (2 by default)
+(def number-of-bytes-loc (int 4))     ;; Total number of data bytes
+(def sampling-frequency-loc (int 24)) ;; Sampling frequency of the signal
 
-(def complement-int8  (bit-shift-left 1 7))  ;; TODO
-(def complement-int16 (bit-shift-left 1 15)) ;; TODO
-(def complement-int24 (bit-shift-left 1 23)) ;; TODO
-(def complement-int32 (bit-shift-left 1 31)) ;; TODO
+;; Mask of the sign bit in a 8 bits integer
+(def complement-int8  (bit-shift-left 1 7))
+;; Mask of the sign bit in a 16 bits integer
+(def complement-int16 (bit-shift-left 1 15))
+;; Mask of the sign bit in a 24 bits integer
+(def complement-int24 (bit-shift-left 1 23))
+;; Mask of the sign bit in a 32 bits integer
+(def complement-int32 (bit-shift-left 1 31))
 
-(defn apply-complement [compl condition value]
+(defn apply-complement
+  ;; Converts an unsigned integer to a signed integer using the two's complement method
+  [compl condition value]
   (if condition value (- value compl)))
 
-(defn le2c-bytes-to-int8 [^bytes arr ^double ith] ;; little endian, 2's complement
+(defn le2c-bytes-to-int8 
+  "Converts a byte to a 8-bits integer located at ith in the input stream,
+  using the two's complement method"
+  [^bytes arr ^double ith]
   (apply-complement complement-int8 
     (= 0 (bit-and (aget arr ith) 0x00000080))
     (bit-and (aget arr ith) 0x0000007f)))
 
-(defn le2c-bytes-to-int16 [^bytes arr ^double ith] ;; little endian, 2's complement
+(defn le2c-bytes-to-int16 
+  "Converts 2 bytes to a 16-bits integer, 
+  where the big endian is located at ith in the input stream,
+  and using the two's complement method"
+  [^bytes arr ^double ith]
   (apply-complement complement-int16
     (= 0 (bit-and (aget arr (+ ith 1)) 0x00008000))
     (bit-or (bit-and (aget arr (+ ith 0)) 0x000000ff)
       (bit-and (bit-shift-left (aget arr (+ ith 1)) 8) 0x00007f00))))
 
-(defn le2c-bytes-to-int24 [^bytes arr ^double ith] ;; little endian, 2's complement
+(defn le2c-bytes-to-int24 
+  "Converts 3 bytes to a 24-bits integer, 
+  where the big endian is located at ith in the input stream,
+  and using the two's complement method"
+  [^bytes arr ^double ith]
   (apply-complement complement-int24
     (= 0 (bit-and (aget arr (+ ith 2)) 0x00800000))
     (bit-or (bit-and (aget arr (+ ith 0)) 0x000000ff)
       (bit-and (bit-shift-left (aget arr (+ ith 1)) 8) 0x0000ff00)
       (bit-and (bit-shift-left (aget arr (+ ith 2)) 16) 0x007f0000))))
 
-(defn le2c-bytes-to-int32 [^bytes arr ^double ith] ;; little endian, 2's complement
+(defn le2c-bytes-to-int32 
+  "Converts 4 bytes to a 32-bits integer, 
+  where the big endian is located at ith in the input stream,
+  and using the two's complement method"
+  [^bytes arr ^double ith]
   (apply-complement complement-int32
     (= 0 (bit-and (aget arr (+ ith 3)) 0x80000000))
     (bit-or (bit-and (aget arr (+ ith 0)) 0x000000ff)
@@ -48,8 +71,15 @@
       (bit-and (bit-shift-left (aget arr (+ ith 2)) 16) 0x00ff0000)
       (bit-and (bit-shift-left (aget arr (+ ith 3)) 24) 0x7f000000))))
 
-(defn load-wav [filepath & {:keys [rate] :or {rate 44100}}]
+(defn load-wav
+  "Efficient way to load a raw audio stream into a Clojure array,
+  given a filename and a target sampling frequency. For efficiency purposes,
+  the samples that do not fall in the range of the target sampling frequency
+  are skipped. The target frequency most be a whole unmber divisor of the file
+  sampling frequency."
+  [filepath & {:keys [rate] :or {rate 44100}}]
   (with-open [r (io/input-stream filepath)]
+    ;; Extracts metadata from the raw header
     (let [data (IOUtils/toByteArray (DataInputStream. r))
           bytes-per-sample (/ (int (aget data bits-per-sample-loc)) 8)
           bytes-per-bloc (le2c-bytes-to-int16 data bytes-per-bloc-loc)
@@ -65,8 +95,12 @@
             (= bytes-per-sample 1) le2c-bytes-to-int8
             :else le2c-bytes-to-int16)]
       (do
+        ;; Assuming the sampling frequency (after resampling) is equal to 44100 Hz
+        (assert (= (int sampling-frequency) 44100))
+        ;; Assuming the audio has been recorded in stereo mode, 2 channels
         (assert (= number-of-channels 2))
-        (doall 
+        ;; Loads the audio samples and computes the mean of the two channels
+        (doall
           (map 
             (fn [i] (/ 
               (+ (int-converter data i) 

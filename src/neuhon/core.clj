@@ -7,7 +7,8 @@
         [neuhon.wav]
         [neuhon.spectral]
         [neuhon.windowing]
-        [neuhon.profiles]))
+        [neuhon.profiles]
+        [neuhon.utils]))
 
 (def db-base-path (str "D://KeyFinderDB/"))
 (def csv-path (str "D://KeyFinderDB/DOC/KeyFinderV2Dataset.csv"))
@@ -24,20 +25,27 @@
   (print-function (format "Predicted key : %s (%s)\n\n" 
     (.predicted-key metadata) (str (.distance metadata)))))
 
-(defn find-key [filepath]
-  (let [signal (load-wav filepath :rate sampling-freq-default)
-        N (count signal)
-        test-signal (take spectrum-size-default (drop 460000 signal))
-        test-size (count test-signal)
+(defn find-key-locally [signal]
+  ;; TODO : don't need the take/drop anymore -> copy into array
+  (let [frames (take spectrum-size-default (drop 400000 signal))
         window (create-window spectrum-size-default nuttall-window-func) ;; Not working
-        c (complex-seq-to-real (iterative-fft
-            (new-complex-seq test-signal spectrum-size-default)))
-        cqt (doall (map (fn [i] (apply-win-on-spectrum c i)) 
+        real (convert-to-array frames spectrum-size-default)
+        imag (make-array data-type spectrum-size-default) ;; TODO : Avoid memory allocation
+        fft (Fft/transform real imag)
+        c (complex-to-real real imag)
+        cqt (doall (map 
+          (fn [i] (apply-win-on-spectrum c i))
           (range (count cosine-windows))))
         chromatic-vector (map (fn [i] (note-score cqt i)) (range 12))]
-    (do 
-      (println (count c))
+    (do
+      (println (seq cqt))
+      (println chromatic-vector)
       (find-best-profile chromatic-vector))))
+
+(defn find-key-globally [filepath]
+  (let [signal (load-wav filepath :rate sampling-freq-default)
+        N (count signal)]
+    (find-key-locally signal)))
 
 (clojure.java.io/file out-path)
 (defn process-all []
@@ -58,7 +66,7 @@
                 target-key (nth line 2)
                 audio-filename (nth line 3)
                 audio-filepath (clojure.string/join [db-base-path audio-filename])
-                predicted-key (find-key audio-filepath)
+                predicted-key (find-key-globally audio-filepath)
                 metadata (Metadata. i artist title target-key predicted-key
                   (key-distance predicted-key target-key))]
             (do
@@ -74,10 +82,10 @@
               (flush)
               (display-result metadata (fn [s] (.write wrtr s)))))
           (recur (inc i))))
-        (println @perfect-matches)
-        (println @out-of-a-fifth-matches)
-        (println @relative-matches)
-        (println @parallel-matches)
-        (println @wrong-keys))))))
+        (println (format "---> Perfect matches        : %4d" @perfect-matches))
+        (println (format "---> Out-of-a-fifth matches : %4d" @out-of-a-fifth-matches))
+        (println (format "---> Relative matches       : %4d" @relative-matches))
+        (println (format "---> Parallel matches       : %4d" @parallel-matches))
+        (println (format "---> Wrong predictions      : %4d" @wrong-keys)))))))
 
 (process-all)
