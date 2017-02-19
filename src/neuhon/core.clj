@@ -5,52 +5,99 @@
             [clojure.java.io :as io])
   (:use [clojure.java.io]
         [neuhon.wav]
-        [neuhon.spectral]
         [neuhon.windowing]
         [neuhon.profiles]
+        [neuhon.spectral]
         [neuhon.utils]))
 
+;; hardcoded path
+;; Base folder where the wav files are located
 (def db-base-path (str "D://KeyFinderDB/"))
-(def csv-path (str "D://KeyFinderDB/DOC/KeyFinderV2Dataset.csv"))
-(def out-path (str "output.txt"))
 
+;; csv file containing the title, artist, wav filename and label of each song
+(def csv-path (str db-base-path "DOC/KeyFinderV2Dataset.csv"))
+
+;; output file storing the predicted key signatures
+(def out-filename (str "output.txt"))
+
+;; Metadata type for keeping the metadata of a file, as well as its predicted key signature
 (deftype Metadata [file-id artist title target-key predicted-key distance])
 
-(defn display-result [metadata print-function]
+(defn display-result 
+  "Generic print function for displaying a prediction.
+  The results can be displayed in a file or in the standard output."
+  [metadata print-function]
   (print-function (format "File number %4d\n" (.file-id metadata)))
   (print-function "----------------\n")
   (print-function (format "Artist        : %s\n" (.artist metadata)))
   (print-function (format "Title         : %s\n" (.title metadata)))
   (print-function (format "Target key    : %s\n" (.target-key metadata)))
-  (print-function (format "Predicted key : %s (%s)\n\n" 
+  (print-function (format "Predicted key : %s (%s)\n\n"
     (.predicted-key metadata) (str (.distance metadata)))))
 
-(defn find-key-locally [signal]
-  ;; TODO : don't need the take/drop anymore -> copy into array
-  (let [frames (take spectrum-size-default (drop 400000 signal))
-        window (create-window spectrum-size-default nuttall-window-func) ;; Not working
-        real (convert-to-array frames spectrum-size-default)
-        imag (make-array data-type spectrum-size-default) ;; TODO : Avoid memory allocation
-        fft (Fft/transform real imag)
-        c (complex-to-real real imag)
-        cqt (doall (map 
+(defn find-key-locally
+  "Predict the key signature of a song at a certain location of it.
+  This function must be called multiple times for a same song at 
+  different locations to enhance its accuracy. This can be operated
+  using a sliding window, and making a weighted average of the local predictions."
+  [key-counters signal start]
+  (let [window (create-window spectrum-size-default nuttall-window-func) ;; Not stable
+        real (convert-to-array signal start spectrum-size-default)
+        imag (make-array data-type spectrum-size-default)
+        fft (Fft/transform real imag) ;; Fast Fourier Transform
+        c (complex-to-real real imag) ;; Complex spectrum to real spectrum conversion
+        cqt (doall (map               ;; Constant-Q Transform
           (fn [i] (apply-win-on-spectrum c i))
           (range (count cosine-windows))))
         chromatic-vector (map (fn [i] (note-score cqt i)) (range 12))]
     (do
-      (println (seq cqt))
-      (println chromatic-vector)
       (find-best-profile chromatic-vector))))
 
-(defn find-key-globally [filepath]
+(defn find-key-globally
+  "Predict the key signature of a song by making multiple local predictions
+  and averaging the results. The process is as follows :
+  1) Loading the wav file at a low sampling rate (ex : 4410 Hz)
+     Aliasing effects are not taken into account yet
+  2) Initialize a sliding window with fixed size (ex : 16384 samples)
+  3) Predict the key signature within the temporal window (call find-key-locally)
+     - Compute the complex FFT
+     - Convert it to a real FFT
+     - Convolute the spectrum at logarithmically-spaced bins with spectral windows
+       and sum the results to new coefficients
+     - Reshape the new coefficients into a matrix of 12 columns
+     - Make a weighted sum of the coefficients over the rows -> new chromatic vector
+     - Find the profile that matches the chromatic vector the best
+     - The best profile indicates which key signature is the most probable
+  4) Increment the key counter corresponding to the locally-predicted key
+  5) Slide the temporal window
+  6) Start over from step 3
+  7) Predict using the highest key counter"
+  [filepath]
   (let [signal (load-wav filepath :rate sampling-freq-default)
-        N (count signal)]
-    (find-key-locally signal)))
+        N (count signal)
+        key-counters (make-array data-type 24)
+        step-size (int (Math/floor (/ N spectrum-size-default)))]
+    ;; (ste signal 4000 spectrum-size-default) ;; Computes short term energy
+    (println (range 0 (* step-size spectrum-size-default) spectrum-size-default))
+    (doall
+      (map
+        (fn [i]
+          (do
+            (println i (* step-size spectrum-size-default))
+            (inc-array-element key-counters 
+              (find-key-locally key-counters signal i))))
+        (range 0 (* step-size spectrum-size-default) spectrum-size-default)))
+    (key-to-str (arg-max (seq key-counters)))))
 
-(clojure.java.io/file out-path)
-(defn process-all []
+;;(clojure.java.io/file out-filename)
+(defn process-all
+  "Function for evaluating the final key prediction algorithm.
+  This is done by parsing a csv file (containing titles, artists, filenames
+  and encoded key signatures), predicting the key signature for each wav file
+  and comparing with the real, hand-encoded key signatures."
+  [db-path]
   (with-open [in-file (io/reader csv-path)]
-    (with-open [wrtr (writer out-path)]
+    (with-open [wrtr (writer out-filename)]
       (let [csv-seq (csv/read-csv in-file :separator (first ";"))
             perfect-matches (atom 0)
             relative-matches (atom 0)
@@ -65,7 +112,7 @@
                 title (nth line 1)
                 target-key (nth line 2)
                 audio-filename (nth line 3)
-                audio-filepath (clojure.string/join [db-base-path audio-filename])
+                audio-filepath (clojure.string/join [db-path audio-filename])
                 predicted-key (find-key-globally audio-filepath)
                 metadata (Metadata. i artist title target-key predicted-key
                   (key-distance predicted-key target-key))]
@@ -73,10 +120,10 @@
               (cond
                 (is-same-key? predicted-key target-key) 
                   (swap! perfect-matches inc)
-                (is-left-right-neighboor? predicted-key target-key) 
+                (is-out-of-a-fifth? predicted-key target-key)
                   (swap! out-of-a-fifth-matches inc)
-                (is-radial-neighboor? predicted-key target-key) 
-                  (swap! relative-matches inc)
+                ;; (is-relative? predicted-key target-key) 
+                ;;   (swap! relative-matches inc)
                 :else (swap! wrong-keys inc))
               (display-result metadata print)
               (flush)
@@ -88,4 +135,4 @@
         (println (format "---> Parallel matches       : %4d" @parallel-matches))
         (println (format "---> Wrong predictions      : %4d" @wrong-keys)))))))
 
-(process-all)
+(process-all db-base-path)

@@ -1,10 +1,9 @@
 (ns neuhon.spectral)
 
-(set! *warn-on-reflection* true)
+(set! *warn-on-reflection* false)
 (set! *unchecked-math* true)
 
-(comment "Disclaimer :
-  ")
+(comment "Disclaimer : ") ;; TODO
 
 (defn log_2 
   "Applies a binary logarithm on an input number"

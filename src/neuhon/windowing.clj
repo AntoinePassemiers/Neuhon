@@ -67,16 +67,14 @@
   (let [convolution (fn [i] (* (nth signal i) (nth window i)))]
     (map convolution (range (count window)))))
 
-(deftype Window 
-  "A spectral window type for storing the window coefficients,
-  as well of the left and right bounds of the window"
-  [coefs lk rk])
+(comment "A spectral window type for storing the window coefficients,
+  as well of the left and right bounds of the window")
+(deftype Window [coefs lk rk])
 
-(deftype WindowMatrix 
-  "An abstract type for storing all the windows required by the CQT algorithm,
+(comment "An abstract type for storing all the windows required by the CQT algorithm,
   where each of the windows will be convoluted with the spectrum to compute
-  one of the coefficients of the extended chromatic vector"
-  [coefs lks rks]
+  one of the coefficients of the extended chromatic vector")
+(deftype WindowMatrix [coefs lks rks]
   clojure.lang.IPersistentCollection
   (seq [self] (if (seq coefs) self nil))
   (cons [self o] (WindowMatrix. coefs (conj lks o) (conj rks o)))
@@ -103,7 +101,7 @@
 (defn get-Q-from-p 
   "Computes the constant Q, based on an arbitrary parameter p"
   [p]
-  (* p (- (long (Math/pow 2 (/ 1.0 12))) 1)))
+  (* p (- (Math/pow 2 (/ 1.0 12)) 1)))
 
 (defn win-left-bound
   "Left bound index of the spectral window that corresponds to fk"
@@ -130,20 +128,26 @@
         win (make-array win-coef-type win-size)]
     (Window. (map (fn [i] (cosine-win-element (+ lk i) lk rk)) (range 0 win-size)) lk rk)))
 
-;; Pre-computes a temporal cosine window
+;; Pre-computes a sequence of temporal cosine windows with fixed size
 (def cosine-windows 
   (doall 
     (map 
-      (fn [d] 
+      (fn [d]
         (cosine-win 
           (get-Q-from-p p-default) 
           (midi-to-hertz d) spectrum-size-default sampling-freq-default))
         (range lowest-midi-note-default highest-midi-note-default))))
 
+;; Converts a sequence of Windows into a WindowMatrix
 (def winmat (WindowMatrix. 
   (doall (map (fn [win] (.coefs win)) cosine-windows))
   (doall (map (fn [win] (.lk win)) cosine-windows)) 
   (doall (map (fn [win] (.rk win)) cosine-windows))))
+
+(defn apply-sum
+  "Sums the elements of an input sequence"
+  [data]
+  (reduce + data))
 
 (defn apply-win-on-spectrum 
   "Computes a QCT coefficient by applying a spectral window,
@@ -154,12 +158,7 @@
         rk (.rk win)
         coefs (.coefs win)
         convolution (fn [i] (* (nth spectrum (+ lk i)) (nth coefs i)))]
-    (reduce + (map convolution (range (- rk lk))))))
-
-(defn apply-sum
-  "Sums the elements of an input sequence"
-  [data]
-  (reduce + data))
+    (apply-sum (map convolution (range (- rk lk))))))
 
 (defn note-subset
   "Returns the values in an extended chromatic vector

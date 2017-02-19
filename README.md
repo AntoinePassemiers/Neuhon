@@ -1,6 +1,6 @@
-# krazy-noises
+# Neuhon
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure software for key signature detection in musical audio files
 
 ## Usage
 

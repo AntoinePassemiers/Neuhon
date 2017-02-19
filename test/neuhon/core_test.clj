@@ -1,6 +1,6 @@
-(ns krazy-noises.core-test
+(ns neuhon.core-test
   (:require [clojure.test :refer :all]
-            [krazy-noises.core :refer :all]))
+            [neuhon.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."
