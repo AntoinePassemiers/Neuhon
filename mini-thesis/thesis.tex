@@ -1,0 +1,105 @@
+\documentclass[letterpaper]{article}
+\usepackage{natbib,alifexi}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+\usepackage{abstract}
+\usepackage{textcomp}
+
+\title{Etude d\textquotesingle algorithmes pour la détection de la tonalité de fichiers musicaux et implémentation en Clojure}
+\author{Antoine Passemiers$$ \\
+\mbox{}\\
+$$Université Libre de Bruxelles \\
+apassemi@ulb.ac.be}
+
+\begin{document}
+\maketitle
+
+\renewcommand{\abstractname}{Résumé}    % Change the abstract title
+\renewcommand\bibname{Bibliographie}        % Change the bib title
+\renewcommand{\refname}{Bibliographie}
+
+\begin{abstract}
+
+Le projet consiste en la discussion de différents algorithmes relatifs à la détection 
+automatisée de tonalité de fichiers musicaux, la conception d\textquotesingle 
+un de ces algorithmes à l\textquotesingle aide du paradigme fonctionnel,
+et la comparaison de son efficacité avec celle obtenue avec une approche impérative.
+ L\textquotesingle algorithme de détection sera évalué sur les critères de la rapidité 
+d\textquotesingle exécution, ainsi que la précision de la détection.
+ De fait, les approches impératives et fonctionnelles seront comparées sur ces deux aspects.
+
+\end{abstract}
+
+\section{Introduction}
+
+La tonalité d\textquotesingle une oeuvre musicale se caractérise par
+l\textquotesingle ensemble des sons formant une même gamme diatonique. 
+A la différence de la gamme, où les sons se succèdent de façon contigüe,
+la tonalité (ou ton) regroupe des sons qui peuvent être disjoints et/ou superposés \citep{AD}.
+En conséquence, nous nous intéressons à l\textquotesingle analyse de mélodies polyphoniques, 
+où plusieurs notes peuvent être jouées en même temps.
+
+L\textquotesingle algorithme utilisé pour la détection de la tonalité repose en partie
+sur la solution proposée par Ibrahim Sha\textquotesingle ath lors 
+de la conception du logiciel KeyFinder \citep{IS}.
+
+TODO
+
+La précision de la détection est évaluée à l\textquotesingle aide d\textquotesingle une base 
+de données, constituée de 1000 fichiers musicaux au format wav, dont les tonalités sont connues
+et inscrites dans un fichier csv. Ces fichiers sont identiques à ceux utilisés par 
+Ibrahim Sha\textquotesingle ath dans le cadre de sa recherche.
+
+TODO
+
+\citep{SP} \citep{AT} \citep{JP}
+
+\section{Considérations théoriques}
+
+Le signal audio est premièrement extrait du fichier wav, puis la moyenne entre les 
+deux canaux est effectuée si le fichier a été enregistré en stéréo. En effet il n\textquotesingle
+est pas nécessaire de prendre en compte le panoramique puisque celui-ci n\textquotesingle a que 
+peu d\textquotesingle influence sur la mélodie dans le domaine spectral. 
+Etant donné que les notes jouées sont uniquement caractérisées par leur fréquence fondamentale,
+il n\textquotesingle est pas nécessaire de considérer l\textquotesingle entièreté du spectre
+du fichier musical. De fait, la fréquence d\textquotesingle échantillonnage est abaissée à un dixième 
+de la fréquence standard (4410 Hz), mais ce sous-échantillonnage est susceptible de provoquer des
+phénomènes d\textquotesingle aliasing. Contrairement à la solution de Sh\textquotesingle ath, 
+qui gère les problèmes d\textquotesingle aliasing sonore par l\textquotesingle application 
+d\textquotesingle un filtre passe-bas, une approche plus simpliste et plus rapide se limiterait à
+l\textquotesingle application d\textquotesingle une moyenne mobile sur une fenêtre glissante
+de taille arbitraire. L\textquotesingle avantage de la méthode est de bénéficier d\textquotesingle effets
+passe-bas sans devoir effectuer de calculs dans le domaine fréquentiel. Pour ce qui est de la taille
+de la fenêtre temporelle, il s\textquotesingle agit d\textquotesingle un paramètre fixé durant
+l\textquotesingle évaluation de l\textquotesingle algorithme.
+
+TODO - suite
+
+\subsection{}
+
+\section{Implémentation en Clojure}
+
+TODO
+
+\subsection{Implémentation en Python ?}
+
+TODO - Ajouts de modèles de Markov cachés pour la gestion de l\textquotesingle aspect 
+temporel ? Approche machine learning ?
+
+\section{Résultats}
+
+\subsection{Rapidité d\textquotesingle exécution}
+
+TODO
+
+\subsection{Précision des algorithmes}
+
+TODO
+
+\footnotesize
+\bibliographystyle{apalike}
+\bibliography{thesis}
+
+
+\end{document}
