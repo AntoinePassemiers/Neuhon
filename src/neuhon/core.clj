@@ -1,6 +1,6 @@
 (ns neuhon.core
   (:gen-class)
-  (:import (com.example.spectral Fft))
+  (:import (org.jtransforms.fft DoubleFFT_1D))
   (:require [clojure.data.csv :as csv]
             [clojure.java.io :as io])
   (:use [clojure.java.io]
@@ -43,9 +43,8 @@
   [key-counters signal start]
   (let [window (create-window spectrum-size-default nuttall-window-func) ;; Not stable
         real (convert-to-array signal start spectrum-size-default)
-        imag (make-array data-type spectrum-size-default)
-        fft (Fft/transform real imag) ;; Fast Fourier Transform
-        c (complex-to-real real imag) ;; Complex spectrum to real spectrum conversion
+        c (.realForwardFull (DoubleFFT_1D. spectrum-size-default) real) ;; Fast Fourier Transform
+        ;; c (complex-to-real real imag) ;; Complex spectrum to real spectrum conversion
         cqt (doall (map               ;; Constant-Q Transform
           (fn [i] (apply-win-on-spectrum c i))
           (range (count cosine-windows))))

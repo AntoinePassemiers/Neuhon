@@ -1,8 +1,5 @@
 (ns neuhon.utils)
 
-(ns neuhon.NotFullyImplementedError
-  (:gen-class :extends java.lang.Exception))
-
 (defn inc-array-element
   "Increment an array at a given index"
   [arr i]
@@ -32,11 +29,3 @@
       (map
         (fn [i] (pow2 (nth data i)))
         (range start (+ start length))))))
-
-(defn todo
-  "Prevents a non-fully implemented function from being called"
-  [func]
-  (fn [& args]
-    (throw 
-      (NotFullyImplementedError. 
-        (str (-> #'func meta :name) " is not implemented yet")))))

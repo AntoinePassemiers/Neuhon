@@ -1,4 +1,14 @@
-(ns neuhon.profiles)
+(ns neuhon.profiles
+  (:gen-class)
+  (:use [clojure.java.io]
+        [neuhon.utils]))
+
+(defn normalize
+  "Normalize the elements of an input sequence,
+  after computing their sum"
+  [data]
+  (let [total (reduce + data)]
+    (map (fn [i] (/ (nth data i) total)) (range (count data)))))
 
 ;; Sha'ath average profile of the major scale
 (def major-base-profile (normalize [6.4 2.2 3.5 2.3 4.4 4.1 2.5 5.2 2.4 3.7 2.3 2.9]))
@@ -28,13 +38,6 @@
     (if (> n 0) 
       (rotate-left (concat (drop 1 profile) [(first profile)]) (- n 1))
       profile)))
-
-(defn normalize
-  "Normalize the elements of an input sequence,
-  after computing their sum"
-  [data]
-  (let [total (reduce + data)]
-    (map (fn [i] (/ (nth data i) total)) (range (count data)))))
 
 (defn key-distance 
   "Computes the distance between two key signatures,
@@ -74,14 +77,14 @@
       (= (get key-types key-a) (get key-types key-b))
       (or (= distance 5) (= distance 7)))))
 
-(todo
-  (defn is-relative? 
-    "Tells whether two keys correspond to parallel scales or not"
-    [key-a key-b]
-    (let [distance (key-distance key-a key-b)]
-      (and 
-        (= (get key-types key-a) (get key-types key-b))
-        (or (= distance 5) (= distance 7))))))
+;; TODO
+(defn is-relative? 
+  "Tells whether two keys correspond to parallel scales or not"
+  [key-a key-b]
+  (let [distance (key-distance key-a key-b)]
+    (and 
+      (= (get key-types key-a) (get key-types key-b))
+      (or (= distance 5) (= distance 7)))))
 
 (comment "Generates all the possible profiles by rotating the two existing ones :
   major C, major C#, ... major B
