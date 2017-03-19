@@ -1,4 +1,6 @@
-(ns neuhon.utils)
+(ns neuhon.utils
+  (:gen-class)
+  (:use [clojure.core.matrix]))
 
 (defn inc-array-element
   "Increment an array at a given index"
@@ -9,6 +11,16 @@
   "Converts an input sequence to a Java array"
   [sequence start length]
   (let [new_array (make-array Double/TYPE length)]
+    (doall
+      (map
+        (fn [i] (aset new_array i (double (nth sequence (+ start i)))))
+        (range length)))
+    new_array))
+
+(defn convert-to-complex-array
+  "Converts an input sequence to a double-sized Java array"
+  [sequence start length]
+  (let [new_array (make-array Double/TYPE (* 2 length))]
     (doall
       (map
         (fn [i] (aset new_array i (double (nth sequence (+ start i)))))

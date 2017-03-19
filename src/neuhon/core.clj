@@ -4,6 +4,7 @@
   (:require [clojure.data.csv :as csv]
             [clojure.java.io :as io])
   (:use [clojure.java.io]
+        [clojure.core.matrix]
         [neuhon.wav]
         [neuhon.windowing]
         [neuhon.profiles]
@@ -42,12 +43,13 @@
   using a sliding window, and making a weighted average of the local predictions."
   [key-counters signal start]
   (let [window (create-window spectrum-size-default nuttall-window-func) ;; Not stable
-        real (convert-to-array signal start spectrum-size-default)
-        c (.realForwardFull (DoubleFFT_1D. spectrum-size-default) real) ;; Fast Fourier Transform
+        signal (convert-to-complex-array signal start spectrum-size-default)
+        c (.realForwardFull (DoubleFFT_1D. spectrum-size-default) signal) ;; Fast Fourier Transform
         ;; c (complex-to-real real imag) ;; Complex spectrum to real spectrum conversion
-        cqt (doall (map               ;; Constant-Q Transform
-          (fn [i] (apply-win-on-spectrum c i))
-          (range (count cosine-windows))))
+        cqt (doall ;; Constant-Q Transform
+          (map
+            (fn [i] (apply-win-on-spectrum c i))
+            (range (count cosine-windows))))
         chromatic-vector (map (fn [i] (note-score cqt i)) (range 12))]
     (do
       (find-best-profile chromatic-vector))))
@@ -77,12 +79,10 @@
         key-counters (make-array data-type 24)
         step-size (int (Math/floor (/ N spectrum-size-default)))]
     ;; (ste signal 4000 spectrum-size-default) ;; Computes short term energy
-    (println (range 0 (* step-size spectrum-size-default) spectrum-size-default))
     (doall
       (map
         (fn [i]
           (do
-            (println i (* step-size spectrum-size-default))
             (inc-array-element key-counters 
               (find-key-locally key-counters signal i))))
         (range 0 (* step-size spectrum-size-default) spectrum-size-default)))

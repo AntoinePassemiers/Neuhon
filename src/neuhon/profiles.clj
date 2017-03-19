@@ -1,6 +1,7 @@
 (ns neuhon.profiles
   (:gen-class)
   (:use [clojure.java.io]
+        [clojure.core.matrix]
         [neuhon.utils]))
 
 (defn normalize
