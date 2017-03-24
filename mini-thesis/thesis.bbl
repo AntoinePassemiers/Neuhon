@@ -1,8 +1,16 @@
 \begin{thebibliography}{}
 
+\bibitem[Bengio and Frasconi, 1996]{YB}
+Bengio, Y. and Frasconi, P. (1996).
+\newblock Input-output hmm's for sequence processing.
+
 \bibitem[Danhauser, 1929]{AD}
 Danhauser, A. (1929).
 \newblock {\em Théorie de la Musique}.
+
+\bibitem[Kumar, 2015]{SK}
+Kumar, S. (2015).
+\newblock Clojure high performance programming.
 
 \bibitem[Pauws, 2004]{SP}
 Pauws, S. (2004).

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99992 (MiKTeX 2.9 64-bit) (preloaded format=xelatex 2016.4.6)  20 FEB 2017 21:06
+This is XeTeX, Version 3.14159265-2.6-0.99992 (MiKTeX 2.9 64-bit) (preloaded format=xelatex 2016.4.6)  24 MAR 2017 18:59
 entering extended mode
 **C:/Users/Xanto183/krazy-noises/mini-thesis/thesis.tex
 (C:/Users/Xanto183/krazy-noises/mini-thesis/thesis.tex
@@ -306,25 +306,26 @@ Requested font "ec-lmbx9" at 9.0pt
 Requested font "ts1-lmr9" at 9.0pt
 Requested font "ec-lmbx12" at 12.0pt
 Requested font "ts1-lmr10" at 10.0pt
-Requested font "ec-lmr10" at 10.95pt
-Requested font "ec-lmbx10" at 10.95pt
-Requested font "ts1-lmbx10" at 10.95pt
- (thesis.bbl
+Requested font "ec-lmbx10" at 10.0pt
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+(thesis.bbl [1
+
+
+
+]
 Requested font "ec-lmri9" at 9.0pt
- [1
-
-
-
-])
-[2
+) [2
 
 ] (thesis.aux) ) 
 Here is how much of TeX's memory you used:
- 2036 strings out of 428721
- 26175 string characters out of 3164047
- 75404 words of memory out of 3000000
- 5380 multiletter control sequences out of 15000+200000
- 58924 words of font info for 48 fonts, out of 3000000 for 9000
+ 2039 strings out of 428721
+ 26188 string characters out of 3164047
+ 77404 words of memory out of 3000000
+ 5384 multiletter control sequences out of 15000+200000
+ 55560 words of font info for 46 fonts, out of 3000000 for 9000
  1096 hyphenation exceptions out of 8191
  34i,10n,22p,335b,264s stack positions out of 5000i,500n,10000p,200000b,50000s
 

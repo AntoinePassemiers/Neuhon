@@ -22,46 +22,55 @@ apassemi@ulb.ac.be}
 \begin{abstract}
 
 Le projet consiste en la discussion de différents algorithmes relatifs à la détection 
-automatisée de tonalité de fichiers musicaux, la conception d\textquotesingle 
-un de ces algorithmes à l\textquotesingle aide du paradigme fonctionnel,
-et la comparaison de son efficacité avec celle obtenue avec une approche impérative.
- L\textquotesingle algorithme de détection sera évalué sur les critères de la rapidité 
-d\textquotesingle exécution, ainsi que la précision de la détection.
- De fait, les approches impératives et fonctionnelles seront comparées sur ces deux aspects.
+automatisée de tonalité de fichiers musicaux, l\textquotesingle implémentation de ceux-ci en Python,
+ainsi qu\textquotesingle une réflexion sur la comptabilité de ces derniers avec le paradigme fonctionnel.
+Le choix de l\textquotesingle algorithme a concevoir selon l\textquotesingle approche fonctionnelle sera basé
+sur des critères de rapidité d\textquotesingle exécution et de précision de la détection. 
+L\textquotesingle algorithme final sera alors implémenté en Clojure.
 
 \end{abstract}
 
 \section{Introduction}
 
-La tonalité d\textquotesingle une œuvre musicale se caractérise par
+La tonalité d\textquotesingle une oeuvre musicale se caractérise par
 l\textquotesingle ensemble des sons formant une même gamme diatonique. 
 A la différence de la gamme, où les sons se succèdent de façon contigüe,
 la tonalité (ou ton) regroupe des sons qui peuvent être disjoints et/ou superposés \citep{AD}.
 En conséquence, nous nous intéressons à l\textquotesingle analyse de mélodies polyphoniques, 
 où plusieurs notes peuvent être jouées en même temps.
 
-L\textquotesingle algorithme utilisé pour la détection de la tonalité repose en partie
+En particulier, nous allons nous pencher sur deux catégories d\textquotesingle algorithmes :
+ceux basés sur des modèles cognitifs, et ceux incluant des notions d\textquotesingle 
+apprentissage automatique. Les premiers tentent d\textquotesingle intégrer au mieux les connaissances
+de la théorie musicale et reposent sur la façon dont les personnes reconnaissent les différentes tonalités,
+alors que les autres utilisent l\textquotesingle inférence statistique pour déterminer celles-ci.
+
+L\textquotesingle approche cognitive utilisée pour la détection de la tonalité repose en partie
 sur la solution proposée par Ibrahim Sha\textquotesingle ath lors 
-de la conception du logiciel KeyFinder \citep{IS}.
-
-TODO
-
-La précision de la détection est évaluée à l\textquotesingle aide d\textquotesingle une base 
-de données, constituée de 1000 fichiers musicaux au format wav, dont les tonalités sont connues
-et inscrites dans un fichier csv. Ces fichiers sont identiques à ceux utilisés par 
+de la conception du logiciel KeyFinder \citep{IS}. La précision de la détection est évaluée 
+à l\textquotesingle aide d\textquotesingle une base 
+de données, constituée de 250 fichiers musicaux au format wav, dont les tonalités sont connues
+et inscrites dans un fichier csv. Ces fichiers font partie de ceux utilisés par 
 Ibrahim Sha\textquotesingle ath dans le cadre de sa recherche.
 
-TODO
+Pour ce qui est de la partie apprentissage automatique, les méthodes présentées seront principalement
+en lien avec les modèles de Markov cachés. Leur évaluation se fera en divisant la base de données en
+un jeu de données d\textquotesingle apprentissage et un jeu de données de validation (respectivement
+60 \% et 40 \% du jeu de données d\textquotesingle origine). Ce mini-mémoire se voulant concis et 
+centré sur les objectifs décrits, le lecteur est supposé déjà disposer de connaissances suffisantes en 
+apprentissage automatique, en théorie musicale et en traitement logiciel de signaux.
 
-\citep{SP} \citep{AT} \citep{JP}
+TODO : \citep{SP} \citep{AT}
 
 \section{Considérations théoriques}
+
+\subsubsection{Modèle cognitif}
 
 Le signal audio est premièrement extrait du fichier wav, puis la moyenne entre les 
 deux canaux est effectuée si le fichier a été enregistré en stéréo. En effet il n\textquotesingle
 est pas nécessaire de prendre en compte le panoramique puisque celui-ci n\textquotesingle a que 
 peu d\textquotesingle influence sur la mélodie dans le domaine spectral. 
-Etant donné que les notes jouées sont uniquement caractérisées par leur fréquence fondamentale,
+Étant donné que les notes jouées sont uniquement caractérisées par leur fréquence fondamentale,
 il n\textquotesingle est pas nécessaire de considérer l\textquotesingle entièreté du spectre
 du fichier musical. De fait, la fréquence d\textquotesingle échantillonnage est abaissée à un dixième 
 de la fréquence standard (4410 Hz), mais ce sous-échantillonnage est susceptible de provoquer des
@@ -76,26 +85,37 @@ l\textquotesingle évaluation de l\textquotesingle algorithme.
 
 TODO - suite
 
-\subsection{}
+\subsubsection{Modèles de Markov Cachés}
+
+TODO : \citep{JP}
+
+\subsubsection{Modèles de Markov Cachés de type entrée-sortie (IO-HMM)}
+
+TODO : \citep{YB}
+
+\subsubsection{Résultats}
+
+\begin{table}[h]
+\center{
+\begin{tabular}{|c|c|c|c|c|c|}\hline
+Méthode & ACC & REL & PAR & OOF & TOT \\ \hline\hline
+COGN & --  & -- & -- & -- & -- \\
+EAA & -- & -- & -- & -- & -- \\
+HMM & -- & -- & -- & -- & -- \\
+IO-HMM & -- & -- & -- & -- & -- \\ \hline
+\end{tabular}
+}
+\vskip 0.25cm
+\caption{Évaluation des méthodes présentées selon différents indices :
+ACC (accuracy), REL (relative keys), PAR (parallel keys) et OOF (out-of-a-fifth keys).
+Le tableau reprend les scores du modèle cognitif (COGN), du modèle d\textquotesingle autocorrélation,
+des modèles de Markov cachés (HMM), et du modèle de Markov caché d\textquotesingle entrée-sortie (IO-HMM).}
+\end{table}
 
 \section{Implémentation en Clojure}
 
-TODO
+TODO : \citep{SK}
 
-\subsection{Implémentation en Python ?}
-
-TODO - Ajouts de modèles de Markov cachés pour la gestion de l\textquotesingle aspect 
-temporel ? Approche machine learning ?
-
-\section{Résultats}
-
-\subsection{Rapidité d\textquotesingle exécution}
-
-TODO
-
-\subsection{Précision des algorithmes}
-
-TODO
 
 \footnotesize
 \bibliographystyle{apalike}
