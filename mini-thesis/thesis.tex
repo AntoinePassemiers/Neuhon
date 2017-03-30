@@ -80,14 +80,19 @@ d\textquotesingle un filtre passe-bas, une approche plus simpliste et plus rapid
 l\textquotesingle application d\textquotesingle une moyenne mobile sur une fenêtre glissante
 de taille arbitraire. L\textquotesingle avantage de la méthode est de bénéficier d\textquotesingle effets
 passe-bas sans devoir effectuer de calculs dans le domaine fréquentiel. Pour ce qui est de la taille
-de la fenêtre temporelle, il s\textquotesingle agit d\textquotesingle un paramètre fixé durant
+de la fenêtre temporelle, il s\textquotesingle agit d\textquotesingle un hyper-paramètre fixé durant
 l\textquotesingle évaluation de l\textquotesingle algorithme.
 
 TODO - suite
 
 \subsubsection{Méthodes basées sur l\textquotesingle auto-corrélation}
 
-Les fonctions d\textquotesingle auto-corrélation sot cool car indépendantes des phases du spectre.
+Les algorithmes reposant sur l\textquotesingle utilisation de fonctions d\textquotesingle auto-corrélation sont plus souples
+car l\textquotesingle auto-corrélation peut être calculé de diverses manières, et seulement pour les fréquences voulues.
+En effet, choisir le lag permet de fixer la fréquence voulue et, par extension, il est possible d\textquotesingle analyser
+l\textquotesingle auto-corrélation pour toutes les notes musicales situées entre 65 Hz et 1109 Hz en évaluant la valeur
+de la fonction d\textquotesingle auto-corrélation pour tous les lags correspondants.Le lag est alors simplement égal à la période
+voulue. Un autre avantage des fonctions d\textquotesingle auto-corrélation est que celles-ci sont indépendantes des phases du spectre.
 
 \subsubsection{Modèles de Markov Cachés (HMM)}
 
@@ -95,7 +100,8 @@ Les modèles de Markov cachés sont des machines à états discrets cherchant à
 leurs distributions, ainsi que par les probabilités de transition entre les états cachés de la machine, où chaque état
 caché possède ses propres probabilités d\textquotesingle émission. Contrairement à des modèles d\textquotesingle
 apprentissage automatique plus populaires tels que les réseaux de neurones ou les machines à vecteurs de support,
-les HMM sont capables de traiter des séquences de longueur variable.
+les HMM sont capables de traiter des séquences de longueur non fixée. Cette caractéristique est appréciable dans le cadre
+de l\textquotesingle analyse de morceaux de musique, qui sont par nature de longueurs très variables.
 
 TODO : \citep{JP} \citep{DR}
 

@@ -9,6 +9,7 @@ Best score using the cognitive model:  58   28   18   8    77   189
 
 from autocorrelation import *
 from cognitive import *
+from spectral import *
 
 __all_detection_methods__ = ["findKey", "findKeyUsingAutocorrelation"]
 
@@ -68,4 +69,5 @@ def main(prediction_func):
 	print("Finished")
 
 if __name__ == "__main__":
-	main(findKeyUsingAutocorrelation)
+	# main(findKeyUsingAutocorrelation)
+	pass
