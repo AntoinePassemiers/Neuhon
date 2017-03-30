@@ -61,13 +61,29 @@ class VanicekRegressor:
 
 
 class LombScargleRegressor:
+	""" Least squares regressor based on the Lomb-Scargle method, which
+	takes into account the phase changes. 
 
+	Parameters
+	----------
+	window_size : int
+	    Number of input samples per window
+	sampling_rate : float
+	    Sampling rate of the input samples
+
+	Attributes
+	----------
+	taus : np.ndarray[ndim = 1]
+	    Phase changes of each of the given frequencies
+	"""
 	def __init__(self, window_size, sampling_rate):
+		""" Precomputes what can be precomputed for Lomb-Scargle method """
 		self.window_size = window_size
 		self.sampling_rate = sampling_rate
 		self.taus = self.timeDelay(window_size, sampling_rate)
 
 	def timeDelay(self, window_size, sampling_rate):
+		""" Computes the phases changes of the given frequencies """
 		time = np.arange(window_size)
 		taus = np.empty(len(Parameters.note_frequencies), dtype = np.double)
 		for i, freq in enumerate(Parameters.note_frequencies):
@@ -77,6 +93,7 @@ class LombScargleRegressor:
 		return taus
 
 	def fit(self, psi):
+		""" Computes the periodogram from input samples """
 		time = np.arange(self.window_size)
 		Px = np.empty(len(Parameters.note_frequencies), dtype = np.double)
 		for i, freq in enumerate(Parameters.note_frequencies):
