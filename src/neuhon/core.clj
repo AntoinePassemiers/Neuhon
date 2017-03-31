@@ -8,6 +8,7 @@
         [neuhon.wav]
         [neuhon.windowing]
         [neuhon.profiles]
+        [neuhon.fft]
         [neuhon.spectral]
         [neuhon.utils]))
 
@@ -135,3 +136,6 @@
         (println (format "---> Wrong predictions      : %4d" @wrong-keys)))))))
 
 (process-all db-base-path)
+
+;; Usefull functions : zipmap, repeat, disj
+;; fn + nth -> is it really slower than fn + fn ?

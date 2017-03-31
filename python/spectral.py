@@ -80,9 +80,9 @@ class LombScargleRegressor:
 		""" Precomputes what can be precomputed for Lomb-Scargle method """
 		self.window_size = window_size
 		self.sampling_rate = sampling_rate
-		self.taus = self.timeDelay(window_size, sampling_rate)
+		self.taus = self.timeDelays(window_size, sampling_rate)
 
-	def timeDelay(self, window_size, sampling_rate):
+	def timeDelays(self, window_size, sampling_rate):
 		""" Computes the phases changes of the given frequencies """
 		time = np.arange(window_size)
 		taus = np.empty(len(Parameters.note_frequencies), dtype = np.double)
@@ -103,3 +103,6 @@ class LombScargleRegressor:
 			den_b = np.sum(np.sin(2.0 * np.pi * (time - self.taus[i]) * (freq / sampling_rate)) ** 2)
 			Px[i] = 0.5 * (num_a / den_a + num_b / den_b)
 		return Px
+
+regressor = LombScargleRegressor(16384, 4410.0)
+print([(freq, regressor.taus[i]) for i, freq in enumerate(Parameters.note_frequencies)])

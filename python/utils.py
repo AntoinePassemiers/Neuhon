@@ -7,7 +7,7 @@ import numpy as np
 
 def midiToHertz(note):
     """ Converts from a midi value to a frequency """
-    return 2.0 ** ((note - 69.0) / 12.0) * 440.0
+    return 440.0 * 2.0 ** ((note - 69.0) / 12.0)
 
 def hertzToMidi(frequency):
     """ Converts from a frequency to a midi note """

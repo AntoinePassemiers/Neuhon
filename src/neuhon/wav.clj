@@ -1,4 +1,6 @@
 (ns neuhon.wav
+  ^{:doc "Load a stereo wav file"
+    :author "Antoine Passemiers"}
   (:require [clojure.java.io :as io])
   (:import [java.io DataInputStream DataOutputStream]
            [org.apache.commons.io IOUtils]))
@@ -95,9 +97,9 @@
             (= bytes-per-sample 1) le2c-bytes-to-int8
             :else le2c-bytes-to-int16)]
       (do
-        ;; Assuming the sampling frequency (after resampling) is equal to 44100 Hz
+        ;; Assumes the sampling frequency (after resampling) is equal to 44100 Hz
         (assert (= (int sampling-frequency) 44100))
-        ;; Assuming the audio has been recorded in stereo mode, 2 channels
+        ;; Assumes the audio has been recorded in stereo mode (2 channels)
         (assert (= number-of-channels 2))
         ;; Loads the audio samples and computes the mean of the two channels
         (doall

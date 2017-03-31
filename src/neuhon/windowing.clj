@@ -1,7 +1,8 @@
 (ns neuhon.windowing
   (:gen-class)
   (:use [clojure.java.io]
-        [clojure.core.matrix]))
+        [clojure.core.matrix]
+        [neuhon.utils]))
 
 ;; Lowest note considered in Hertz
 (def lowest-midi-note-default (int 9))
@@ -20,11 +21,6 @@
 
 ;; Primitive type of the spectral coefficients
 (def win-coef-type Double/TYPE)
-
-(defn midi-to-hertz
-  "Converts a midi note to its respective frequency, expressed in Hertz"
-  [d]
-  (* 440.0 (Math/pow 2 (float (/ (- d 69.0) 12.0)))))
 
 (defn generic-blackman-window 
   "Returns a new function with fixed cosine coefficients.
@@ -152,11 +148,6 @@
   (doall (map (fn [win] (.coefs win)) cosine-windows))
   (doall (map (fn [win] (.lk win)) cosine-windows)) 
   (doall (map (fn [win] (.rk win)) cosine-windows))))
-
-(defn apply-sum
-  "Sums the elements of an input sequence"
-  [data]
-  (reduce + data))
 
 (defn apply-win-on-spectrum 
   "Computes a QCT coefficient by applying a spectral window,

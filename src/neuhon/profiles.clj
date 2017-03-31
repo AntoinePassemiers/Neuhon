@@ -1,4 +1,6 @@
 (ns neuhon.profiles
+  ^{:doc "Major and minor scale profiles"
+    :author "Antoine Passemiers"}
   (:gen-class)
   (:use [clojure.java.io]
         [clojure.core.matrix]
