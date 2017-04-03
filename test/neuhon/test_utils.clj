@@ -20,11 +20,11 @@
 (defn round-as-string 
   [value n-decimals]
   (cond
-    (= n-decimals 0) (format "%.0f"  value)
-    (= n-decimals 1) (format "%.1f"  value)
-    (= n-decimals 2) (format "%.2f"  value)
-    (= n-decimals 3) (format "%.3f"  value)
-    :else (format "%.4f"  value)))
+    (= n-decimals 0) (format "%.0f" (bigdec value))
+    (= n-decimals 1) (format "%.1f" (bigdec value))
+    (= n-decimals 2) (format "%.2f" (bigdec value))
+    (= n-decimals 3) (format "%.3f" (bigdec value))
+    :else (format "%.4f" (bigdec value))))
 
 (defn almost-equals
   [a b n-decimals]
