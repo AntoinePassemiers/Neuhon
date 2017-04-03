@@ -82,6 +82,17 @@ class LombScargleRegressor:
 		self.sampling_rate = sampling_rate
 		self.taus = self.timeDelays(window_size, sampling_rate)
 
+		""" Preprocessed variables """
+		time = np.arange(window_size)
+		self.cos_waves, self.sin_waves = list(), list()
+		self.dens_a, self.dens_b = list(), list()
+		for i, freq in enumerate(Parameters.note_frequencies):
+			tmp = 2.0 * np.pi * (time - self.taus[i]) * (freq / sampling_rate)
+			self.cos_waves.append(np.cos(tmp))
+			self.sin_waves.append(np.sin(tmp))
+			self.dens_a.append(np.sum(np.cos(tmp) ** 2))
+			self.dens_b.append(np.sum(np.sin(tmp) ** 2))
+
 	def timeDelays(self, window_size, sampling_rate):
 		""" Computes the phases changes of the given frequencies """
 		time = np.arange(window_size)
@@ -97,12 +108,39 @@ class LombScargleRegressor:
 		time = np.arange(self.window_size)
 		Px = np.empty(len(Parameters.note_frequencies), dtype = np.double)
 		for i, freq in enumerate(Parameters.note_frequencies):
-			num_a = np.sum(psi * np.cos(2.0 * np.pi * (time - self.taus[i]) * (freq / sampling_rate))) ** 2
-			num_b = np.sum(psi * np.sin(2.0 * np.pi * (time - self.taus[i]) * (freq / sampling_rate))) ** 2
-			den_a = np.sum(np.cos(2.0 * np.pi * (time - self.taus[i]) * (freq / sampling_rate)) ** 2)
-			den_b = np.sum(np.sin(2.0 * np.pi * (time - self.taus[i]) * (freq / sampling_rate)) ** 2)
-			Px[i] = 0.5 * (num_a / den_a + num_b / den_b)
+			num_a = np.sum(psi * self.cos_waves[i]) ** 2
+			num_b = np.sum(psi * self.sin_waves[i]) ** 2
+			Px[i] = 0.5 * (num_a / self.dens_a[i] + num_b / self.dens_b[i])
 		return Px
 
-regressor = LombScargleRegressor(16384, 4410.0)
-print([(freq, regressor.taus[i]) for i, freq in enumerate(Parameters.note_frequencies)])
+def getPeriodograms(signal):
+	window_size = Parameters.window_size
+	sampling_rate = Parameters.target_sampling_rate
+	regressor = LombScargleRegressor(window_size, sampling_rate)
+	i, n_vectors = 0, 0
+	n_coefs = len(Parameters.note_frequencies)
+	n_samples = len(signal)
+ 	T = n_samples - Parameters.window_size
+ 	# blackman_win = np.blackman(Parameters.window_size)
+	periodograms = np.empty((T / Parameters.window_size + 1, n_coefs), dtype = np.double)
+	while i < T:
+		frame = signal[i:i+Parameters.window_size]
+		periodograms[n_vectors, :] = regressor.fit(frame)
+		i += Parameters.window_size
+		n_vectors += 1
+	return periodograms
+
+
+if __name__ == "__main__":
+	sampling_rate = 4410.0
+	regressor = LombScargleRegressor(16384, sampling_rate)
+	print([(freq, regressor.taus[i]) for i, freq in enumerate(Parameters.note_frequencies)])
+
+	window_size = Parameters.window_size
+	freq = 440.0
+	s = np.sin(2.0 * np.pi * np.arange(window_size) * freq / sampling_rate)
+	# s = s * 500 + np.random.rand(window_size) * 700
+	periodogram = regressor.fit(s)
+	print(periodogram)
+	print(np.max(periodogram))
+	assert(freq == Parameters.note_frequencies[np.argmax(periodogram)])

@@ -10,10 +10,14 @@ from scipy.signal import butter, lfilter, freqz
 from scipy.stats import pearsonr
 
 from utils import *
+from spectral import *
 
 CSV_PATH = "D://KeyFinderDB/DOC/KeyFinderV2Dataset.csv"
 WAV_PATH = "D://KeyFinderDB"
 
+
+METHOD_CQT          = 0xA86F20
+METHOD_LOMB_SCARGLE = 0xA86F21
 
 def createProfileMatrix(profile):
     mat = np.empty((12, 12), dtype = np.float)
@@ -139,7 +143,7 @@ def getCQTs(fft_matrix, wins):
         n_vectors += 1
     return cqt_matrix
 
-def findKey(filename):
+def findKey(filename, method = METHOD_CQT):
     hist = {
         "C" : 0, "C#" : 0, "D" : 0, "Eb" : 0, "E" : 0, "F" : 0, "F#" : 0, "G" : 0,
         "G#" : 0, "A" : 0, "Bb" : 0, "B" : 0, "Cm" : 0, "C#m" : 0, "Dm" : 0, "Ebm" : 0,
@@ -157,16 +161,22 @@ def findKey(filename):
     wins = getSpectralWindows(framerate = Parameters.target_sampling_rate)
     """ Computing Short-Term Energies """
     ste_sequence, zcr_sequence = getSTEandZCRs(signal)
-    """ Computing real Fast Fourier Transforms """
-    fft_matrix = getFFTs(signal)
-    """ Computing Constant-Q Transforms """
-    cqt_matrix = getCQTs(fft_matrix, wins)
 
-    n_samples = len(cqt_matrix)
+    if method == METHOD_CQT:
+        """ Computing real Fast Fourier Transforms """
+        fft_matrix = getFFTs(signal)
+        """ Computing Constant-Q Transforms """
+        feature_matrix = getCQTs(fft_matrix, wins)
+    elif method == METHOD_LOMB_SCARGLE:
+        """ Computing Lomb-Scargle periodograms """
+        feature_matrix = getPeriodograms(signal)
+        # print(list(feature_matrix[30]))
+
+    n_samples = len(feature_matrix)
     chromatic_matrix = np.empty((n_samples, 12), dtype = np.double)
     n_vectors = 0
     while n_vectors < n_samples:
-        coefs = cqt_matrix[n_vectors]
+        coefs = feature_matrix[n_vectors]
         coefs = np.reshape(coefs, (Parameters.n_octaves, 12))
         p = Parameters.chromatic_max_weight
         coefs = p * coefs.max(axis = 0) + (1.0 - p) * coefs.sum(axis = 0)
@@ -190,3 +200,9 @@ def findKey(filename):
         n_vectors += 1
     predicted_key_name = max(hist.iteritems(), key = operator.itemgetter(1))[0]
     return predicted_key_name, chromatic_matrix
+
+def findKeyUsingCQT(filename): 
+    return findKey(filename, method = METHOD_CQT)
+
+def findKeyUsingLombScargle(filename): 
+    return findKey(filename, method = METHOD_LOMB_SCARGLE)

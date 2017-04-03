@@ -22,6 +22,9 @@
 ;; Highest midi note to consider
 (def ^:const max-midi-note 88)
 
+;; Number of midi notes to consider
+(def ^:const n-midi-notes (- max-midi-note min-midi-note))
+
 ;; Number of octaves := (max-midi-node - min-midi-node) / 12
 (def ^:const n-octaves 5)
 (assert (= (/ (- max-midi-note min-midi-note) 12) n-octaves))
@@ -29,6 +32,18 @@
 ;; Proportion between highest amplitude and mean amplitude to build chromatic vectors
 (def ^:const chromatic_max_weight 0.8)
 
+
+(defn arg-max
+  "Finds the sequence index where the highest value is located"
+  ([data] (arg-max data 0 Double/MIN_VALUE 0))
+  ([data begin end] (arg-max data begin Double/MIN_VALUE 0))
+  ([data begin max-value best-index] 
+  (do
+    (if (= (count data) begin)
+      best-index
+      (if (> (nth data begin) max-value)
+        (arg-max data (+ begin 1) (nth data begin) begin)
+        (arg-max data (+ begin 1) max-value best-index))))))
 
 (defn apply-sum
   "Sums the elements of an input sequence"

@@ -111,18 +111,6 @@
     (fn [i] (dot-product chromatic-vector (nth profiles i)))
     (range 12))))
 
-(defn arg-max
-  "Finds the sequence index where the highest value is located"
-  ([data] (arg-max data 0 Double/MIN_VALUE 0))
-  ([data begin end] (arg-max data begin Double/MIN_VALUE 0))
-  ([data begin max-value best-index] 
-  (do
-    (if (= (count data) begin)
-      best-index
-      (if (> (nth data begin) max-value)
-        (arg-max data (+ begin 1) (nth data begin) begin)
-        (arg-max data (+ begin 1) max-value best-index))))))
-
 (defn find-best-profile 
   "Matches an input chromatic vector with every major or every minor profiles,
   and returns the key that maximizes the match score."

@@ -22,6 +22,9 @@
 ;; output file storing the predicted key signatures
 (def out-filename (str "output.txt"))
 
+;; Value to use for padding while partitioning the signal into windows
+(def ^:const padding-default-value 0)
+
 ;; Metadata type for keeping the metadata of a file, as well as its predicted key signature
 (deftype Metadata [file-id artist title target-key predicted-key distance])
 
@@ -42,16 +45,9 @@
   This function must be called multiple times for a same song at 
   different locations to enhance its accuracy. This can be operated
   using a sliding window, and making a weighted average of the local predictions."
-  [key-counters signal start]
-  (let [window (create-window spectrum-size-default nuttall-window-func) ;; Not stable
-        signal (convert-to-complex-array signal start spectrum-size-default)
-        c (.realForwardFull (DoubleFFT_1D. spectrum-size-default) signal) ;; Fast Fourier Transform
-        ;; c (complex-to-real real imag) ;; Complex spectrum to real spectrum conversion
-        cqt (doall ;; Constant-Q Transform
-          (map
-            (fn [i] (apply-win-on-spectrum c i))
-            (range (count cosine-windows))))
-        chromatic-vector (map (fn [i] (note-score cqt i)) (range 12))]
+  [key-counters signal]
+  (let [periodogram (compute-periodogram signal)
+        chromatic-vector (map (fn [i] (note-score periodogram i)) (range 12))]
     (do
       (find-best-profile chromatic-vector))))
 
@@ -78,14 +74,22 @@
   (let [signal (load-wav filepath :rate sampling-freq-default)
         N (count signal)
         key-counters (make-array data-type 24)
-        step-size (int (Math/floor (/ N spectrum-size-default)))]
+        step-size (int (Math/floor (/ N spectrum-size-default)))
+        partitions (partition 
+          spectrum-size-default
+          spectrum-size-default
+          [padding-default-value]
+          signal)
+        current-partition-id (atom 0)]
     ;; (ste signal 4000 spectrum-size-default) ;; Computes short term energy
     (doall
       (map
         (fn [i]
           (do
+            (swap! current-partition-id inc)
             (inc-array-element key-counters 
-              (find-key-locally key-counters signal i))))
+              (find-key-locally key-counters 
+                (nth partitions @current-partition-id)))))
         (range 0 (* step-size spectrum-size-default) spectrum-size-default)))
     (key-to-str (arg-max (seq key-counters)))))
 
@@ -135,7 +139,9 @@
         (println (format "---> Parallel matches       : %4d" @parallel-matches))
         (println (format "---> Wrong predictions      : %4d" @wrong-keys)))))))
 
-(process-all db-base-path)
+;; (process-all db-base-path)
 
 ;; Usefull functions : zipmap, repeat, disj
 ;; fn + nth -> is it really slower than fn + fn ?
+;; use (def ^:const stuff 48) and (def ^:dynamic stuff 48) -> const values are inlined
+;; use definline to inline small functions

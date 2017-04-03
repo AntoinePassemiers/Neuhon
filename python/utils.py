@@ -27,11 +27,11 @@ class Parameters:
     window_size = 4096 * 4
 
     """ Hyper-parameters (for optimization or validation purposes) """
-    min_midi_note = 15 # 15
-    max_midi_note = 75 # 15
-    n_octaves = 5
+    min_midi_note = 8  # 15
+    max_midi_note = 80 # 75
+    n_octaves = 6      # 5
     chromatic_max_weight = 0.8
-    note_frequencies = midiToHertz(np.arange(36.0, 88.0))
+    note_frequencies = midiToHertz(np.arange(min_midi_note, max_midi_note) - 1)
     note_periods = np.rint(target_sampling_rate / note_frequencies).astype(int)
 
 def todo(func):

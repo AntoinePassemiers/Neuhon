@@ -30,6 +30,9 @@
 ;; Constant for converting from frequency to pulse rate
 (def ^:const pulse-conversion-factor (* 2.0 (/ Math/PI target-sampling-rate)))
 
+;; Time line for generating sine waves
+(def ^:dynamic timeline (range window-size))
+
 (defn vsin
   "Vectorized sinus function"
   [coll]
@@ -44,8 +47,6 @@
   "Vectorized product between two sequences"
   [A B]
   (map #(* %1 %2) A B))
-
-(def timeline (range window-size))
 
 (defn freq-time-delay
   "Computes the phase change of a given frequency,
@@ -100,7 +101,21 @@
         (apply-sum (map #(pow2 %1) cos-wave))
         (apply-sum (map #(pow2 %1) sin-wave))))))
 
-(def s (cos-waveform 440.0 (freq-time-delay 440.0)))
+(def ls-freqs (doall (lomb-scargle-preprocessing)))
 
-(def stuff (lomb-scargle-preprocessing))
-stuff
+(defn apply-lomb-scargle-on-one-frequency
+  [signal ith]
+  (let [freq-data (nth ls-freqs ith)
+        cos-wave (.waveform-cos freq-data)
+        sin-wave (.waveform-sin freq-data)
+        den-cos  (.den-cos freq-data)
+        den-sin  (.den-sin freq-data)]
+    (* 0.5 (+
+      (/ (pow2 (apply-sum (vproduct cos-wave signal))) den-cos)
+      (/ (pow2 (apply-sum (vproduct sin-wave signal))) den-sin)))))
+
+(defn compute-periodogram
+  [signal]
+  (map 
+    #(apply-lomb-scargle-on-one-frequency signal %1) 
+    (range n-midi-notes)))
