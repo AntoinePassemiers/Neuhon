@@ -88,8 +88,13 @@ passe-bas sans devoir effectuer de calculs dans le domaine fréquentiel. Pour ce
 de la fenêtre temporelle, il s\textquotesingle agit d\textquotesingle un hyper-paramètre fixé durant
 l\textquotesingle évaluation de l\textquotesingle algorithme. \citep{IS}\\
 
-Ensuite, une fenêtre de Blackman est appliquée sur les données observées afin d\textquotesingle éviter des distortions spectrales
-dues à la taille limitée de la fenêtre (et au principe d\textquotesingle incertitude d\textquotesingle Heisenberg).
+Ensuite, une fenêtre de Blackman est appliquée sur les données observées afin d\textquotesingle éviter les distortions spectrales
+dues à la taille limitée de la fenêtre (et au principe d\textquotesingle incertitude d\textquotesingle Heisenberg). Le spectre est alors
+approximé à l\textquotesingle aide de la transformée de Fourier rapide (FFT). L\textquotesingle intuition derrière la Constant-Q Transform (CQT)
+est de penser que les coefficients de la FFT dont les fréquences ne correspondent pas à des notes de musique prennent plus de poids que les autres
+coefficients. Ceci doit être réajusté en appliquant des fenêtres spectrales centrées sur les notes de musiques. Pour chaque fenêtre, les coefficients résultants de cette opération sont alors sommés pour ne former qu\textquotesingle un seul coefficient spectral. L\textquotesingle ensemble des coefficients globaux
+constitue alors la CQT.
+
 
 \subsubsection*{2.1.2. Méthodes basées sur l\textquotesingle auto-corrélation}
 
