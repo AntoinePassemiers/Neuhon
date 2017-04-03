@@ -5,6 +5,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{abstract}
 \usepackage{textcomp}
+\usepackage{amsmath} 
 
 \title{Étude d\textquotesingle algorithmes pour la détection de la tonalité de fichiers musicaux et implémentation en Clojure}
 \author{Antoine Passemiers$$ \\
@@ -19,6 +20,8 @@ apassemi@ulb.ac.be}
 \renewcommand\bibname{Bibliographie}        % Change the bib title
 \renewcommand{\refname}{Bibliographie}
 
+
+
 \begin{abstract}
 
 Le projet consiste en la discussion de différents algorithmes relatifs à la détection 
@@ -30,20 +33,20 @@ L\textquotesingle algorithme final sera alors implémenté en Clojure.
 
 \end{abstract}
 
-\section{Introduction}
+\section*{1. Introduction}
 
 La tonalité d\textquotesingle une oeuvre musicale se caractérise par
 l\textquotesingle ensemble des sons formant une même gamme diatonique. 
 A la différence de la gamme, où les sons se succèdent de façon contigüe,
 la tonalité (ou ton) regroupe des sons qui peuvent être disjoints et/ou superposés \citep{AD}.
 En conséquence, nous nous intéressons à l\textquotesingle analyse de mélodies polyphoniques, 
-où plusieurs notes peuvent être jouées en même temps.
+où plusieurs notes peuvent être jouées en même temps.\\
 
 En particulier, nous allons nous pencher sur deux catégories d\textquotesingle algorithmes :
 ceux basés sur des modèles cognitifs, et ceux incluant des notions d\textquotesingle 
 apprentissage automatique. Les premiers tentent d\textquotesingle intégrer au mieux les connaissances
 de la théorie musicale et reposent sur la façon dont les personnes reconnaissent les différentes tonalités,
-alors que les autres utilisent l\textquotesingle inférence statistique pour déterminer celles-ci.
+alors que les autres utilisent l\textquotesingle inférence statistique pour déterminer celles-ci.\\
 
 L\textquotesingle approche cognitive utilisée pour la détection de la tonalité repose en partie
 sur la solution proposée par Ibrahim Sha\textquotesingle ath lors 
@@ -51,7 +54,7 @@ de la conception du logiciel KeyFinder \citep{IS}. La précision de la détectio
 à l\textquotesingle aide d\textquotesingle une base 
 de données, constituée de 250 fichiers musicaux au format wav, dont les tonalités sont connues
 et inscrites dans un fichier csv. Ces fichiers font partie de ceux utilisés par 
-Ibrahim Sha\textquotesingle ath dans le cadre de sa recherche.
+Ibrahim Sha\textquotesingle ath dans le cadre de sa recherche.\\
 
 Pour ce qui est de la partie apprentissage automatique, les méthodes présentées seront principalement
 en lien avec les modèles de Markov cachés. Leur évaluation se fera en divisant la base de données en
@@ -60,11 +63,13 @@ un jeu de données d\textquotesingle apprentissage et un jeu de données de vali
 centré sur les objectifs décrits, le lecteur est supposé déjà disposer de connaissances suffisantes en 
 apprentissage automatique, en théorie musicale et en traitement logiciel de signaux.
 
-TODO : \citep{SP} \citep{AT}
+TODO : \citep{SP} \citep{AT} -> Partie 2.1.1.
 
-\section{Considérations théoriques}
+\section*{2. Considérations théoriques}
 
-\subsubsection{Modèle cognitif}
+\subsection*{2.1. Pré-traitement et analyse spectrale}
+
+\subsubsection*{2.1.1. Constant-Q Transform (CQT)}
 
 Le signal audio est premièrement extrait du fichier wav, puis la moyenne entre les 
 deux canaux est effectuée si le fichier a été enregistré en stéréo. En effet il n\textquotesingle
@@ -81,11 +86,12 @@ l\textquotesingle application d\textquotesingle une moyenne mobile sur une fenê
 de taille arbitraire. L\textquotesingle avantage de la méthode est de bénéficier d\textquotesingle effets
 passe-bas sans devoir effectuer de calculs dans le domaine fréquentiel. Pour ce qui est de la taille
 de la fenêtre temporelle, il s\textquotesingle agit d\textquotesingle un hyper-paramètre fixé durant
-l\textquotesingle évaluation de l\textquotesingle algorithme.
+l\textquotesingle évaluation de l\textquotesingle algorithme. \citep{IS}\\
 
-TODO - suite
+Ensuite, une fenêtre de Blackman est appliquée sur les données observées afin d\textquotesingle éviter des distortions spectrales
+dues à la taille limitée de la fenêtre (et au principe d\textquotesingle incertitude d\textquotesingle Heisenberg).
 
-\subsubsection{Méthodes basées sur l\textquotesingle auto-corrélation}
+\subsubsection*{2.1.2. Méthodes basées sur l\textquotesingle auto-corrélation}
 
 Les algorithmes reposant sur l\textquotesingle utilisation de fonctions d\textquotesingle auto-corrélation sont plus souples
 car l\textquotesingle auto-corrélation peut être calculé de diverses manières, et seulement pour les fréquences voulues.
@@ -94,22 +100,77 @@ l\textquotesingle auto-corrélation pour toutes les notes musicales situées ent
 de la fonction d\textquotesingle auto-corrélation pour tous les lags correspondants.Le lag est alors simplement égal à la période
 voulue. Un autre avantage des fonctions d\textquotesingle auto-corrélation est que celles-ci sont indépendantes des phases du spectre.
 
-\subsubsection{Modèles de Markov Cachés (HMM)}
+\subsubsection*{2.1.3. Estimation spectrale par moindres carrés}
+
+Il est possible d\textquotesingle estimer le spectre par régression, au travers d\textquotesingle algorithmes n\textquotesingle exigeant
+pas de grandes quantités de calcul. Parmi les algorithmes les plus importants résident celui de Vaníček et celui de Lomb-Scargle. Leur particularité est
+de pouvoir traiter des données qui ne sont pas reçues à intervalles réguliers (la majorité des observations se font la nuit). En outre, contrairement à la transformée de Fourier rapide qui possède une résolution aussi précise que la fenêtre d\textquotesingle observation est grande, ces algorithmes
+calculent un périodogramme dont la taille est fixée par le nombre de fréquences qui nous intéressent. Au plus le nombre de fréquences analysées est
+élevé, au plus le temps d\textquotesingle exécution sera conséquent.
+
+\begin{align}
+\hat{\theta}_{k} = (A_{k}^{T} A_{k})^{-1} A_{k}^{T} y
+\end{align}
+
+Selon la méthode de Vanícek, le signal est supposé être centré sur zéro et représenter une combinaison linéaire de sinusoïdes et d\textquotesingle un bruit blanc.
+Les coefficients de cette combinaison linéaire sont réunis dans un vecteur $\theta_{k}$, de telle manière que le signal équivaut à $y \approx A\theta_{k}$.
+La matrice A est telle que chaque ligne de celle-ci constitue une sinusoïde de fréquence d\textquotesingle intérêt. Les coefficients sont alors finalement
+donnés par l\textquotesingle équation 1. \citep{PV}\\
+
+Le défaut de la méthode est de ne pas considérer les phases des fréquences concernées. En effet chaque sinusoïde contenue dans la matrice A
+est supposée posséder une phase nulle. La méthode de Lomb-Scargle permet de résoudre ce problème en pré-calculant les phases des sinusoïdes
+utilisées et en tenant compte au mieux de celles-ci lors du calcul du spectre. Le déphasage $\tau$ correspondant à la fréquence $t$ est donné par
+l\textquotesingle équation 2. \citep{LS}
+
+\begin{align}
+\tan 2\pi f \tau = \frac{\sum\limits_{j=1} \sin 2\pi f t_{j}}{\sum\limits_{j=1} \cos 2\pi f t_{j}}
+\end{align}
+
+\begin{align}
+\Delta R(f) = \frac{(YC)^{2}}{CC} 
++ \frac{(YS)^{2}}{SS}
+\end{align}
+
+\begin{align}
+YC = \sum\limits_{j=1} y_{j}\cos 2\pi f (t_{j} - \tau)
+\end{align}
+
+\begin{align}
+YS = \sum\limits_{j=1} y_{j}\sin 2\pi f (t_{j} - \tau)
+\end{align}
+
+\begin{align}
+CC = \sum\limits_{j=1} \cos^{2} 2\pi f (t_{j} - \tau)
+\end{align}
+
+\begin{align}
+SS = \sum\limits_{j=1} \sin^{2} 2\pi f (t_{j} - \tau)
+\end{align}
+
+\subsubsection*{2.1.4. Autres méthodes}
+
+TODO : Cepstre, spectre de puissance, ...
+
+\subsection*{2.2. Prédiction de la tonalité}
+
+\subsubsection*{2.2.1. Modèle cognitif}
+
+\subsubsection*{2.2.2. Modèles de Markov Cachés (HMM)}
 
 Les modèles de Markov cachés sont des machines à états discrets cherchant à représenter des séries multivariées par
 leurs distributions, ainsi que par les probabilités de transition entre les états cachés de la machine. De plus, chaque état
 caché de cette dernière possède ses propres probabilités d\textquotesingle émission. Contrairement à des modèles d\textquotesingle
 apprentissage automatique plus populaires tels que les réseaux de neurones ou les machines à vecteurs de support,
 les HMM sont capables de traiter des séquences de longueur non fixée. Cette caractéristique est appréciable dans le cadre
-de l\textquotesingle analyse de morceaux de musique, qui sont des durées de nature très variables.
+de l\textquotesingle analyse de morceaux de musique, qui ont des durées de nature très variables.
 
 TODO : \citep{JP} \citep{DR}
 
-\subsubsection{Modèles de Markov Cachés de type entrée-sortie (IO-HMM)}
+\subsubsection*{2.2.3. Modèles de Markov Cachés de type entrée-sortie (IO-HMM)}
 
 TODO : \citep{YB}
 
-\subsubsection{Résultats}
+\subsubsection*{2.2.4. Résultats}
 
 \begin{table}[h]
 \center{

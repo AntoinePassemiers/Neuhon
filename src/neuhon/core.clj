@@ -47,11 +47,10 @@
   This function must be called multiple times for a same song at 
   different locations to enhance its accuracy. This can be operated
   using a sliding window, and making a weighted average of the local predictions."
-  [key-counters signal]
+  [signal]
   (let [periodogram (compute-periodogram signal)
         chromatic-vector (reshape-into-chromatic-vector periodogram)]
     (do
-      (println chromatic-vector)
       (find-best-profile chromatic-vector))))
 
 (defn find-key-globally
@@ -61,10 +60,7 @@
      Aliasing effects are not taken into account yet
   2) Initialize a sliding window with fixed size (ex : 16384 samples)
   3) Predict the key signature within the temporal window (call find-key-locally)
-     - Compute the complex FFT
-     - Convert it to a real FFT
-     - Convolute the spectrum at logarithmically-spaced bins with spectral windows
-       and sum the results to new coefficients
+     - Compute the periodogram
      - Reshape the new coefficients into a matrix of 12 columns
      - Make a weighted sum of the coefficients over the rows -> new chromatic vector
      - Find the profile that matches the chromatic vector the best
@@ -76,7 +72,7 @@
   [filepath]
   (let [signal (load-wav filepath :rate sampling-freq-default)
         N (count signal)
-        key-counters (make-array data-type 24)
+        key-counters (make-array Integer/TYPE 24)
         step-size (int (Math/floor (/ N spectrum-size-default)))
         partitions (partition 
           spectrum-size-default
@@ -85,16 +81,17 @@
           signal)
         current-partition-id (atom 0)]
     ;; (ste signal 4000 spectrum-size-default) ;; Computes short term energy
-    (doall
-      (map
-        (fn [i]
-          (do
-            (swap! current-partition-id inc)
-            (inc-array-element key-counters 
-              (find-key-locally key-counters 
-                (nth partitions @current-partition-id)))))
-        (range 0 (* step-size spectrum-size-default) spectrum-size-default)))
-    (key-to-str (arg-max (seq key-counters)))))
+    (do
+      (doall
+        (map
+          (fn [i]
+            (do
+              (inc-array-element key-counters 
+                (find-key-locally 
+                  (nth partitions @current-partition-id))))
+              (swap! current-partition-id inc))
+          (range 0 (* step-size spectrum-size-default) spectrum-size-default)))
+      (key-to-str (arg-max (seq key-counters))))))
 
 ;;(clojure.java.io/file out-filename)
 (defn process-all
@@ -113,28 +110,30 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 2)
-          (let [line (nth csv-seq i)
-                artist (nth line 0)
-                title (nth line 1)
-                target-key (nth line 2)
-                audio-filename (nth line 3)
-                audio-filepath (clojure.string/join [db-path audio-filename])
-                predicted-key (find-key-globally audio-filepath)
-                metadata (Metadata. i artist title target-key predicted-key
-                  (key-distance predicted-key target-key))]
-            (do
-              (cond
-                (is-same-key? predicted-key target-key) 
-                  (swap! perfect-matches inc)
-                (is-out-of-a-fifth? predicted-key target-key)
-                  (swap! out-by-a-fifth-matches inc)
-                ;; (is-relative? predicted-key target-key) 
-                ;;   (swap! relative-matches inc)
-                :else (swap! wrong-keys inc))
-              (display-result metadata print)
-              (flush)
-              (display-result metadata (fn [s] (.write wrtr s)))))
+        (when (< i 230)
+          (try
+            (let [line (nth csv-seq i)
+                  artist (nth line 0)
+                  title (nth line 1)
+                  target-key (nth line 2)
+                  audio-filename (nth line 3)
+                  audio-filepath (clojure.string/join [db-path audio-filename])
+                  predicted-key (find-key-globally audio-filepath)
+                  metadata (Metadata. i artist title target-key predicted-key
+                    (key-distance predicted-key target-key))]
+              (do
+                (cond
+                  (is-same-key? predicted-key target-key) 
+                    (swap! perfect-matches inc)
+                  (is-out-of-a-fifth? predicted-key target-key)
+                    (swap! out-by-a-fifth-matches inc)
+                  ;; (is-relative? predicted-key target-key) 
+                  ;;   (swap! relative-matches inc)
+                  :else (swap! wrong-keys inc))
+                (display-result metadata print)
+                (flush)
+                (display-result metadata (fn [s] (.write wrtr s)))))
+            (catch Exception e (do)))
           (recur (inc i))))
         (println (format "---> Perfect matches        : %4d" @perfect-matches))
         (println (format "---> Out-by-a-fifth matches : %4d" @out-by-a-fifth-matches))
@@ -145,10 +144,11 @@
 (process-all db-base-path)
 
 ;;                       1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
-;; Ground truth       :  Gm  Ebm Am  C#m Ebm A   Em  Ebm Bbm Em  Dm  Em  G   G#m  Am
-;; Python predictions :  Gm  Bb  E   D   Em  G#m F#m Em  Ebm Em  A   Dm  C   G#m  A
-;; with no low-pass   :  Gm  Eb  E   D   Em  G#m C   F#m Ebm G   A   Fm  C   G#   A
-;; Clojure version    :  G#  Bb  C#  F#  F#  Cm  G#  Dm  F   C#  B   F#m C#  --   --
+;; Ground truth       :  Gm  Ebm Am  C#m Ebm A   Em  Ebm Bbm Em  Dm  Em  G   G#m Am
+;; Python predictions :  Gm  Bb  E   D   Em  G#m F#m Em  Ebm Em  A   Dm  C   G#m A
+;; with no low-pass   :  Gm  Eb  E   D   Em  G#m C   F#m Ebm G   A   Fm  C   G#  A
+;; Clojure version    :  G#  F   C#  F#  F#  Cm  G#  D   F   C#  B   Eb  G#  C   B
+;; Distance           :  1   2   4   5   3   3   4   11  7   9   9   11  1   4   2
 
 ;; Usefull functions : zipmap, repeat, disj
 ;; fn + nth -> is it really slower than fn + fn ?
