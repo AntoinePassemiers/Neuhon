@@ -51,6 +51,7 @@
   (let [periodogram (compute-periodogram signal)
         chromatic-vector (reshape-into-chromatic-vector periodogram)]
     (do
+      (println chromatic-vector)
       (find-best-profile chromatic-vector))))
 
 (defn find-key-globally
@@ -141,7 +142,7 @@
         (println (format "---> Parallel matches       : %4d" @parallel-matches))
         (println (format "---> Wrong predictions      : %4d" @wrong-keys)))))))
 
-;; (process-all db-base-path)
+(process-all db-base-path)
 
 ;;                       1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
 ;; Ground truth       :  Gm  Ebm Am  C#m Ebm A   Em  Ebm Bbm Em  Dm  Em  G   G#m  Am

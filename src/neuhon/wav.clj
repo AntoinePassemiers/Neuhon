@@ -3,7 +3,8 @@
     :author "Antoine Passemiers"}
   (:require [clojure.java.io :as io])
   (:import [java.io DataInputStream DataOutputStream]
-           [org.apache.commons.io IOUtils]))
+           [org.apache.commons.io IOUtils])
+  (:use [clojure.java.io]))
 
 ;; Primitive type of the audio raw samples
 (def wav-data-type Integer/TYPE)
@@ -104,7 +105,17 @@
         ;; Loads the audio samples and computes the mean of the two channels
         (doall
           (map 
-            (fn [i] (/ 
+            (fn [i] (float (/ 
               (+ (int-converter data i) 
-                (int-converter data (+ i half-bytes-step))) 2))
+                (int-converter data (+ i half-bytes-step))) 2)))
             (range wav-header-size number-of-bytes bytes-step)))))))
+
+
+;;(def db-base-path (str "D://KeyFinderDB/"))
+;;(def audio-filename (str "10cc - Dreadlock Holiday.wav"))
+;;(def filepath (clojure.string/join [db-base-path audio-filename]))
+;;(def out-filename (str "wav.txt"))
+;;(with-open [wrtr (writer out-filename)]
+;;  (.write wrtr 
+;;      (pr-str
+;;        (load-wav filepath :rate 4410.0)))
