@@ -1,7 +1,10 @@
 (ns neuhon.spectral-test
+  ^{:doc "Testing the Lomb-Scargle algorithm"
+    :author "Antoine Passemiers"}
   (:require [clojure.test :refer :all]
             [neuhon.core :refer :all])
   (:use [neuhon.spectral]
+        [neuhon.matrix]
         [neuhon.test-utils]))
 
 
@@ -40,3 +43,7 @@
              3.55143492E-05 5.56798923E-03 8.61840524E-05 2.83516176E-04])
           2
           0.90)))))
+
+(deftest types-test
+  (testing "Testing preprocessed data for the Lomb-Scargle algorithm"
+    (is (= (count ls-freqs) keyboard-size))))

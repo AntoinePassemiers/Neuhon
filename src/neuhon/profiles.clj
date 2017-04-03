@@ -13,11 +13,21 @@
   (let [total (reduce + data)]
     (map (fn [i] (/ (nth data i) total)) (range (count data)))))
 
-;; Sha'ath average profile of the major scale
-(def major-base-profile (normalize [6.4 2.2 3.5 2.3 4.4 4.1 2.5 5.2 2.4 3.7 2.3 2.9]))
+;; Krumhansl's average profile of the major scale
+(def krumhansl-major-base-profile (normalize [6.4 2.2 3.5 2.3 4.4 4.1 2.5 5.2 2.4 3.7 2.3 2.9]))
 
-;; Sha'ath average profile of the minor scale
-(def minor-base-profile (normalize [6.4 2.8 3.6 5.4 2.7 3.6 2.6 4.8 4.0 2.7 3.3 3.2]))
+;; Krumhansl's average profile of the minor scale
+(def krumhansl-minor-base-profile (normalize [6.4 2.8 3.6 5.4 2.7 3.6 2.6 4.8 4.0 2.7 3.3 3.2]))
+
+;; Sha'ath's average profile of the major scale
+(def shaath-major-base-profile (normalize [6.6 2.0 3.5 2.2 4.6 4.0 2.5 5.2 2.4 3.8 2.3 3.4]))
+
+;; Sha'ath's average profile of the minor scale
+(def shaath-minor-base-profile (normalize [6.5 2.8 3.5 5.4 2.7 3.5 2.5 5.1 4.0 2.7 4.3 3.2]))
+
+(def major-base-profile shaath-major-base-profile)
+(def minor-base-profile shaath-minor-base-profile)
+
 
 ;; Key signature names 
 (def key-names ["C" "C#" "D" "Eb" "E" "F" "F#" "G" "G#" "A" "Bb" "B"])
@@ -90,8 +100,8 @@
       (or (= distance 5) (= distance 7)))))
 
 (comment "Generates all the possible profiles by rotating the two existing ones :
-  major C, major C#, ... major B
-  minor C, minor C#, ... minor B")
+  major C -> major C, major C#, ... major B
+  minor C -> minor C, minor C#, ... minor B")
 (def all-major-profiles
   (doall (map (fn [i] (rotate-left major-base-profile i)) (range 12))))
 (def all-minor-profiles

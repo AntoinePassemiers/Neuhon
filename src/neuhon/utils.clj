@@ -17,16 +17,16 @@
 (def ^:const window-size 16384)
 
 ;; Lowest midi note to consider
-(def ^:const min-midi-note 28)
+(def ^:const min-midi-note 8)
 
 ;; Highest midi note to consider
-(def ^:const max-midi-note 88)
+(def ^:const max-midi-note 80)
+
+;; Number of octaves := (max-midi-node - min-midi-node) / 12
+(def ^:const n-octaves 6)
 
 ;; Number of midi notes to consider
 (def ^:const n-midi-notes (- max-midi-note min-midi-note))
-
-;; Number of octaves := (max-midi-node - min-midi-node) / 12
-(def ^:const n-octaves 5)
 (assert (= (/ (- max-midi-note min-midi-note) 12) n-octaves))
 
 ;; Proportion between highest amplitude and mean amplitude to build chromatic vectors

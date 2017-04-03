@@ -1,12 +1,14 @@
 (ns neuhon.core
+  ^{:doc "Main features of the software"
+    :author "Antoine Passemiers"}
   (:gen-class)
   (:import (org.jtransforms.fft DoubleFFT_1D))
   (:require [clojure.data.csv :as csv]
             [clojure.java.io :as io])
   (:use [clojure.java.io]
-        [clojure.core.matrix]
         [neuhon.wav]
         [neuhon.windowing]
+        [neuhon.matrix]
         [neuhon.profiles]
         [neuhon.fft]
         [neuhon.spectral]
@@ -47,7 +49,7 @@
   using a sliding window, and making a weighted average of the local predictions."
   [key-counters signal]
   (let [periodogram (compute-periodogram signal)
-        chromatic-vector (map (fn [i] (note-score periodogram i)) (range 12))]
+        chromatic-vector (reshape-into-chromatic-vector periodogram)]
     (do
       (find-best-profile chromatic-vector))))
 
@@ -106,7 +108,7 @@
             perfect-matches (atom 0)
             relative-matches (atom 0)
             parallel-matches (atom 0)
-            out-of-a-fifth-matches (atom 0)
+            out-by-a-fifth-matches (atom 0)
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
@@ -125,7 +127,7 @@
                 (is-same-key? predicted-key target-key) 
                   (swap! perfect-matches inc)
                 (is-out-of-a-fifth? predicted-key target-key)
-                  (swap! out-of-a-fifth-matches inc)
+                  (swap! out-by-a-fifth-matches inc)
                 ;; (is-relative? predicted-key target-key) 
                 ;;   (swap! relative-matches inc)
                 :else (swap! wrong-keys inc))
@@ -134,12 +136,18 @@
               (display-result metadata (fn [s] (.write wrtr s)))))
           (recur (inc i))))
         (println (format "---> Perfect matches        : %4d" @perfect-matches))
-        (println (format "---> Out-of-a-fifth matches : %4d" @out-of-a-fifth-matches))
+        (println (format "---> Out-by-a-fifth matches : %4d" @out-by-a-fifth-matches))
         (println (format "---> Relative matches       : %4d" @relative-matches))
         (println (format "---> Parallel matches       : %4d" @parallel-matches))
         (println (format "---> Wrong predictions      : %4d" @wrong-keys)))))))
 
 ;; (process-all db-base-path)
+
+;;                       1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+;; Ground truth       :  Gm  Ebm Am  C#m Ebm A   Em  Ebm Bbm Em  Dm  Em  G   G#m  Am
+;; Python predictions :  Gm  Bb  E   D   Em  G#m F#m Em  Ebm Em  A   Dm  C   G#m  A
+;; with no low-pass   :  Gm  Eb  E   D   Em  G#m C   F#m Ebm G   A   Fm  C   G#   A
+;; Clojure version    :  G#  Bb  C#  F#  F#  Cm  G#  Dm  F   C#  B   F#m C#  --   --
 
 ;; Usefull functions : zipmap, repeat, disj
 ;; fn + nth -> is it really slower than fn + fn ?

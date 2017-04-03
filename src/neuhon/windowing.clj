@@ -1,7 +1,8 @@
 (ns neuhon.windowing
+  ^{:doc "Spectral and temporal windows"
+  :author "Antoine Passemiers"}
   (:gen-class)
   (:use [clojure.java.io]
-        [clojure.core.matrix]
         [neuhon.utils]))
 
 ;; Lowest note considered in Hertz
@@ -159,16 +160,3 @@
         coefs (.coefs win)
         convolution (fn [i] (* (nth spectrum (+ lk i)) (nth coefs i)))]
     (apply-sum (map convolution (range (- rk lk))))))
-
-(defn note-subset
-  "Returns the values in an extended chromatic vector
-  that match a given musical note"
-  [chromatic-vector note-index]
-  (doall (map (fn [i] (nth chromatic-vector (+ note-index i))) 
-    (range 0 (- (count chromatic-vector) 12) 12))))
-
-(defn note-score 
-  "Scores how well a chromatic vector matches a given note"
-  [chromatic-vector note-index]
-  (let [subset (note-subset chromatic-vector note-index)]
-    (+ (* 0.8 (apply max subset)) (* 0.2 (apply-sum subset)))))
