@@ -32,7 +32,7 @@
     (is (= (find-best-profile (nth all-minor-profiles 8))  20))
     (is (= (find-best-profile (nth all-minor-profiles 9))  21))
     (is (= (find-best-profile (nth all-minor-profiles 10)) 22))
-    (is (= (find-best-profile (nth all-minor-profiles 11)) 23))))c
+    (is (= (find-best-profile (nth all-minor-profiles 11)) 23))))
 
 (deftest match-exact-same-proportions-test
   (testing "Comparing tone profiles with profiles with same proportions"

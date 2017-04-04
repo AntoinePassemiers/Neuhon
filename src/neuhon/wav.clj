@@ -19,60 +19,46 @@
 (def number-of-bytes-loc (int 4))     ;; Total number of data bytes
 (def sampling-frequency-loc (int 24)) ;; Sampling frequency of the signal
 
-;; Mask of the sign bit in a 8 bits integer
-(def complement-int8  (bit-shift-left 1 7))
-;; Mask of the sign bit in a 16 bits integer
-(def complement-int16 (bit-shift-left 1 15))
-;; Mask of the sign bit in a 24 bits integer
-(def complement-int24 (bit-shift-left 1 23))
-;; Mask of the sign bit in a 32 bits integer
-(def complement-int32 (bit-shift-left 1 31))
-
-(defn apply-complement
-  ;; Converts an unsigned integer to a signed integer using the two's complement method
-  [compl condition value]
-  (if condition value (- value compl)))
-
 (defn le2c-bytes-to-int8 
   "Converts a byte to a 8-bits integer located at ith in the input stream,
   using the two's complement method"
   [^bytes arr ^double ith]
-  (apply-complement complement-int8 
-    (= 0 (bit-and (aget arr ith) 0x00000080))
-    (bit-and (aget arr ith) 0x0000007f)))
+  (-
+    (bit-and (aget arr (+ ith 0)) 0x0000007f)
+    (bit-and (aget arr (+ ith 0)) 0x00000080)))
 
 (defn le2c-bytes-to-int16 
   "Converts 2 bytes to a 16-bits integer, 
   where the big endian is located at ith in the input stream,
   and using the two's complement method"
   [^bytes arr ^double ith]
-  (apply-complement complement-int16
-    (= 0 (bit-and (aget arr (+ ith 1)) 0x00008000))
+  (-
     (bit-or (bit-and (aget arr (+ ith 0)) 0x000000ff)
-      (bit-and (bit-shift-left (aget arr (+ ith 1)) 8) 0x00007f00))))
+      (bit-and (bit-shift-left (aget arr (+ ith 1)) 8) 0x00007f00))
+    (bit-and (aget arr (+ ith 1)) 0x00008000)))
 
 (defn le2c-bytes-to-int24 
   "Converts 3 bytes to a 24-bits integer, 
   where the big endian is located at ith in the input stream,
   and using the two's complement method"
   [^bytes arr ^double ith]
-  (apply-complement complement-int24
-    (= 0 (bit-and (aget arr (+ ith 2)) 0x00800000))
+  (-
     (bit-or (bit-and (aget arr (+ ith 0)) 0x000000ff)
       (bit-and (bit-shift-left (aget arr (+ ith 1)) 8) 0x0000ff00)
-      (bit-and (bit-shift-left (aget arr (+ ith 2)) 16) 0x007f0000))))
+      (bit-and (bit-shift-left (aget arr (+ ith 2)) 16) 0x007f0000))
+    (bit-and (aget arr (+ ith 2)) 0x00800000)))
 
 (defn le2c-bytes-to-int32 
   "Converts 4 bytes to a 32-bits integer, 
   where the big endian is located at ith in the input stream,
   and using the two's complement method"
   [^bytes arr ^double ith]
-  (apply-complement complement-int32
-    (= 0 (bit-and (aget arr (+ ith 3)) 0x80000000))
+  (-
     (bit-or (bit-and (aget arr (+ ith 0)) 0x000000ff)
       (bit-and (bit-shift-left (aget arr (+ ith 1)) 8) 0x0000ff00)
       (bit-and (bit-shift-left (aget arr (+ ith 2)) 16) 0x00ff0000)
-      (bit-and (bit-shift-left (aget arr (+ ith 3)) 24) 0x7f000000))))
+      (bit-and (bit-shift-left (aget arr (+ ith 3)) 24) 0x7f000000))
+    (bit-and (aget arr (+ ith 3)) 0x80000000)))
 
 (defn load-wav
   "Efficient way to load a raw audio stream into a Clojure array,
@@ -98,6 +84,7 @@
             (= bytes-per-sample 1) le2c-bytes-to-int8
             :else le2c-bytes-to-int16)]
       (do
+        (println bytes-per-sample)
         ;; Assumes the sampling frequency (after resampling) is equal to 44100 Hz
         (assert (= (int sampling-frequency) 44100))
         ;; Assumes the audio has been recorded in stereo mode (2 channels)
@@ -105,17 +92,17 @@
         ;; Loads the audio samples and computes the mean of the two channels
         (doall
           (map 
-            (fn [i] (float (/ 
+            (fn [i] (int (/ 
               (+ (int-converter data i) 
                 (int-converter data (+ i half-bytes-step))) 2)))
             (range wav-header-size number-of-bytes bytes-step)))))))
 
 
-;;(def db-base-path (str "D://KeyFinderDB/"))
-;;(def audio-filename (str "10cc - Dreadlock Holiday.wav"))
-;;(def filepath (clojure.string/join [db-base-path audio-filename]))
-;;(def out-filename (str "wav.txt"))
-;;(with-open [wrtr (writer out-filename)]
-;;  (.write wrtr 
-;;      (pr-str
-;;        (load-wav filepath :rate 4410.0)))
+(def db-base-path (str "D://KeyFinderDB/"))
+(def audio-filename (str "10cc - Dreadlock Holiday.wav"))
+(def filepath (clojure.string/join [db-base-path audio-filename]))
+(def out-filename (str "wav.txt"))
+(with-open [wrtr (writer out-filename)]
+  (.write wrtr 
+      (pr-str
+        (load-wav filepath :rate 4410.0))))

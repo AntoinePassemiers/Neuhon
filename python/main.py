@@ -42,7 +42,7 @@ def main(prediction_func):
     tp, fp, relatives, parallels, out_by_a_fifth, n_total = 0, 0, 0, 0, 0, 0
     distances = np.zeros(12)
 
-    for i in range(50): # 230
+    for i in range(1): # 230
         row = csv_file.readline().replace('\n', '').split(';')
         artist, title, target_key, filename = row[0], row[1], row[2], row[3]
 
@@ -62,10 +62,9 @@ def main(prediction_func):
                 out_by_a_fifth += 1
             else:
                 fp += 1
+            showWavFileResults(i, artist, title, target_key, predicted_key)
         except IOError:
             pass
-
-        showWavFileResults(i, artist, title, target_key, predicted_key)
     showFinalResults(tp, out_by_a_fifth, parallels, relatives, fp, n_total)
     csv_file.close()
     print(distances)

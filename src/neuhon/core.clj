@@ -70,18 +70,19 @@
   6) Start over from step 3
   7) Predict using the highest key counter"
   [filepath]
-  (let [signal (load-wav filepath :rate sampling-freq-default)
+  (let [signal (load-wav filepath :rate target-sampling-rate)
         N (count signal)
         key-counters (make-array Integer/TYPE 24)
-        step-size (int (Math/floor (/ N spectrum-size-default)))
+        step-size (int (Math/floor (/ N window-size)))
         partitions (partition 
-          spectrum-size-default
-          spectrum-size-default
+          window-size
+          window-size
           [padding-default-value]
           signal)
         current-partition-id (atom 0)]
     ;; (ste signal 4000 spectrum-size-default) ;; Computes short term energy
     (do
+      (println (count signal))
       (doall
         (map
           (fn [i]
@@ -90,7 +91,7 @@
                 (find-key-locally 
                   (nth partitions @current-partition-id))))
               (swap! current-partition-id inc))
-          (range 0 (* step-size spectrum-size-default) spectrum-size-default)))
+          (range 0 (* step-size window-size) window-size)))
       (key-to-str (arg-max (seq key-counters))))))
 
 ;;(clojure.java.io/file out-filename)
@@ -110,7 +111,7 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 230)
+        (when (< i 2)
           (try
             (let [line (nth csv-seq i)
                   artist (nth line 0)
@@ -143,6 +144,7 @@
 
 (process-all db-base-path)
 
+;; First file : 11208960 samples -> 1120896 in Clojure
 ;;                       1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
 ;; Ground truth       :  Gm  Ebm Am  C#m Ebm A   Em  Ebm Bbm Em  Dm  Em  G   G#m Am
 ;; Python predictions :  Gm  Bb  E   D   Em  G#m F#m Em  Ebm Em  A   Dm  C   G#m A
