@@ -1,7 +1,8 @@
 (ns neuhon.test-utils
   (:require [clojure.test :refer :all]
             [neuhon.core :refer :all])
-  (:use [neuhon.spectral]))
+  (:use [neuhon.wav]
+        [neuhon.spectral]))
 
 (defn is-all-true?
   [coll]

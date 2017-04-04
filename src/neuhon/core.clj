@@ -82,7 +82,6 @@
         current-partition-id (atom 0)]
     ;; (ste signal 4000 spectrum-size-default) ;; Computes short term energy
     (do
-      (println (count signal))
       (doall
         (map
           (fn [i]
