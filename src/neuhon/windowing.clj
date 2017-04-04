@@ -53,8 +53,7 @@
 (defn convolute
   "Applies the convolution between an input signal and a window"
   [signal window]
-  (let [convolution (fn [i] (* (nth signal i) (nth window i)))]
-    (map convolution (range (count window)))))
+    (map #(* %1 %2) signal window))
 
 (comment "A spectral window type for storing the window coefficients,
   as well of the left and right bounds of the window")
@@ -85,7 +84,10 @@
 (defn win-nth 
   "Gets the spectral window corresponding to a given bin"
   [matrix n]
-  (Window. (nth (.coefs matrix) n) (nth (.lks matrix) n) (nth (.rks matrix) n)))
+  (Window. 
+    (nth (.coefs matrix) n) 
+    (nth (.lks matrix) n) 
+    (nth (.rks matrix) n)))
 
 (defn get-Q-from-p 
   "Computes the constant Q, based on an arbitrary parameter p"
@@ -95,12 +97,24 @@
 (defn win-left-bound
   "Left bound index of the spectral window that corresponds to fk"
   [Q fk N sampling-rate]
-  (double (Math/round (* (- 1 (/ (double Q) 2)) (/ (double (* fk N)) (double sampling-rate))))))
+  (double 
+    (Math/round 
+      (* 
+        (- 1 (/ (double Q) 2)) 
+        (/ 
+          (double (* fk N)) 
+          (double sampling-rate))))))
 
 (defn win-right-bound
   "Right bound index of the spectral window that corresponds to fk"
   [Q fk N sampling-rate] 
-  (double (Math/round (* (+ 1 (/ (double Q) 2)) (/ (double (* fk N)) (double sampling-rate))))))
+  (double 
+    (Math/round 
+      (* 
+        (+ 1 (/ (double Q) 2)) 
+        (/ 
+          (double (* fk N)) 
+          (double sampling-rate))))))
 
 (defn cosine-win-element 
   "Computes one coefficient of the cosine temporal window"
