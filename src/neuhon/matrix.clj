@@ -14,3 +14,9 @@
     (transpose 
       (object-array 
         (partition 12 12 periodogram)))))
+
+(partition 
+  spectrum-size-default
+  spectrum-size-default
+  [padding-default-value]
+  signal)

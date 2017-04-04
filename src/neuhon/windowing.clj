@@ -5,20 +5,6 @@
   (:use [clojure.java.io]
         [neuhon.utils]))
 
-;; Lowest note considered in Hertz
-(def lowest-midi-note-default (int 9))
-
-;; Highest note considered in Hertz
-(def highest-midi-note-default (int 81))
-
-;; Resolution of the Fourier transform
-(def spectrum-size-default (int 16384))
-
-;; Framerate after resampling of the raw audio
-(def sampling-freq-default (float 4410.0))
-
-;; Arbitrary p parameter for determining the value of the constant Q
-(def p-default (float 0.8))
 
 ;; Primitive type of the spectral coefficients
 (def win-coef-type Double/TYPE)
@@ -140,9 +126,9 @@
     (map 
       (fn [d]
         (cosine-win 
-          (get-Q-from-p p-default) 
-          (midi-to-hertz d) spectrum-size-default sampling-freq-default))
-      (range lowest-midi-note-default highest-midi-note-default))))
+          (get-Q-from-p chromatic_max_weight) 
+          (midi-to-hertz d) window-size target-sampling-rate))
+      (range min-midi-note max-midi-note))))
 
 ;; Converts a sequence of Windows into a WindowMatrix
 (def winmat (WindowMatrix. 
