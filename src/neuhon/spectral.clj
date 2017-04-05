@@ -79,11 +79,6 @@
       (* pulse-conversion-factor (- %1 tau) freq))
     timeline))
 
-(defn corr-between-two-colls
-  "Correlation function between two collections"
-  [A B]
-  (apply-sum (vproduct A B)))
-
 (defn lomb-scargle-preprocessing
   "Pre-computes what can be preprocessed during the
   Lonm-Scargle least-squares regression"
@@ -106,10 +101,11 @@
 (defn apply-lomb-scargle-on-one-frequency
   [signal ith]
   (let [freq-data (nth ls-freqs ith)
-        cos-wave (.waveform-cos freq-data)
-        sin-wave (.waveform-sin freq-data)
-        den-cos  (.den-cos freq-data)
-        den-sin  (.den-sin freq-data)]
+        freq      (.freq freq-data)
+        cos-wave  (.waveform-cos freq-data)
+        sin-wave  (.waveform-sin freq-data)
+        den-cos   (.den-cos freq-data)
+        den-sin   (.den-sin freq-data)]
     (* 0.5 (+
       (/ (pow2 (apply-sum (vproduct cos-wave signal))) den-cos)
       (/ (pow2 (apply-sum (vproduct sin-wave signal))) den-sin)))))
@@ -117,5 +113,9 @@
 (defn compute-periodogram
   [signal]
   (map 
-    #(apply-lomb-scargle-on-one-frequency signal %1) 
+    #(apply-lomb-scargle-on-one-frequency signal %1)
     (range n-midi-notes)))
+
+(def a (cos-waveform 440.0 0.0))
+(println (compute-periodogram a))
+(println a)

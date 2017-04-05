@@ -17,10 +17,10 @@
 (def ^:const window-size 16384)
 
 ;; Lowest midi note to consider
-(def ^:const min-midi-note 8)
+(def ^:const min-midi-note 7)
 
 ;; Highest midi note to consider
-(def ^:const max-midi-note 80)
+(def ^:const max-midi-note 79)
 
 ;; Number of octaves := (max-midi-node - min-midi-node) / 12
 (def ^:const n-octaves 6)

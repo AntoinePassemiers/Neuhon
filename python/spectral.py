@@ -134,13 +134,10 @@ def getPeriodograms(signal):
 if __name__ == "__main__":
 	sampling_rate = 4410.0
 	regressor = LombScargleRegressor(16384, sampling_rate)
-	print([(freq, regressor.taus[i]) for i, freq in enumerate(Parameters.note_frequencies)])
+	# print([(freq, regressor.taus[i]) for i, freq in enumerate(Parameters.note_frequencies)])
 
 	window_size = Parameters.window_size
 	freq = 440.0
-	s = np.sin(2.0 * np.pi * np.arange(window_size) * freq / sampling_rate)
-	# s = s * 500 + np.random.rand(window_size) * 700
-	periodogram = regressor.fit(s)
-	print(periodogram)
-	print(np.max(periodogram))
-	assert(freq == Parameters.note_frequencies[np.argmax(periodogram)])
+	s = np.cos(2.0 * np.pi * np.arange(window_size) * freq / sampling_rate)
+	print(list(regressor.fit(s)))
+	print(list(s))

@@ -25,7 +25,7 @@
 
 (deftest periodogram-test
   (testing "Periodogram of a 440 Hz sine-wave with no phase change"
-    (let [test-waveform (cos-waveform 440.0 (freq-time-delay 440.0))]
+    (let [test-waveform (sin-waveform 440.0 0)]
       (is
         (coll-almost-equals
           (compute-periodogram test-waveform)
