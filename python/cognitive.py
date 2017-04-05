@@ -153,7 +153,6 @@ def findKey(filename, method = METHOD_CQT):
     stereo_signal = getSignalFromFile(filename)
     """ Averaging the 2 channels (stereo -> mono) """
     signal = stereoToMono(stereo_signal) # Mean of left and right channels
-    print(len(signal))
     """ Low-pass filtering """
     signal = lowPassFiltering(signal)
     """ Downsampling """

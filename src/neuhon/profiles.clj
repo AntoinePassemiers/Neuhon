@@ -48,9 +48,10 @@
   "Rotates the element of a sequence to the left"
   ([profile] (rotate-left profile 1))
   ([profile n]
-    (if (> n 0) 
-      (rotate-left (concat (drop 1 profile) [(first profile)]) (- n 1))
-      profile)))
+    (let [m (mod n 12)]
+      (if (> m 0) 
+        (rotate-left (concat (drop 1 profile) [(first profile)]) (- m 1))
+        profile))))
 
 (defn key-distance 
   "Computes the distance between two key signatures,
@@ -103,22 +104,66 @@
   major C -> major C, major C#, ... major B
   minor C -> minor C, minor C#, ... minor B")
 (def all-major-profiles
-  (doall (map (fn [i] (rotate-left major-base-profile i)) (range 12))))
+  (doall 
+    (map 
+      (fn [i] (rotate-left major-base-profile i)) 
+      (range 12))))
 (def all-minor-profiles
-  (doall (map (fn [i] (rotate-left minor-base-profile i)) (range 12))))
+  (doall 
+    (map 
+      (fn [i] (rotate-left minor-base-profile i)) 
+      (range 12))))
 
-(defn dot-product 
-  "Dot-product of two input sequences with same lengths"
+(defn mean
+  "Mean of an input sequence"
+  [coll]
+  (/ (apply-sum coll) (count coll)))
+
+(defn variance
+  "Variance of an input sequence"
+  [coll]
+  (/
+    (apply-sum
+      (map
+        #(pow2 (- %1 (mean coll)))
+        coll))
+    (count coll)))
+
+(defn stdv
+  "Standard deviation of an input sequence"
+  [coll]
+  (Math/sqrt (variance coll)))
+
+(defn normalize
+  "Normalizing an input sequence by subtracting its mean"
+  [coll]
+  (map
+    #(- %1 (mean coll))
+    coll))
+
+(defn dot-product
+  "Dot-product between two input sequences"
+  [A B]
+  (apply-sum (map #(* %1 %2) A B)))
+
+(defn pearsonr
+  "Pearson correlation coeffient between a chromatic vector and a tone profile"
   [chromatic-vector profile]
-  (let [convolution (fn [i] (* (nth chromatic-vector i) (nth profile i)))]
-    (reduce + (map convolution (range 12)))))
+  (/
+    (dot-product
+      (normalize chromatic-vector)
+      (normalize profile))
+    (*
+      (count chromatic-vector)
+      (stdv chromatic-vector)
+      (stdv profile))))
 
 (defn match-with-profiles 
   "Matches an input chromatic vector with every major or every minor profiles
   and return all the scores"
   [chromatic-vector profiles]
   (doall (map
-    (fn [i] (dot-product chromatic-vector (nth profiles i)))
+    (fn [i] (pearsonr chromatic-vector (nth profiles i)))
     (range 12))))
 
 (defn find-best-profile 

@@ -76,8 +76,8 @@
         step-size (int (Math/floor (/ N window-size)))
         partitions (partition 
           window-size
-          window-size
-          [padding-default-value]
+          window-size ;; slide
+          (repeat window-size padding-default-value)
           signal)
         current-partition-id (atom 0)]
     ;; (ste signal 4000 spectrum-size-default) ;; Computes short term energy
@@ -110,7 +110,7 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 2)
+        (when (< i 230) ;; 230
           (try
             (let [line (nth csv-seq i)
                   artist (nth line 0)
@@ -123,7 +123,7 @@
                     (key-distance predicted-key target-key))]
               (do
                 (cond
-                  (is-same-key? predicted-key target-key) 
+                  (is-same-key? predicted-key target-key)
                     (swap! perfect-matches inc)
                   (is-out-of-a-fifth? predicted-key target-key)
                     (swap! out-by-a-fifth-matches inc)
@@ -148,8 +148,8 @@
 ;; Ground truth       :  Gm  Ebm Am  C#m Ebm A   Em  Ebm Bbm Em  Dm  Em  G   G#m Am
 ;; Python predictions :  Gm  Bb  E   D   Em  G#m F#m Em  Ebm Em  A   Dm  C   G#m A
 ;; with no low-pass   :  Gm  Eb  E   D   Em  G#m C   F#m Ebm G   A   Fm  C   G#  A
-;; Clojure version    :  G#  F   C#  F#  F#  Cm  G#  D   F   C#  B   Eb  G#  C   B
-;; Distance           :  1   2   4   5   3   3   4   11  7   9   9   11  1   4   2
+;; Clojure version    :  G#  Bb  C#  F#  F#  Cm  G#  D   F   C#  B   Eb  G#  C   B
+;; Distance           :  1   7   4   5   3   3   4   11  7   9   9   11  1   4   2
 
 ;; Usefull functions : zipmap, repeat, disj
 ;; fn + nth -> is it really slower than fn + fn ?

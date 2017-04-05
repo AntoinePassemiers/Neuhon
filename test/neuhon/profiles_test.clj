@@ -7,6 +7,27 @@
         [neuhon.test-utils]))
 
 
+(deftest variance-test
+  (testing "Variance of an input sequence"
+    (is (almost-equals (variance (seq [5.2 1.0 7.4])) 7.04888888 3))
+    (is (not (almost-equals (variance (seq [78.0 1.0 7.4])) 7.04888888 3)))))
+
+(deftest normalize-test
+  (testing "Normalization of an input sequence"
+    (is 
+      (=
+        (normalize (seq [1.0 3.0 2.0]))
+        (seq [-1.0 1.0 0.0])))))
+
+(deftest pearsonr-test
+  (testing "Pearson correlation coefficient"
+    (is (almost-equals 
+      0.2706698 
+      (pearsonr
+        (seq [1.0 2.0 3.0 4.0])
+        (seq [7.8 1.1 3.6 9.7]))
+      4))))
+
 (deftest match-exact-same-profiles-test
   (testing "Comparing tone profiles with themselves"
     (is (= (find-best-profile (nth all-major-profiles 0))  0))
