@@ -4,6 +4,7 @@
   (:require [clojure.test :refer :all]
             [neuhon.core :refer :all])
   (:use [neuhon.profiles]
+        [neuhon.stats]
         [neuhon.test-utils]))
 
 

@@ -51,6 +51,7 @@
   (let [periodogram (compute-periodogram signal)
         chromatic-vector (reshape-into-chromatic-vector periodogram)]
     (do
+      (println periodogram)
       (find-best-profile chromatic-vector))))
 
 (defn find-key-globally
@@ -86,6 +87,7 @@
         (map
           (fn [i]
             (do
+              (println @current-partition-id)
               (inc-array-element key-counters 
                 (find-key-locally 
                   (nth partitions @current-partition-id))))
@@ -110,7 +112,7 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 230) ;; 230
+        (when (< i 2) ;; 230
           (try
             (let [line (nth csv-seq i)
                   artist (nth line 0)
@@ -155,3 +157,18 @@
 ;; fn + nth -> is it really slower than fn + fn ?
 ;; use (def ^:const stuff 48) and (def ^:dynamic stuff 48) -> const values are inlined
 ;; use definline to inline small functions
+
+;; 0  |||||
+;; 1  |||
+;; 2  ||||||||
+;; 3  ||||
+;; 4  ||||||||
+;; 5  |||||||||
+;; 6  ||||
+;; 7  ||||
+;; 8  |||||
+;; 9  |||||||
+;; 10 |||||
+;; 11 ||
+
+;; last : 50

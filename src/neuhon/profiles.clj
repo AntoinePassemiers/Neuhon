@@ -4,14 +4,8 @@
   (:gen-class)
   (:use [clojure.java.io]
         [clojure.core.matrix]
+        [neuhon.stats]
         [neuhon.utils]))
-
-(defn normalize
-  "Normalize the elements of an input sequence,
-  after computing their sum"
-  [data]
-  (let [total (reduce + data)]
-    (map (fn [i] (/ (nth data i) total)) (range (count data)))))
 
 ;; Krumhansl's average profile of the major scale
 (def krumhansl-major-base-profile (normalize [6.4 2.2 3.5 2.3 4.4 4.1 2.5 5.2 2.4 3.7 2.3 2.9]))
@@ -100,7 +94,8 @@
       (= (get key-types key-a) (get key-types key-b))
       (or (= distance 5) (= distance 7)))))
 
-(comment "Generates all the possible profiles by rotating the two existing ones :
+(comment 
+  "Generate all the possible profiles by rotating the two existing ones :
   major C -> major C, major C#, ... major B
   minor C -> minor C, minor C#, ... minor B")
 (def all-major-profiles
@@ -113,50 +108,6 @@
     (map 
       (fn [i] (rotate-left minor-base-profile i)) 
       (range 12))))
-
-(defn mean
-  "Mean of an input sequence"
-  [coll]
-  (/ (apply-sum coll) (count coll)))
-
-(defn variance
-  "Variance of an input sequence"
-  [coll]
-  (/
-    (apply-sum
-      (map
-        #(pow2 (- %1 (mean coll)))
-        coll))
-    (count coll)))
-
-(defn stdv
-  "Standard deviation of an input sequence"
-  [coll]
-  (Math/sqrt (variance coll)))
-
-(defn normalize
-  "Normalizing an input sequence by subtracting its mean"
-  [coll]
-  (map
-    #(- %1 (mean coll))
-    coll))
-
-(defn dot-product
-  "Dot-product between two input sequences"
-  [A B]
-  (apply-sum (map #(* %1 %2) A B)))
-
-(defn pearsonr
-  "Pearson correlation coeffient between a chromatic vector and a tone profile"
-  [chromatic-vector profile]
-  (/
-    (dot-product
-      (normalize chromatic-vector)
-      (normalize profile))
-    (*
-      (count chromatic-vector)
-      (stdv chromatic-vector)
-      (stdv profile))))
 
 (defn match-with-profiles 
   "Matches an input chromatic vector with every major or every minor profiles
