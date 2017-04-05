@@ -111,7 +111,7 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 230) ;; 230
+        (when (< i 2) ;; 230
           (try
             (let [line (nth csv-seq i)
                   artist (nth line 0)
