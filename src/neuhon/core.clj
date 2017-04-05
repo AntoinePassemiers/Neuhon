@@ -111,7 +111,7 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 2) ;; 230
+        (when (< i 230) ;; 230
           (try
             (let [line (nth csv-seq i)
                   artist (nth line 0)
@@ -142,15 +142,14 @@
         (println (format "---> Parallel matches       : %4d" @parallel-matches))
         (println (format "---> Wrong predictions      : %4d" @wrong-keys)))))))
 
-;; (process-all db-base-path)
+(process-all db-base-path)
 
 ;; First file : 11208960 samples -> 1120896 in Clojure
 ;;                       1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
 ;; Ground truth       :  Gm  Ebm Am  C#m Ebm A   Em  Ebm Bbm Em  Dm  Em  G   G#m Am
 ;; Python predictions :  Gm  Bb  E   D   Em  G#m F#m Em  Ebm Em  A   Dm  C   G#m A
 ;; with no low-pass   :  Gm  Eb  E   D   Em  G#m C   F#m Ebm G   A   Fm  C   G#  A
-;; Clojure version    :  G#  Bb  C#  F#  F#  Cm  G#  D   F   C#  B   Eb  G#  C   B
-;; Distance           :  1   7   4   5   3   3   4   11  7   9   9   11  1   4   2
+;; Clojure version    :  Gm  B   Bb  C   Bbm F#m D   G#m Bm  G   F   Am
 
 ;; Usefull functions : zipmap, repeat, disj
 ;; fn + nth -> is it really slower than fn + fn ?

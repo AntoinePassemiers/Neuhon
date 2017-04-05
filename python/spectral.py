@@ -139,5 +139,4 @@ if __name__ == "__main__":
 	window_size = Parameters.window_size
 	freq = 440.0
 	s = np.cos(2.0 * np.pi * np.arange(window_size) * freq / sampling_rate)
-	print(list(regressor.fit(s)))
-	print(list(s))
+	# print(list(regressor.fit(s)))

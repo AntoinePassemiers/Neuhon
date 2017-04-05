@@ -21,7 +21,7 @@
 
 ;; Frequency bins between min-midi-node and max-midi-node
 (def ^:const note-frequencies
-  (map midi-to-hertz (range min-midi-note max-midi-note)))
+  (map midi-to-hertz (range (- min-midi-note 1) (- max-midi-note 1))))
 
 ;; Periods corresponding to the frequency bins
 (def ^:const note-periods
@@ -115,7 +115,3 @@
   (map 
     #(apply-lomb-scargle-on-one-frequency signal %1)
     (range n-midi-notes)))
-
-(def a (cos-waveform 440.0 0.0))
-(println (compute-periodogram a))
-(println a)

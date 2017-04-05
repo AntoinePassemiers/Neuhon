@@ -39,12 +39,21 @@
     "Cm" 1 "C#m" 1 "Dm" 1 "Ebm" 1 "Em" 1 "Fm" 1 "F#m" 1 "Gm" 1 "G#m" 1 "Am" 1 "Bbm" 1 "Bm" 1))
 
 (defn rotate-left
-  "Rotates the element of a sequence to the left"
+  "Rotates the elements of a sequence to the left"
   ([profile] (rotate-left profile 1))
   ([profile n]
     (let [m (mod n 12)]
       (if (> m 0) 
         (rotate-left (concat (drop 1 profile) [(first profile)]) (- m 1))
+        profile))))
+
+(defn rotate-right
+  "Rotates the elements of a sequence to the right"
+  ([profile] (rotate-right profile 1))
+  ([profile n]
+    (let [m (mod n 12)]
+      (if (> m 0) 
+        (rotate-right (concat [(last profile)] (drop-last 1 profile)) (- m 1))
         profile))))
 
 (defn key-distance 
@@ -117,6 +126,14 @@
     (fn [i] (pearsonr chromatic-vector (nth profiles i)))
     (range 12))))
 
+(defn add-frequency-range-offset
+  "Take into account the fact that the first note starts at min-midi-note"
+  [key-index]
+  (if
+    (>= key-index 12)
+    (+ 12 (mod (+ key-index (- min-midi-note 1)) 12))
+    (mod (+ key-index (- min-midi-note 1)) 12)))
+
 (defn find-best-profile 
   "Matches an input chromatic vector with every major or every minor profiles,
   and returns the key that maximizes the match score."
@@ -125,7 +142,7 @@
         minor-scores (match-with-profiles chromatic-vector all-minor-profiles)
         best-major   (arg-max major-scores)
         best-minor   (arg-max minor-scores)]
-    (do
-      (if (> (nth major-scores best-major) (nth minor-scores best-minor))
-        best-major
-        (+ 12 best-minor)))))
+    (if 
+      (> (nth major-scores best-major) (nth minor-scores best-minor))
+      (add-frequency-range-offset best-major)
+      (add-frequency-range-offset (+ 12 best-minor)))))

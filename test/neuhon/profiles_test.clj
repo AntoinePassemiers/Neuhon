@@ -61,6 +61,12 @@
       (rotate-left (seq [4 8 7 6 3 0 0 1 5 7 9 6]) 4)
       (seq [3 0 0 1 5 7 9 6 4 8 7 6])))))
 
+(deftest rotate-right-test
+  (testing "Rotate an input sequence to the right"
+    (is (=
+      (rotate-right (seq [4 8 7 6 3 0 0 1 5 7 9 6]) 3)
+      (seq [7 9 6 4 8 7 6 3 0 0 1 5])))))
+
 (deftest match-exact-same-profiles-test
   (testing "Comparing tone profiles with themselves"
     (is (= (find-best-profile (nth all-major-profiles 0))  0))
