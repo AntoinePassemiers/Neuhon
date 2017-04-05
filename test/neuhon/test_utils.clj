@@ -27,11 +27,17 @@
     (= n-decimals 3) (format "%.3f" (bigdec value))
     :else (format "%.4f" (bigdec value))))
 
+(defn round-to-n-digits
+  "Round a double to the given precision (number of significant digits)"
+  [value n-digits]
+  (let [factor (Math/pow 10 n-digits)]
+    (/ (Math/round (* value factor)) factor)))
+
 (defn almost-equals
   [a b n-decimals]
   (=
-    (round-as-string a n-decimals)
-    (round-as-string b n-decimals)))
+    (round-to-n-digits a n-decimals)
+    (round-to-n-digits b n-decimals)))
 
 (defn coll-almost-equals
   ([A B n-decimals]

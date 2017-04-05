@@ -7,6 +7,32 @@
         [neuhon.stats]
         [neuhon.test-utils]))
 
+(deftest key-to-str-test
+  (testing "Converting an integer key to a tone name"
+    (is (= (key-to-str 0)  "C"))
+    (is (= (key-to-str 1)  "C#"))
+    (is (= (key-to-str 2)  "D"))
+    (is (= (key-to-str 3)  "Eb"))
+    (is (= (key-to-str 4)  "E"))
+    (is (= (key-to-str 5)  "F"))
+    (is (= (key-to-str 6)  "F#"))
+    (is (= (key-to-str 7)  "G"))
+    (is (= (key-to-str 8)  "G#"))
+    (is (= (key-to-str 9)  "A"))
+    (is (= (key-to-str 10) "Bb"))
+    (is (= (key-to-str 11) "B"))
+    (is (= (key-to-str 12) "Cm"))
+    (is (= (key-to-str 13) "C#m"))
+    (is (= (key-to-str 14) "Dm"))
+    (is (= (key-to-str 15) "Ebm"))
+    (is (= (key-to-str 16) "Em"))
+    (is (= (key-to-str 17) "Fm"))
+    (is (= (key-to-str 18) "F#m"))
+    (is (= (key-to-str 19) "Gm"))
+    (is (= (key-to-str 20) "G#m"))
+    (is (= (key-to-str 21) "Am"))
+    (is (= (key-to-str 22) "Bbm"))
+    (is (= (key-to-str 23) "Bm"))))
 
 (deftest variance-test
   (testing "Variance of an input sequence"
@@ -28,6 +54,12 @@
         (seq [1.0 2.0 3.0 4.0])
         (seq [7.8 1.1 3.6 9.7]))
       4))))
+
+(deftest rotate-left-test
+  (testing "Rotate an input sequence to the left"
+    (is (=
+      (rotate-left (seq [4 8 7 6 3 0 0 1 5 7 9 6]) 4)
+      (seq [3 0 0 1 5 7 9 6 4 8 7 6])))))
 
 (deftest match-exact-same-profiles-test
   (testing "Comparing tone profiles with themselves"

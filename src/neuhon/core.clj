@@ -6,6 +6,7 @@
   (:require [clojure.data.csv :as csv]
             [clojure.java.io :as io])
   (:use [clojure.java.io]
+        [clojure.core.matrix]
         [neuhon.wav]
         [neuhon.windowing]
         [neuhon.matrix]
@@ -51,7 +52,6 @@
   (let [periodogram (compute-periodogram signal)
         chromatic-vector (reshape-into-chromatic-vector periodogram)]
     (do
-      (println periodogram)
       (find-best-profile chromatic-vector))))
 
 (defn find-key-globally
@@ -87,7 +87,6 @@
         (map
           (fn [i]
             (do
-              (println @current-partition-id)
               (inc-array-element key-counters 
                 (find-key-locally 
                   (nth partitions @current-partition-id))))
@@ -143,7 +142,7 @@
         (println (format "---> Parallel matches       : %4d" @parallel-matches))
         (println (format "---> Wrong predictions      : %4d" @wrong-keys)))))))
 
-(process-all db-base-path)
+;;(process-all db-base-path)
 
 ;; First file : 11208960 samples -> 1120896 in Clojure
 ;;                       1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
@@ -157,18 +156,3 @@
 ;; fn + nth -> is it really slower than fn + fn ?
 ;; use (def ^:const stuff 48) and (def ^:dynamic stuff 48) -> const values are inlined
 ;; use definline to inline small functions
-
-;; 0  |||||
-;; 1  |||
-;; 2  ||||||||
-;; 3  ||||
-;; 4  ||||||||
-;; 5  |||||||||
-;; 6  ||||
-;; 7  ||||
-;; 8  |||||
-;; 9  |||||||
-;; 10 |||||
-;; 11 ||
-
-;; last : 50

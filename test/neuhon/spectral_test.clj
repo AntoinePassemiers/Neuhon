@@ -7,6 +7,13 @@
         [neuhon.matrix]
         [neuhon.test-utils]))
 
+(deftest round-test
+  (testing "Rounding doubles"
+    (is (=
+      (map 
+        #(round-to-n-digits %1 6) 
+        (seq [1.35269602E-05 2.65298176E-04 3.94780978E-04 3.68102717E-04]))
+      (seq [1.4E-05 2.65E-04 3.95E-04 3.68E-04])))))
 
 (deftest phase-changes-test
   (testing "Phase changes with Lomb-Scargle method"
@@ -41,8 +48,8 @@
              1.01455425E-02 2.67573942E-02 4.09566357E+03 1.43072388E-02
              2.61295843E-03 2.30739179E-03 4.11106521E-04 8.94056096E-04
              3.55143492E-05 5.56798923E-03 8.61840524E-05 2.83516176E-04])
-          2
-          0.90)))))
+          5
+          0.95)))))
 
 (deftest types-test
   (testing "Testing preprocessed data for the Lomb-Scargle algorithm"
