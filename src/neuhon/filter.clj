@@ -7,5 +7,15 @@
         [neuhon.utils]))
 
 (defn moving-average-filtering
-    "Low-pass filtering using a moving average window"
-    [signal cutoff-freq])
+  "Low-pass filtering using a moving average window"
+  [signal N]
+  (map
+    #(float
+      (/ 
+        (apply-sum %1) N))
+    (partition N 1 signal)))
+
+;;(doall 
+;;  (moving-average-filtering
+;;    (take 10000000 (repeatedly #(rand-int 42)))
+;;    5))

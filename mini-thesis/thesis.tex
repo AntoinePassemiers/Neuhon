@@ -67,7 +67,7 @@ TODO : \citep{SP} \citep{AT} -> Partie 2.1.1.
 
 \section*{2. Considérations théoriques}
 
-\subsection*{2.1. Pré-traitement et analyse spectrale}
+\subsection*{2.1. Pré-traitement et estimation spectrale}
 
 \subsubsection*{2.1.1. Constant-Q Transform (CQT)}
 
@@ -124,17 +124,34 @@ donnés par l\textquotesingle équation 1. \citep{PS}\\
 
 Le défaut de la méthode est de ne pas considérer les phases des fréquences concernées. En effet chaque sinusoïde contenue dans la matrice A
 est supposée posséder une phase nulle. La méthode de Lomb-Scargle permet de résoudre ce problème en pré-calculant les phases des sinusoïdes
-utilisées et en tenant compte au mieux de celles-ci lors du calcul du spectre. Le déphasage $\tau$ correspondant à la fréquence $t$ est donné par
+utilisées et en tenant compte au mieux de celles-ci lors du calcul du spectre. Le déphasage $\tau$ correspondant à la fréquence $f$ est donné par
 l\textquotesingle équation 2. \citep{LS}
 
 \begin{align}
 \tan 2\pi f \tau = \frac{\sum\limits_{j=1} \sin 2\pi f t_{j}}{\sum\limits_{j=1} \cos 2\pi f t_{j}}
 \end{align}
 
+Tout comme dans la méthode de Vanícek, la régression consiste en la recherche de coefficients qui expliquent au mieux le signal sous la forme d\textquotesingle
+une pondération de sinusoïdes. Le coefficient associé à la fréquence $f$ est donné par l\textquotesingle équation 3 :
+
 \begin{align}
 \Delta R(f) = \frac{(YC)^{2}}{CC} 
 + \frac{(YS)^{2}}{SS}
 \end{align}
+
+Les valeurs CC et SS peuvent être pré-calculées, car les fréquences d\textquotesingle intérêt ne changent pas d\textquotesingle un fichier
+à l\textquotesingle autre.
+
+\begin{align}
+CC = \sum\limits_{j=1} \cos^{2} 2\pi f (t_{j} - \tau)
+\end{align}
+
+\begin{align}
+SS = \sum\limits_{j=1} \sin^{2} 2\pi f (t_{j} - \tau)
+\end{align}
+
+Les valeurs YC et YS cherchent à mesurer respectivement les niveau d\textquotesingle orthogonalité du signal $y$ avec une sinusoïde déphasée de $\pi / 2$
+et avec une sinusoïde de phase nulle. Ces sinusoïdes peuvent également être pré-calculées. Les formules permettant de calculer YC et YS sont :
 
 \begin{align}
 YC = \sum\limits_{j=1} y_{j}\cos 2\pi f (t_{j} - \tau)
@@ -144,13 +161,8 @@ YC = \sum\limits_{j=1} y_{j}\cos 2\pi f (t_{j} - \tau)
 YS = \sum\limits_{j=1} y_{j}\sin 2\pi f (t_{j} - \tau)
 \end{align}
 
-\begin{align}
-CC = \sum\limits_{j=1} \cos^{2} 2\pi f (t_{j} - \tau)
-\end{align}
-
-\begin{align}
-SS = \sum\limits_{j=1} \sin^{2} 2\pi f (t_{j} - \tau)
-\end{align}
+Ainsi, les seules opérations restantes lors de l\textquotesingle exécution de l\textquotesingle algorithme sont les produits scalaires entre les
+sinusoïdes et le signal délimité par la fenêtre glissante, ce qui réduit drastiquement la quantité de calculs requis pour l\textquotesingle estimation du spectre.
 
 \subsubsection*{2.1.4. Autres méthodes}
 
