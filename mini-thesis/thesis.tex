@@ -67,9 +67,7 @@ TODO : \citep{SP} \citep{AT} -> Partie 2.1.1.
 
 \section*{2. Considérations théoriques}
 
-\subsection*{2.1. Pré-traitement et estimation spectrale}
-
-\subsubsection*{2.1.1. Constant-Q Transform (CQT)}
+\subsection*{2.1. Pré-traitement}
 
 Le signal audio est premièrement extrait du fichier wav, puis la moyenne entre les 
 deux canaux est effectuée si le fichier a été enregistré en stéréo. En effet il n\textquotesingle
@@ -79,24 +77,32 @@ peu d\textquotesingle influence sur la mélodie dans le domaine spectral.
 il n\textquotesingle est pas nécessaire de considérer l\textquotesingle entièreté du spectre
 du fichier musical. De fait, la fréquence d\textquotesingle échantillonnage est abaissée à un dixième 
 de la fréquence standard (4410 Hz), mais ce sous-échantillonnage est susceptible de provoquer des
-phénomènes d\textquotesingle aliasing. Contrairement à la solution de Sh\textquotesingle ath, 
-qui gère les problèmes d\textquotesingle aliasing sonore par l\textquotesingle application 
-d\textquotesingle un filtre passe-bas, une approche plus simpliste et plus rapide se limiterait à
+phénomènes d\textquotesingle aliasing. La solution de Sh\textquotesingle ath implique de
+gérer les problèmes d\textquotesingle aliasing sonore par l\textquotesingle application 
+d\textquotesingle un filtre passe-bas. Dans le cadre de ce projet, nous nous limiterons à
 l\textquotesingle application d\textquotesingle une moyenne mobile sur une fenêtre glissante
 de taille arbitraire. L\textquotesingle avantage de la méthode est de bénéficier d\textquotesingle effets
 passe-bas sans devoir effectuer de calculs dans le domaine fréquentiel. Pour ce qui est de la taille
 de la fenêtre temporelle, il s\textquotesingle agit d\textquotesingle un hyper-paramètre fixé durant
-l\textquotesingle évaluation de l\textquotesingle algorithme. \citep{IS}\\
+l\textquotesingle évaluation de l\textquotesingle algorithme. \citep{IS}
 
-Ensuite, une fenêtre de Blackman est appliquée sur les données observées afin d\textquotesingle éviter les distortions spectrales
-dues à la taille limitée de la fenêtre (et au principe d\textquotesingle incertitude d\textquotesingle Heisenberg). Le spectre est alors
-approximé à l\textquotesingle aide de la transformée de Fourier rapide (FFT). L\textquotesingle intuition derrière la Constant-Q Transform (CQT)
+\subsection*{2.2. Estimation spectrale}
+
+Il existe deux catégories de techniques d\textquotesingle estimation de densité spectrale : les méthodes paramétriques et les méthodes non-paramétriques.
+
+
+\subsubsection*{2.2.1. Constant-Q Transform (CQT)}
+
+Avant de procéder à l\textquotesingle estimation de la CQT, une fenêtre de Blackman est appliquée sur les données observées afin d\textquotesingle
+ éviter les distortions spectrales dues à l\textquotesingle étroitesse de la fenêtre (et au principe d\textquotesingle incertitude d\textquotesingle Heisenberg).
+Le spectre est alors approximé à l\textquotesingle aide de la transformée de Fourier rapide (FFT). L\textquotesingle intuition derrière la Constant-Q 
+Transform (CQT)
 est de penser que les coefficients de la FFT dont les fréquences ne correspondent pas à des notes de musique prennent plus de poids que les autres
 coefficients. Ceci doit être réajusté en appliquant des fenêtres spectrales centrées sur les notes de musiques. Pour chaque fenêtre, les coefficients résultants de cette opération sont alors sommés pour ne former qu\textquotesingle un seul coefficient spectral. L\textquotesingle ensemble des coefficients globaux
 constitue alors la CQT.
 
 
-\subsubsection*{2.1.2. Méthodes basées sur l\textquotesingle auto-corrélation}
+\subsubsection*{2.2.2. Méthodes basées sur l\textquotesingle auto-corrélation}
 
 Les algorithmes reposant sur l\textquotesingle utilisation de fonctions d\textquotesingle auto-corrélation sont plus souples
 car l\textquotesingle auto-corrélation peut être calculé de diverses manières, et seulement pour les fréquences voulues.
@@ -105,7 +111,7 @@ l\textquotesingle auto-corrélation pour toutes les notes musicales situées ent
 de la fonction d\textquotesingle auto-corrélation pour tous les lags correspondants.Le lag est alors simplement égal à la période
 voulue. Un autre avantage des fonctions d\textquotesingle auto-corrélation est que celles-ci sont indépendantes des phases du spectre.
 
-\subsubsection*{2.1.3. Estimation spectrale par moindres carrés}
+\subsubsection*{2.2.3. Estimation spectrale par moindres carrés}
 
 Il est possible d\textquotesingle estimer le spectre par régression, au travers d\textquotesingle algorithmes n\textquotesingle exigeant
 pas de grandes quantités de calcul. Parmi les algorithmes les plus importants résident celui de Vaníček et celui de Lomb-Scargle. Leur particularité est
@@ -164,15 +170,15 @@ YS = \sum\limits_{j=1} y_{j}\sin 2\pi f (t_{j} - \tau)
 Ainsi, les seules opérations restantes lors de l\textquotesingle exécution de l\textquotesingle algorithme sont les produits scalaires entre les
 sinusoïdes et le signal délimité par la fenêtre glissante, ce qui réduit drastiquement la quantité de calculs requis pour l\textquotesingle estimation du spectre.
 
-\subsubsection*{2.1.4. Autres méthodes}
+\subsubsection*{2.2.4. Autres méthodes}
 
 TODO : Cepstre, spectre de puissance, ...
 
-\subsection*{2.2. Prédiction de la tonalité}
+\subsection*{2.3. Prédiction de la tonalité}
 
-\subsubsection*{2.2.1. Modèle cognitif}
+\subsubsection*{2.3.1. Modèle cognitif}
 
-\subsubsection*{2.2.2. Modèles de Markov Cachés (HMM)}
+\subsubsection*{2.3.2. Modèles de Markov Cachés (HMM)}
 
 Les modèles de Markov cachés sont des machines à états discrets cherchant à représenter des séries multivariées par
 leurs distributions, ainsi que par les probabilités de transition entre les états cachés de la machine. De plus, chaque état
@@ -187,7 +193,7 @@ TODO : \citep{JP} \citep{DR}
 
 TODO : \citep{YB}
 
-\subsubsection*{2.2.4. Résultats}
+\subsubsection*{2.4. Résultats}
 
 \begin{table}[h]
 \center{
@@ -206,7 +212,7 @@ Le tableau reprend les scores du modèle cognitif (COGN), du modèle d\textquote
 des modèles de Markov cachés (HMM), et du modèle de Markov caché d\textquotesingle entrée-sortie (IO-HMM).}
 \end{table}
 
-\section{Implémentation en Clojure}
+\section{3. Implémentation en Clojure}
 
 TODO : \citep{SK}
 
