@@ -29,10 +29,15 @@ KRUMHANSL_MAJOR_BASE_PROFILE = np.array([6.4, 2.2, 3.5, 2.3, 4.4, 4.1, 2.5, 5.2,
 KRUMHANSL_MINOR_BASE_PROFILE = np.array([6.4, 2.8, 3.6, 5.4, 2.7, 3.6, 2.6, 4.8, 4.0, 2.7, 3.3, 3.2])
 SHAATH_MAJOR_BASE_PROFILE    = np.array([6.6, 2.0, 3.5, 2.2, 4.6, 4.0, 2.5, 5.2, 2.4, 3.8, 2.3, 3.4])
 SHAATH_MINOR_BASE_PROFILE    = np.array([6.5, 2.8, 3.5, 5.4, 2.7, 3.5, 2.5, 5.1, 4.0, 2.7, 4.3, 3.2])
-MAJOR_PROFILE_MATRIX = createProfileMatrix(SHAATH_MAJOR_BASE_PROFILE)
-MINOR_PROFILE_MATRIX = createProfileMatrix(SHAATH_MINOR_BASE_PROFILE)
 
-KEY_NAMES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
+CUSTOM_MAJOR_BASE_PROFILE    = np.array([6.6, 4.0, 3.5, 4.2, 4.6, 4.0, 2.5, 5.2, 2.4, 3.8, 2.3, 4.4])
+CUSTOM_MINOR_BASE_PROFILE    = np.array([6.5, 4.8, 3.5, 6.4, 2.7, 3.5, 2.5, 5.1, 4.0, 2.7, 4.3, 4.2])
+
+MAJOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MAJOR_BASE_PROFILE)
+MINOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MINOR_BASE_PROFILE)
+
+KEY_NAMES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B",
+    "Cm", "C#m", "Dm", "Ebm", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "Bbm", "Bm"]
 KEY_DICT = { keyname : i for i, keyname in enumerate(KEY_NAMES) }
 
 def w_xk(x, lk, rk):
@@ -143,12 +148,15 @@ def getCQTs(fft_matrix, wins):
         n_vectors += 1
     return cqt_matrix
 
+def predictKeyFromHistogram(hist):
+    kk = np.argmax(hist)
+    predicted_key_name = KEY_NAMES[kk]
+    return predicted_key_name
+
+
+
 def findKey(filename, method = METHOD_CQT):
-    hist = {
-        "C" : 0, "C#" : 0, "D" : 0, "Eb" : 0, "E" : 0, "F" : 0, "F#" : 0, "G" : 0,
-        "G#" : 0, "A" : 0, "Bb" : 0, "B" : 0, "Cm" : 0, "C#m" : 0, "Dm" : 0, "Ebm" : 0,
-        "Em" : 0, "Fm" : 0, "F#m" : 0, "Gm" : 0, "G#m" : 0, "Am" : 0, "Bbm" : 0, "Bm" : 0
-    }
+    hist = np.zeros(24, dtype = np.int)
     """ Loading wav file """
     stereo_signal = getSignalFromFile(filename)
     """ Averaging the 2 channels (stereo -> mono) """
@@ -191,15 +199,17 @@ def findKey(filename, method = METHOD_CQT):
         best_minor_key = minor_scores.argmax()
         best_score = max(major_scores[best_major_key], minor_scores[best_minor_key])
         if major_scores[best_major_key] > minor_scores[best_minor_key]:
-            kk = KEY_NAMES[(Parameters.min_midi_note - 1 + best_major_key) % 12]
+            kk = (Parameters.min_midi_note - 1 + best_major_key) % 12
         else:
-            kk = KEY_NAMES[(Parameters.min_midi_note - 1 + best_minor_key) % 12] + "m"
+            kk = (Parameters.min_midi_note - 1 + best_minor_key) % 12 + 12
         if best_score >= 0.0:
-            # hist[kk] += np.log(ste_sequence[n_vectors])
+            # hist[kk] += np.sqrt(ste_sequence[n_vectors])
             hist[kk] += 1
         n_vectors += 1
-    predicted_key_name = max(hist.iteritems(), key = operator.itemgetter(1))[0]
-    return predicted_key_name, chromatic_matrix
+
+    print(hist.reshape(2, 12))
+    predicted_key_name = predictKeyFromHistogram(hist)
+    return predicted_key_name, chromatic_matrix, hist
 
 def findKeyUsingCQT(filename): 
     return findKey(filename, method = METHOD_CQT)

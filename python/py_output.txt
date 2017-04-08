@@ -1,0 +1,2088 @@
+[[ 413873       0  117817  277031       0  379548  300681  564920  124061
+        0  575565  173595]
+ [ 400658  223171 1020442  704611  126544  209664       0  840700  509625
+   430992       0       0]]
+File number    1
+----------------
+Artist        : 10CC
+Title         : Dreadlock Holiday
+Target key    : Gm
+Predicted key : Dm
+
+[[  408676   514058  5333611 13136300   424930   619006        0  1277279
+   2279459        0  7268354        0]
+ [  276941    44780 12427364   142626   550396   531899   174123  1032652
+    581444   315466        0        0]]
+File number    2
+----------------
+Artist        : 187 Lockdown
+Title         : Gunman (Natural Born Chillers Remix)
+Target key    : Ebm
+Predicted key : Eb
+
+[[  238777        0        0  5728999 15850238        0        0 10534520
+    302023  6437625  3457620  2899485]
+ [ 1630285        0        0  1196991  2789299        0   694780  2430536
+   4139670  4541726   290802   388007]]
+File number    3
+----------------
+Artist        : 4hero
+Title         : Star Chasers (Masters At Work Main Mix)
+Target key    : Am
+Predicted key : E
+
+[[       0        0 10528073        0        0        0        0        0
+         0        0        0        0]
+ [       0  1554099        0        0        0        0        0        0
+         0        0        0        0]]
+File number    4
+----------------
+Artist        : 50 Cent
+Title         : In Da Club
+Target key    : C#m
+Predicted key : D
+
+[[  86544  553010 2708344       0 1877781 1418189       0  913705  255602
+  2027899   88095  213768]
+ [      0 2255425 2065741       0 3198701  372220 1227395  549043  795057
+   614628  215703  449201]]
+File number    5
+----------------
+Artist        : 808 State
+Title         : Pacific State
+Target key    : Ebm
+Predicted key : Em
+
+[[       0        0        0        0        0        0        0        0
+         0        0        0        0]
+ [       0        0        0        0    60620        0        0        0
+  28152718        0        0        0]]
+File number    6
+----------------
+Artist        : A Guy Called Gerald
+Title         : Voodoo Ray
+Target key    : A
+Predicted key : G#m
+
+[[4269342  872037  857813  244825  179286 2139233  215563  207496 1783218
+   429809       0       0]
+ [ 598593  580745       0  696410   58459 3361716  650843       0   57075
+  1483838       0  712836]]
+File number    7
+----------------
+Artist        : A Tribe Called Quest
+Title         : Can I Kick It? (Boilerhouse Mix)
+Target key    : Em
+Predicted key : C
+
+[[      0       0       0  172908  105571       0 4406129  235923  313897
+  1264964  368587  143788]
+ [  87046       0   11239 2248214  116787  310707 2159120  245345  259705
+        0  784988       0]]
+File number    8
+----------------
+Artist        : A Tribe Called Quest
+Title         : Find A Way
+Target key    : Ebm
+Predicted key : F#
+
+[[      0       0  571941 7025442       0       0       0       0       0
+        0       0 4004172]
+ [4268007 4066715       0 5969327       0       0       0       0 1820308
+        0       0       0]]
+File number    9
+----------------
+Artist        : A Tribe Called Quest
+Title         : Vivrant Thing (feat Violator)
+Target key    : Bbm
+Predicted key : Eb
+
+[[      0       0  199614 2218237 1518915  291017  593369 4108319 3079984
+        0       0  151772]
+ [      0       0       0       0 5992433  874265 7767762 2268434 3369953
+   789693       0  195330]]
+File number   10
+----------------
+Artist        : A-Skillz
+Title         : Drop The Funk
+Target key    : Em
+Predicted key : F#m
+
+[[       0        0   336458        0        0   166117        0        0
+         0 23246370  8087738        0]
+ [       0        0        0        0        0        0        0        0
+         0        0   366809   182002]]
+File number   11
+----------------
+Artist        : Aaliyah
+Title         : Are You That Somebody?
+Target key    : Dm
+Predicted key : A
+
+[[      0  511080 1856718  400062 1272221 2058377  248854  253425       0
+  1881366       0 2114185]
+ [      0  724050 1563779  691513  526731  206115  274506       0       0
+   141427       0  274537]]
+File number   12
+----------------
+Artist        : AC-DC
+Title         : Back In Black
+Target key    : Em
+Predicted key : B
+
+[[ 3794674   339193  2867100        0        0        0   258073  1151955
+         0   526351        0        0]
+ [  316108   318255   561993   250120   373409   325148   287231        0
+    246439   485586        0 10696872]]
+File number   13
+----------------
+Artist        : AC-DC
+Title         : You Shook Me All Night Long
+Target key    : G
+Predicted key : Bm
+
+[[       0        0        0        0        0        0        0        0
+  44130856   813079        0        0]
+ [       0        0        0        0        0        0        0  1979919
+   7913240        0  1393630        0]]
+File number   14
+----------------
+Artist        : Acid District
+Title         : Keep On Searching
+Target key    : G#m
+Predicted key : G#
+
+[[  751937        0        0        0  3371129   403945        0  1196793
+   1133668 26604316        0   134853]
+ [   95925   110385        0        0  1964157        0  1406789     3113
+   1818471  1185335        0    10217]]
+File number   15
+----------------
+Artist        : Adam F
+Title         : Aromatherapy (Edit)
+Target key    : Am
+Predicted key : A
+
+[[   16811        0  8560080  4549931        0  5514366        0   697509
+    828410 24074646  1272383        0]
+ [  838862        0  8497632        0  1588897        0        0        0
+         0 12430951        0   410244]]
+File number   16
+----------------
+Artist        : Adam F
+Title         : Circles (Album Edit)
+Target key    : Dm
+Predicted key : A
+
+[[       0   851061  1785892   157361        0  1311132  3186506 14893783
+  15910656   512403   878461   476514]
+ [       0        0        0   700225        0   884051  1993412   348508
+   9814202  2631155        0  1223634]]
+File number   18
+----------------
+Artist        : Adam F
+Title         : Metropolis
+Target key    : Fm
+Predicted key : G#
+
+[[3625932       0       0  370891       0  941788 1180667 5035024  280112
+        0  342803  432000]
+ [2696260       0       0       0 1136910 1450078       0 1566018 3098372
+   353189       0       0]]
+File number   19
+----------------
+Artist        : Adam F
+Title         : Smash Sumthin (feat Redman)
+Target key    : Cm
+Predicted key : G
+
+[[       0  1076541   475886    93884  2059550   480695  1619633  1390461
+   2533578   992002 16352288        0]
+ [       0   535109   665875  1688564   162174  2389663   898932  7273560
+   1978282   737180  3376328   251560]]
+File number   20
+----------------
+Artist        : Adam F
+Title         : Stand Clear (feat M.O.P.) (Origin Unknown Remix)
+Target key    : F#m
+Predicted key : Bb
+
+[[ 512106       0       0       0 1264604 5251510  270743       0  760957
+  1021739       0       0]
+ [      0       0       0       0  163959 4530137  482163       0  248532
+   243767  262466       0]]
+File number   21
+----------------
+Artist        : Adam F
+Title         : Where's My (feat Lil' Mo)
+Target key    : Fm
+Predicted key : F
+
+[[  685572   635310   292168        0        0  2920375        0  1247913
+  41576420   265900   451964        0]
+ [       0        0   876267      602        0        0   528641 10144316
+  10079530   131208        0        0]]
+File number   22
+----------------
+Artist        : Adam K & Soha
+Title         : Question
+Target key    : Gm
+Predicted key : G#
+
+[[       0   156704        0  5114452        0   167629        0        0
+  10812624        0   393380        0]
+ [       0        0        0   377013        0  3609150   176396  3543355
+   1205660   169544   169028        0]]
+File number   23
+----------------
+Artist        : Adamski
+Title         : Killer (feat Seal)
+Target key    : Bbm
+Predicted key : G#
+
+[[       0        0        0  2318070   895988        0   420871        0
+  59010224        0        0        0]
+ [       0        0        0   929253        0   832768  1146435   464174
+    571262        0        0        0]]
+File number   24
+----------------
+Artist        : Adana Twins
+Title         : Anymore (Manik Remix)
+Target key    : Ebm
+Predicted key : G#
+
+[[ 122251       0       0       0       0 2225501       0       0 1272655
+  3605624 3303991       0]
+ [      0       0  985006       0       0  681549   94477   93919  327628
+   264539       0       0]]
+File number   26
+----------------
+Artist        : Agent Sumo
+Title         : Mayhem
+Target key    : Fm
+Predicted key : A
+
+[[6802998       0 7346028       0       0 6270366       0 2991251       0
+        0  989345       0]
+ [      0       0 2536611       0       0       0       0 1997748       0
+        0       0  991836]]
+File number   27
+----------------
+Artist        : Air
+Title         : Sexy Boy
+Target key    : Dm
+Predicted key : D
+
+[[       0        0        0        0  5219352        0 11256951        0
+     99283        0        0        0]
+ [       0        0        0  2499196        0        0  3302636        0
+         0   102195        0        0]]
+File number   28
+----------------
+Artist        : Aktarv8r
+Title         : Afterwrath
+Target key    : Am
+Predicted key : F#
+
+[[       0        0   112929        0        0  1136167        0        0
+         0 17418999  7988907        0]
+ [       0   162860        0        0        0        0        0        0
+         0   500858        0        0]]
+File number   29
+----------------
+Artist        : Aktarv8r
+Title         : Shinkirou
+Target key    : A
+Predicted key : A
+
+[[ 2382954        0        0        0        0   978457   305190        0
+   2664260  8188637   565748        0]
+ [       0        0        0    86725        0   378285  7935968        0
+    622174 18747267        0        0]]
+File number   30
+----------------
+Artist        : Alexis Raphael
+Title         : Kitchens & Bedrooms
+Target key    : Fm
+Predicted key : Am
+
+[[3280692  162620 2594162   92872 2789182  900995       0  938416  708276
+   447984  110529 1873831]
+ [      0  345024  449225  254330 1095514  360859       0   80884   92440
+   741475  247408 5268804]]
+File number   31
+----------------
+Artist        : Algol
+Title         : Callisto's Warm Oceans
+Target key    : Am
+Predicted key : Bm
+
+[[       0        0   450220        0   532644        0        0        0
+         0        0   409569 15507546]
+ [       0   458439        0        0  2353778        0  1102702        0
+   4021084        0        0  2114258]]
+File number   32
+----------------
+Artist        : Alison Limerick
+Title         : "Where Love Lives (Original 7"" Radio Edit)"
+Target key    : Em
+Predicted key : B
+
+[[       0        0  9254337        0  5112878        0        0  9666062
+         0 11507528        0   458410]
+ [       0        0        0        0  5163055        0        0        0
+    126023        0        0        0]]
+File number   34
+----------------
+Artist        : Alphabet Pony
+Title         : Atoms
+Target key    : Em
+Predicted key : A
+
+[[ 4015927        0        0        0  1967873  7756260        0        0
+         0 10475747        0        0]
+ [       0        0        0        0  1640369        0        0   459450
+         0 11110854        0        0]]
+File number   35
+----------------
+Artist        : Alphabet Pony
+Title         : Clones
+Target key    : Am
+Predicted key : Am
+
+[[       0  9384482 19580245        0        0        0        0        0
+   1038160        0        0        0]
+ [       0  4450824   547600        0        0  3142684        0        0
+         0        0        0        0]]
+File number   36
+----------------
+Artist        : Alter Ego
+Title         : Rocker
+Target key    : Am
+Predicted key : D
+
+[[      0       0 1485483       0  778080       0       0 6965340       0
+  7622144       0       0]
+ [ 329045       0  383309       0 2285293       0 1924335  419122       0
+  1186293       0       0]]
+File number   37
+----------------
+Artist        : Althea & Donna
+Title         : Uptown Top Ranking (2001 digital remaster)
+Target key    : Am
+Predicted key : A
+
+[[ 2159619        0        0        0   588872 10480835        0  7083119
+         0  2108566   618584        0]
+ [       0        0        0        0  6264009   554908   580205  2899387
+         0  2262478        0        0]]
+File number   38
+----------------
+Artist        : Alton Ellis
+Title         : Black Man's Pride
+Target key    : F
+Predicted key : F
+
+[[       0        0        0 14168194 22011657        0  1781762        0
+   5169748        0        0        0]
+ [  117912   836163        0  3126230        0  6666203        0   155808
+         0        0   231340        0]]
+File number   39
+----------------
+Artist        : Aluna George
+Title         : Your Drums, Your Love (Duke Dumont Remix)
+Target key    : G#
+Predicted key : E
+
+[[5253985       0       0       0       0       0       0       0 2136256
+        0       0  705532]
+ [9874677       0       0       0       0       0       0       0  718958
+        0       0       0]]
+File number   40
+----------------
+Artist        : Amerie
+Title         : 1 Thing
+Target key    : Ebm
+Predicted key : Cm
+
+[[11705344  1306069        0        0  1185617  3821495        0  2437149
+   2688308        0        0        0]
+ [  983429   843921   420828   463223  3258690  4186519        0   302727
+   1102417   686706        0        0]]
+File number   41
+----------------
+Artist        : Amira
+Title         : My Desire (Dreem Teem Remix)
+Target key    : Fm
+Predicted key : C
+
+[[ 1486887  2325966        0   604694        0  9817271   650402        0
+    295437 11668433   714744        0]
+ [ 1268630        0  2252228   712231        0  3630301  4203205        0
+         0  3741733  1566167        0]]
+File number   42
+----------------
+Artist        : Amirali
+Title         : Beautiful World
+Target key    : Fm
+Predicted key : A
+
+[[  131850        0        0        0        0        0 18568325        0
+         0    97291   625942 15543343]
+ [       0        0        0   334823        0   275153        0   472544
+   4577251   116896  1028992  1148837]]
+File number   43
+----------------
+Artist        : Amnesia Haze
+Title         : Raw (feat Anturage)
+Target key    : Bm
+Predicted key : F#
+
+[[ 895070 3657784 5761158  631059 2141231 5032636 1479774  773839       0
+        0  513626       0]
+ [      0       0 2976426  735814  387084       0       0 1188089  607614
+        0 1586090  716009]]
+File number   46
+----------------
+Artist        : Antipop Consortium
+Title         : Ping Pong
+Target key    : Fm
+Predicted key : D
+
+[[  670594        0        0   609058  5476156        0 25217710   731710
+         0  2577448        0  5422800]
+ [       0        0        0        0        0        0  5040713        0
+         0        0        0        0]]
+File number   47
+----------------
+Artist        : AntiSerum
+Title         : Trippy (feat Mayhem)
+Target key    : F#m
+Predicted key : F#
+
+[[ 285845  841136 1165735  791464  924511       0       0       0  577524
+   600059  589393 1317380]
+ [1177467 2087795  478757       0  590506  410973  273586       0 1134138
+   160948       0       0]]
+File number   48
+----------------
+Artist        : Aphex Twin
+Title         : Flim
+Target key    : Bb
+Predicted key : C#m
+
+[[8621640 1028034 1077170 2791723 1500378  244063 1446642 1288046 8149624
+  4533326 3954554 1841080]
+ [7197540  208643  660115  284248  563949 1061734  913742 3123958 2254633
+  4002648 1724666 1644135]]
+File number   49
+----------------
+Artist        : Aphex Twin
+Title         : Windowlicker
+Target key    : Cm
+Predicted key : C
+
+[[2349660       0       0       0       0       0  729422 1616497       0
+   553786  491780       0]
+ [      0       0       0       0  226002       0  818466       0       0
+  2646889       0  344579]]
+File number   50
+----------------
+Artist        : Aretha Franklin
+Title         : Respect
+Target key    : C
+Predicted key : Am
+
+[[    5286   903522    36803        0        0        0 78677785        0
+         0        0        0        0]
+ [       0        0        0  2559378        0   647693        0        0
+         0        0   967823        0]]
+File number   51
+----------------
+Artist        : Aril Brikha
+Title         : Palma
+Target key    : Bbm
+Predicted key : F#
+
+[[      0       0       0  510053       0       0       0       0 5362332
+   750436   96897       0]
+ [      0       0       0   92443       0       0       0   85999  348866
+   296525  305452  152429]]
+File number   52
+----------------
+Artist        : Armand Van Helden
+Title         : The Funk Phenomena
+Target key    : Ebm
+Predicted key : G#
+
+[[       0 15280471  1391348        0        0        0        0   603743
+    618312   601094   703443        0]
+ [       0 23075109   625204        0        0        0        0        0
+   1526624  1412571        0   753425]]
+File number   53
+----------------
+Artist        : Armand Van Helden
+Title         : U Don't Know Me (feat Duane Harden)
+Target key    : Gm
+Predicted key : C#m
+
+[[ 632829       0   14121       0       0       0       0       0 7389538
+  5094743       0       0]
+ [ 614236 1587773       0       0       0       0  302714       0  312596
+   551815 3214295       0]]
+File number   54
+----------------
+Artist        : Arrested Development
+Title         : People Everyday (Ibrahim's Edit)
+Target key    : Em
+Predicted key : G#
+
+[[      0       0  849650  287402 3427778       0       0  300363       0
+  1545529       0 1174562]
+ [      0   66359   39594       0  953894       0  607196       0       0
+   313833       0 1310041]]
+File number   55
+----------------
+Artist        : Ash
+Title         : Kung Fu
+Target key    : E
+Predicted key : E
+
+[[       0        0        0   145105  6070782 11415442   340610        0
+   3694754        0 11677665        0]
+ [       0        0        0        0  1579056  3164179        0   156129
+    676123        0   769314        0]]
+File number   56
+----------------
+Artist        : Asian Dub Foundation
+Title         : Box
+Target key    : Fm
+Predicted key : Bb
+
+[[3794248       0  524410 3218387 5840003       0       0  537893  333455
+   533589       0 6287952]
+ [ 720183 2076424  332993  194300 1852019  171585       0       0  668653
+   562482  673721 4314519]]
+File number   57
+----------------
+Artist        : Asian Dub Foundation
+Title         : Charge
+Target key    : Em
+Predicted key : B
+
+[[  448872        0        0   294024        0  1627042   163612   613734
+    464164  4046952 12594664  1811376]
+ [  238048        0   604688        0   451600        0        0  2686579
+    548321   894828  3373490        0]]
+File number   58
+----------------
+Artist        : Asian Dub Foundation
+Title         : Witness
+Target key    : Fm
+Predicted key : Bb
+
+[[       0        0        0        0        0   539564   375205        0
+         0  4525239 38258139        0]
+ [       0        0        0        0        0    94985  2662417        0
+         0 17136823        0        0]]
+File number   59
+----------------
+Artist        : Audio Junkies
+Title         : Bird On A Wire (Audio Junkies Dub)
+Target key    : Fm
+Predicted key : Bb
+
+[[      0 1261001 2903864       0 6061410       0       0 1038648       0
+  1599778  418026 1939460]
+ [      0 7461732       0  693329 4884424       0 2654523       0 1428961
+   989875       0 1063832]]
+File number   60
+----------------
+Artist        : Audioweb
+Title         : Policeman Skank (Freestylers Rinse Out Mix)
+Target key    : Em
+Predicted key : C#m
+
+[[  550564        0   689926        0        0        0   112200   288576
+    756065 19443867   695678   450051]
+ [       0   397674        0        0   316674        0   549319   744469
+    690498  1938067   732471  2293057]]
+File number   61
+----------------
+Artist        : Augustus Pablo
+Title         : Java
+Target key    : Am
+Predicted key : A
+
+[[      0       0       0       0       0       0   77472       0   54399
+  6198325  763547  184984]
+ [  87035       0       0       0       0       0  101225       0  337852
+        0  696170  223235]]
+File number   62
+----------------
+Artist        : Azzido Da Bass
+Title         : Doom's Night (Timo Maas Remix)
+Target key    : Am
+Predicted key : A
+
+[[      0  178614 5352109       0  119886  541666    2485       0  101341
+  8148230 8758492  304533]
+ [      0  136137 1283796       0       0       0  185309 1205591   91603
+  6217852       0 2561315]]
+File number   63
+----------------
+Artist        : B-Complex
+Title         : Beautiful Lies VIP
+Target key    : Dm
+Predicted key : Bb
+
+[[       0   913732  1472475        0  6240133  7730748 12918463   929461
+         0  2694018  1639519   178724]
+ [       0  1810113        0   828611  1980011        0  3655918        0
+   1639164  1844222  2273668   118999]]
+File number   64
+----------------
+Artist        : B-Complex
+Title         : Three Dots
+Target key    : Em
+Predicted key : F#
+
+[[1727882       0 2175910       0 4772737       0       0 1722365       0
+  1856242       0 8587418]
+ [      0 1247825  372641       0 2575127       0 2884250       0       0
+  1562484       0 5055157]]
+File number   65
+----------------
+Artist        : Babe Ruth
+Title         : The Mexican
+Target key    : Em
+Predicted key : B
+
+[[4952686  552903 1667839       0  166089 1144337 6363369  145500       0
+   117633       0  477986]
+ [      0       0       0       0  501665       0 4811821       0       0
+   201606 1773369 4635397]]
+File number   66
+----------------
+Artist        : Baby D
+Title         : Let Me Be Your Fantasy
+Target key    : Em
+Predicted key : F#
+
+[[      0   31413       0       0 5858883       0  364521 4028771       0
+        0  249457 9104104]
+ [      0       0       0       0 4508444       0       0  827579  498896
+        0       0 2190055]]
+File number   67
+----------------
+Artist        : Bachelors Of Science
+Title         : Strings Track
+Target key    : Bm
+Predicted key : B
+
+[[       0 12878725        0     9884  1562961        0   242974        0
+         0 21573885        0        0]
+ [       0  6108272        0   260100        0        0   800621        0
+         0        0   605303        0]]
+File number   68
+----------------
+Artist        : Bachelors Of Science
+Title         : The Ice Dance
+Target key    : C#m
+Predicted key : A
+
+[[       0  4543604 13644689  4744625   240863   139410        0        0
+         0        0        0        0]
+ [10712666   642020  7792495        0        0   146972        0        0
+         0        0        0        0]]
+File number   69
+----------------
+Artist        : Backdraft
+Title         : Riddler
+Target key    : Dm
+Predicted key : D
+
+[[       0    88954        0        0        0        0   303931        0
+         0 45859946  3498350        0]
+ [       0   249529        0        0        0        0        0        0
+    166110   520122   908575   349604]]
+File number   70
+----------------
+Artist        : Bad Company
+Title         : The Nine
+Target key    : Am
+Predicted key : A
+
+[[       0  2800894   461055        0   886125        0 25521945        0
+    400440        0        0  1342939]
+ [       0   592462        0 11104025        0        0        0        0
+    266138        0        0        0]]
+File number   72
+----------------
+Artist        : Basement Jaxx
+Title         : Never Say Never (Mark Knight Remix)
+Target key    : G#m
+Predicted key : F#
+
+[[ 175748       0  279682   84285       0 1273625 3385047       0       0
+  3799841 2235009       0]
+ [      0       0  317416       0    2659  218632  607085  241555       0
+  4425195  321339       0]]
+File number   73
+----------------
+Artist        : Basement Jaxx
+Title         : Red Alert
+Target key    : Fm
+Predicted key : Am
+
+[[29076825        0   322043        0        0  3281116        0        0
+         0   526019        0        0]
+ [       0        0        0        0  7935822        0        0        0
+         0  6000970        0   333921]]
+File number   74
+----------------
+Artist        : Basement Jaxx
+Title         : Where's Your Head At
+Target key    : C
+Predicted key : C
+
+[[       0   849183        0        0 18941459  1761283        0        0
+         0        0   851272  1534239]
+ [       0        0        0  4727409        0  4080032        0  1699413
+         0        0  1619496        0]]
+File number   75
+----------------
+Artist        : Bass Brothers
+Title         : Jamaican Thug
+Target key    : Em
+Predicted key : E
+
+[[   96245  2945871        0        0   651140   112512        0        0
+   5729360   479669        0  1237370]
+ [       0 10040826   760566        0        0   979419    66018        0
+   5021988        0  5512632   351808]]
+File number   76
+----------------
+Artist        : Beastie Boys
+Title         : An Open Letter To NYC
+Target key    : C#m
+Predicted key : C#m
+
+[[       0        0        0  1117055  3768611 12583111   607433   457941
+     85234    87815    87443   182625]
+ [       0        0  3006225    56385   956176  1247674  6092009        0
+         0        0        0   288109]]
+File number   77
+----------------
+Artist        : Beastie Boys
+Title         : Intergalactic
+Target key    : Em
+Predicted key : F
+
+[[ 1728151        0   595504        0   718059   522997        0  1289695
+         0   817049 10735692        0]
+ [       0        0  6956443        0  3160277   505954        0        0
+         0  1918043  1362894  3724001]]
+File number   78
+----------------
+Artist        : Beastie Boys
+Title         : Root Down
+Target key    : F
+Predicted key : Bb
+
+[[       0        0        0  2562991        0        0        0 13025206
+    253428        0        0        0]
+ [       0        0        0        0  1181117        0        0  4085489
+         0        0        0        0]]
+File number   79
+----------------
+Artist        : Beastie Boys
+Title         : Sure Shot
+Target key    : Ebm
+Predicted key : G
+
+[[  840711   542491   541257        0  1389192   446388   941983 10315544
+    524233        0        0        0]
+ [       0        0        0        0  3998139        0  1041769        0
+    840767        0        0        0]]
+File number   80
+----------------
+Artist        : Beastie Boys
+Title         : Triple Trouble
+Target key    : Em
+Predicted key : G
+
+[[       0    49726        0   780823        0     1248 17978680  3551375
+         0  3758882        0  5691890]
+ [       0        0        0        0   651308   556710 16390819        0
+   3625884        0  1342362  5900377]]
+File number   81
+----------------
+Artist        : Beat Assassins
+Title         : Gunclip
+Target key    : F#m
+Predicted key : F#
+
+[[3679795       0       0  354524 1353941       0       0 9419399       0
+        0       0       0]
+ [9248053       0       0       0 1104510       0       0 2261167   99622
+   514440       0  179824]]
+File number   82
+----------------
+Artist        : Beats International
+Title         : Dub Be Good To Me
+Target key    : Gm
+Predicted key : G
+
+[[  374684        0  2933012        0  3109010  1323805        0        0
+    421508 15415395        0   299872]
+ [       0   359932   812470        0  2723303   378417  4822305        0
+         0   710479        0        0]]
+File number   83
+----------------
+Artist        : Beck
+Title         : Where It's At
+Target key    : A
+Predicted key : A
+
+[[2562693  362036       0  291572 1145417       0  330825 8334893       0
+        0       0 1639221]
+ [ 334143       0       0  171067 1102124       0       0 1465840       0
+   191333       0  758455]]
+File number   84
+----------------
+Artist        : Beenie Man
+Title         : Who Am I? (Playground Mix)
+Target key    : Bm
+Predicted key : G
+
+[[24423304        0        0        0        0        0        0 10263927
+      3455   264473        0        0]
+ [       0        0    85933        0        0        0   404224        0
+         0   421421        0        0]]
+File number   85
+----------------
+Artist        : Ben Pearce
+Title         : What I Might Do
+Target key    : Cm
+Predicted key : C
+
+[[       0   227027        0        0   184371  2550692 13779998        0
+         0    57922        0  1062335]
+ [       0        0   464831        0        0   572974  6677384        0
+    235904   169985   933636        0]]
+File number   87
+----------------
+Artist        : Benga
+Title         : Crunked Up
+Target key    : F#m
+Predicted key : F#
+
+[[       0   526260        0   210465        0        0  1753835        0
+   2952477   423305   369158        0]
+ [  527769   223633        0        0        0        0   475659 17916404
+         0  2314025   262945        0]]
+File number   88
+----------------
+Artist        : Benga
+Title         : E Trips
+Target key    : F#m
+Predicted key : Gm
+
+[[  485781        0        0        0        0  1163978        0   827714
+    174640 20617515        0    30802]
+ [  729342   850829        0        0        0   404407   408640        0
+         0  1025669        0   818475]]
+File number   91
+----------------
+Artist        : Big Chocolate
+Title         : Blue Milk
+Target key    : Am
+Predicted key : A
+
+[[      0 1318244 1820548       0 2142011       0 2363134  857290       0
+   463665 2089480  497642]
+ [      0 5002125       0       0  487932       0  399999  472464       0
+        0 5394257  564906]]
+File number   92
+----------------
+Artist        : Big L
+Title         : Put It On
+Target key    : F#m
+Predicted key : Bbm
+
+[[      0       0       0  560203 6966633 1258503       0  847385  293231
+  1189971 1062519       0]
+ [      0 1229889 1060949       0 5495929  779161 1731707       0 1553949
+   393473       0       0]]
+File number   95
+----------------
+Artist        : Bill Withers
+Title         : Use Me
+Target key    : Em
+Predicted key : E
+
+[[      0 1106304       0       0       0       0 3235241       0  444076
+        0       0  225504]
+ [      0  313912       0       0       0  620864       0       0 5078714
+        0       0       0]]
+File number   96
+----------------
+Artist        : Bill Withers
+Title         : Who Is He (And What Is He To You)?
+Target key    : G#m
+Predicted key : G#m
+
+[[      0  362469 1844267       0 4765617       0 1525273       0       0
+  1034739       0 5090091]
+ [      0  808066       0 1072878  816841       0 1105224       0 1103929
+        0  363237 4163902]]
+File number   97
+----------------
+Artist        : Billy Idol
+Title         : White Wedding
+Target key    : Bm
+Predicted key : B
+
+[[ 2250421        0        0        0  1323205        0        0  1429387
+         0 15286863        0   624860]
+ [  381118   706964        0   275933   293153        0  1084190        0
+    673665 11510626        0   317687]]
+File number   98
+----------------
+Artist        : Bimbo & Lemar
+Title         : Music (B&K Jazz Rub)
+Target key    : Em
+Predicted key : A
+
+[[1274218 1076328  286992  279862  744549  788741  300972 3391916 2686770
+        0       0  142273]
+ [ 306482  253276       0  234972  248279       0  145323       0  504584
+   242133       0       0]]
+File number   99
+----------------
+Artist        : Bizarre Inc
+Title         : Playing With Knives
+Target key    : Bm
+Predicted key : G
+
+[[ 2360044        0        0   147381   149422        0        0        0
+         0        0        0 29698981]
+ [       0        0        0        0        0        0        0        0
+   4266969        0        0        0]]
+File number  101
+----------------
+Artist        : Black Box
+Title         : Ride On Time
+Target key    : Am
+Predicted key : B
+
+[[11629001   732988   899286        0        0        0  1371250  1334322
+         0   377967   377170   686518]
+ [  796175        0        0        0        0        0        0        0
+         0  1929014   828442  6315856]]
+File number  102
+----------------
+Artist        : Black Moon
+Title         : Who Got Da Props
+Target key    : Ebm
+Predicted key : C
+
+[[       0        0 13675860        0        0        0        0  1208386
+    553543  8757165  8674389        0]
+ [       0        0  3011314        0        0        0        0  3137049
+         0   593782        0  1075914]]
+File number  103
+----------------
+Artist        : Blak Twang
+Title         : So Rotten (feat Jahmali)
+Target key    : Am
+Predicted key : D
+
+[[1278611  175103 1461519       0  605298       0  129669       0       0
+        0   11216 1375727]
+ [  65221  593585  142698  196900       0  235072       0       0       0
+        0       0 5963304]]
+File number  104
+----------------
+Artist        : Blake Leyh
+Title         : The Fall
+Target key    : Em
+Predicted key : Bm
+
+[[ 443280 1051314  370548       0 1657292  245639  491356  843003  218797
+  2677909 1425544  771570]
+ [ 282209 1817374  374703  301661 1033069       0  551460       0  859917
+  1600797 2144995 1584248]]
+File number  105
+----------------
+Artist        : Blondie
+Title         : Atomic
+Target key    : Em
+Predicted key : A
+
+[[      0  284852 2004481 1550872 1344032 1610728  334376 1567130       0
+   276570  274553  246719]
+ [ 269473       0 1485154  182943 3657729       0  333972  709557       0
+        0       0       0]]
+File number  106
+----------------
+Artist        : Blondie
+Title         : Call Me
+Target key    : Dm
+Predicted key : Em
+
+[[ 3733945        0 10377509  2470720  5080711        0  3338029  1174241
+         0  5590023        0  3145780]
+ [ 1267254  2809710  1215683  3658610  1144578  1256112  4872650        0
+   4753627  1173716  1004755  2358344]]
+File number  107
+----------------
+Artist        : Blondie
+Title         : One Way Or Another
+Target key    : D
+Predicted key : D
+
+[[     158        0   327072        0        0  1109700        0  2375421
+  40566484   729453   242882     1438]
+ [       0        0   495549        0  1923742  1409645  2853015   616525
+    330520   222393    12607        0]]
+File number  108
+----------------
+Artist        : Blondish
+Title         : Lonely Days (Hunter Game Remix)
+Target key    : Am
+Predicted key : G#
+
+[[ 1173381        0   595129  7148003  1286360   367006        0  3759500
+         0   503119  1812989        0]
+ [27168331   635689        0        0 19649677        0        0     6895
+         0  5540458        0        0]]
+File number  110
+----------------
+Artist        : Blu Mar Ten
+Title         : Into The Light (feat Airwalker)
+Target key    : Gm
+Predicted key : Cm
+
+[[26460249        0  2592874  2061894        0   264563        0  1561714
+  17634366        0        0        0]
+ [ 2629881   526488        0        0        0        0        0        0
+         0  1044569        0        0]]
+File number  111
+----------------
+Artist        : Blu Mar Ten
+Title         : Love Is The Devil
+Target key    : Cm
+Predicted key : C
+
+[[ 2095760 11666771        0        0        0  1304217        0        0
+  13671496        0        0        0]
+ [  997275        0        0        0        0 19043217        0   500966
+    499940        0  3505184        0]]
+File number  114
+----------------
+Artist        : Blueboy
+Title         : Remember Me
+Target key    : G#m
+Predicted key : Fm
+
+[[      0      16       0       0       0   40402       0   42652 7462691
+        0       0       0]
+ [      0       0       0      16       0  123905       0       0       0
+        0       0       0]]
+File number  115
+----------------
+Artist        : Blur
+Title         : Girls And Boys
+Target key    : Gm
+Predicted key : G#
+
+[[  129035        0  1284692        0 22096903        0        0  2948360
+         0  1387680        0        0]
+ [   40254        0        0        0  1817824        0   613703   640687
+         0   476205        0        0]]
+File number  116
+----------------
+Artist        : Boards of Canada
+Title         : Music is Math
+Target key    : Gm
+Predicted key : E
+
+[[      0       0       0       0       0       0  482442       0       0
+   786455       0 9353958]
+ [      0       0       0       0  414801       0       0       0  685916
+   119541       0 1375018]]
+File number  117
+----------------
+Artist        : Boards of Canada
+Title         : Roygbiv
+Target key    : Bm
+Predicted key : B
+
+[[ 1116350   551946        0   490720        0        0  1945396        0
+     52000  7050008  2230836  1735879]
+ [ 1079797        0        0   102411        0   124726        0        0
+    444813 12553071  5307832   384878]]
+File number  118
+----------------
+Artist        : Boards of Canada
+Title         : Rue The Whirl
+Target key    : Bm
+Predicted key : Am
+
+[[ 459285       0       0  230251 1687300 1146976  223809  197372       0
+        0       0     264]
+ [ 680345  220653       0  433432  247399  243512  229686       0       0
+        0  229264  562137]]
+File number  120
+----------------
+Artist        : Bob Marley & The Wailers
+Title         : Could You Be Loved (Album version)
+Target key    : Bm
+Predicted key : E
+
+[[6257601       0  232661  396538       0       0       0       0       0
+        0 1323443  357677]
+ [2298441       0  309598       0  458076       0       0       0       0
+   848714  533169  206941]]
+File number  121
+----------------
+Artist        : Bob Marley & The Wailers
+Title         : Get Up, Stand Up
+Target key    : Cm
+Predicted key : C
+
+[[ 365681 3015833 3060152 1346554  278756  730413  727563 2507139       0
+        0  651762       0]
+ [ 624007  371777 3036213  753682 1932261       0 2031268 3684554       0
+   151718  655467  360821]]
+File number  122
+----------------
+Artist        : Bob Marley & The Wailers
+Title         : I Shot The Sheriff (Album version)
+Target key    : Gm
+Predicted key : Gm
+
+[[3685792 1185122  758477       0  751552  374006 1124888 1079184       0
+   708321 1111515 3302463]
+ [      0  380650       0       0       0       0  336254       0  357623
+        0 2214618 1160513]]
+File number  123
+----------------
+Artist        : Bob Marley & The Wailers
+Title         : Jamming (Eric Thorngren Remix)
+Target key    : Bm
+Predicted key : C
+
+[[      0       0       0       0 5228980       0 5484023 4388823       0
+        0  487470 7918338]
+ [      0       0       0 1024634  527099       0 3980184       0  503364
+        0       0 1583290]]
+File number  124
+----------------
+Artist        : Bobby Womack
+Title         : Across 110th Street
+Target key    : Bm
+Predicted key : B
+
+[[ 2164526  2123827  1365893  1439976        0  1183417  7861823   565885
+    487806        0        0        0]
+ [ 1254955   334316  4870477 35384274        0  2810462        0        0
+         0        0        0        0]]
+File number  125
+----------------
+Artist        : Bodyrox
+Title         : Yeah Yeah (feat Luciana) (D Ramirez Vocal Club Mix)
+Target key    : C
+Predicted key : Ebm
+
+[[      0       0       0       0       0 6229926       0       0 1367829
+   362017 1428355       0]
+ [ 731812       0       0       0       0 2398599       0  760248       0
+   749007 1723399       0]]
+File number  127
+----------------
+Artist        : Booker T & The MG's
+Title         : Green Onions
+Target key    : Fm
+Predicted key : F
+
+[[       0        0        0        0        0        0        0  7224597
+  20500808        0        0        0]
+ [       0        0        0        0        0        0        0  3890465
+    397709        0        0        0]]
+File number  128
+----------------
+Artist        : Bossman
+Title         : Ayo
+Target key    : G#m
+Predicted key : G#
+
+[[       0  1923362   645148        0   335535   340879 12255217   181053
+         0    81977        0        0]
+ [       0  1379294        0   778418        0        0   876860        0
+         0   130434   653090        0]]
+File number  129
+----------------
+Artist        : Boys Noize
+Title         : Yeah
+Target key    : Dm
+Predicted key : F#
+
+[[      0       0       0 8654768       0       0       0   18875 9002162
+   405177 1236796       0]
+ [      0       0       0       0  924427 1826844  440955 5309776 5100305
+   466324       0       0]]
+File number  130
+----------------
+Artist        : Brand Nubian
+Title         : Don't Let It Go To Your Head
+Target key    : Eb
+Predicted key : G#
+
+[[      0       0 3266929       0       0       0  616498       0       0
+  4519658 8422745 1932414]
+ [      0  752777 1863604       0  756458       0       0 1445557       0
+  2081142       0 7129087]]
+File number  131
+----------------
+Artist        : Breakbeat Era
+Title         : Animal Machine
+Target key    : Bbm
+Predicted key : Bb
+
+[[ 3567021  2219966  2116358 17543785  1678603   809998  6297041        0
+    438264 10564800  1277428        0]
+ [       0        0        0  5656150        0  2143281  1939229        0
+         0        0  1301901   688438]]
+File number  133
+----------------
+Artist        : Breakbeat Era
+Title         : Past Life
+Target key    : Ebm
+Predicted key : Eb
+
+[[6884687 1750652  434352  441628  297495 9759071 3605366  408327 5225069
+   476603  518800 1051446]
+ [ 875141       0  820016       0  725448 4547497  252051       0 8474361
+        0 1615377 5728898]]
+File number  134
+----------------
+Artist        : Breaking News
+Title         : Rush Hour (Quadrat Beat Remix)
+Target key    : Fm
+Predicted key : F
+
+[[  375098  1746689        0  1323849        0        0 60190008        0
+    699958   310912        0        0]
+ [ 1661167   390207        0        0        0        0  1029682        0
+    737320        0   137518   533490]]
+File number  135
+----------------
+Artist        : Britney Spears
+Title         : Toxic (Armand Van Helden Remix)
+Target key    : Cm
+Predicted key : F#
+
+[[32953738        0        0   853314        0  5262720  1658568   649536
+   2633617        0        0   404440]
+ [ 2205135        0   740970        0  5505106  4281421        0   823095
+         0   930655        0        0]]
+File number  136
+----------------
+Artist        : Brookes Brothers
+Title         : Last Night
+Target key    : Cm
+Predicted key : C
+
+[[  333526 13542990   349125  1714253        0  4622263   822936        0
+   8302867        0 12548216  1188154]
+ [  425940        0   422885  4654789   413916  1479338        0        0
+   1448085        0        0  3002943]]
+File number  137
+----------------
+Artist        : Brookes Brothers
+Title         : Snowman
+Target key    : Bbm
+Predicted key : C#
+
+[[       0   177945        0   415462        0        0  1754006        0
+  11021692  3258299        0 12072621]
+ [       0        0        0  2035557        0        0   824613        0
+   2175919        0        0        0]]
+File number  138
+----------------
+Artist        : Brookes Brothers
+Title         : Tear You Down (Single)
+Target key    : Ebm
+Predicted key : B
+
+[[       0   180900        0        0        0        0 34993118        0
+         0        0        0        0]
+ [       0        0        0  1981264        0        0        0        0
+         0        0        0        0]]
+File number  139
+----------------
+Artist        : Brother Ali
+Title         : Tight Rope
+Target key    : Am
+Predicted key : F#
+
+[[ 1194311        0 18961325   580595   354027        0        0  2764251
+         0  7197434        0        0]
+ [       0        0  2784167        0        0        0   633355        0
+         0  2033589        0  3669168]]
+File number  140
+----------------
+Artist        : Brother Ali
+Title         : Victory! (Come Forward)
+Target key    : Am
+Predicted key : D
+
+[[1148736       0  490826 2680114       0 1926688  577313 1194928  339933
+        0 1742404       0]
+ [1628355       0 3319672  262046  345496       0       0 3091389       0
+   779019       0       0]]
+File number  141
+----------------
+Artist        : Brothers Johnson
+Title         : Strawberry Letter 23
+Target key    : Eb
+Predicted key : Dm
+
+[[       0  1818427        0        0        0        0 14360418        0
+         0        0        0        0]
+ [       0        0        0  1063973        0        0  3985768        0
+         0        0  3364540        0]]
+File number  144
+----------------
+Artist        : Busta Rhymes
+Title         : Fire It Up (Instrumental)
+Target key    : Em
+Predicted key : F#
+
+[[       0   592281   538410 14061674        0        0        0        0
+         0        0  3447758        0]
+ [       0        0        0  1347701   984488        0   543098 14472517
+         0        0        0        0]]
+File number  145
+----------------
+Artist        : Busta Rhymes
+Title         : Woo Hah!! (Got You All In Check) (feat Rampage)
+Target key    : C
+Predicted key : Gm
+
+[[       0        0 16540545        0        0   512316        0 17925632
+         0        0  2643527        0]
+ [       0        0  2911679        0        0        0        0  4867378
+         0        0        0        0]]
+File number  146
+----------------
+Artist        : Busy Signal
+Title         : Modern Day Slavery
+Target key    : Gm
+Predicted key : G
+
+[[ 134192       0       0   38249       0  722875       0  239443 2000876
+   737554 7896324       0]
+ [      0       0       0       0       0  188595       0 5554133  257827
+  2929955 1075219       0]]
+File number  147
+----------------
+Artist        : C&C Music Factory
+Title         : Gonna Make You Sweat (Everybody Dance Now)
+Target key    : Bbm
+Predicted key : Bb
+
+[[ 6863597   488174  2687454   771766   320577        0  3270384 10227250
+   3195498   499542        0   499620]
+ [13143717        0        0        0  1760020   508813  2507934        0
+    609331        0        0        0]]
+File number  148
+----------------
+Artist        : Calvin Harris
+Title         : Acceptable In The 80s
+Target key    : E
+Predicted key : Cm
+
+[[       0        0        0        0        0        0        0 27311460
+         0        0        0  7970930]
+ [       0        0        0        0        0        0        0   644969
+   3822621        0        0    63515]]
+File number  149
+----------------
+Artist        : Calvin Harris
+Title         : I'm Not Alone (Deadmau5 Mix)
+Target key    : F#
+Predicted key : G
+
+[[       0        0   521735  2089931        0  4941885        0        0
+   1178074        0   374774        0]
+ [ 1904127        0 12552550 11651260        0 14779384  3638555        0
+         0        0        0        0]]
+File number  150
+----------------
+Artist        : Calyx
+Title         : Elevate This Sound (feat TeeBee)
+Target key    : Fm
+Predicted key : Fm
+
+[[ 1034397        0        0        0        0 46920521  3972173        0
+         0        0   534033  1098800]
+ [  715372   275963   254714  2490756  2823350  1837736   270473        0
+         0   341454        0        0]]
+File number  151
+----------------
+Artist        : Calyx
+Title         : The Divide (feat TeeBee)
+Target key    : Fm
+Predicted key : F
+
+[[ 1598908  6705922  4797888        0 17385841  2918542  1314033        0
+         0        0        0     1410]
+ [       0    73112 20350042        0  1532725 12681476   368296        0
+         0   130327   339057        0]]
+File number  152
+----------------
+Artist        : Calyx & Teebee
+Title         : Pure Gold (feat Kemo)
+Target key    : Fm
+Predicted key : Dm
+
+[[ 1703462   752802  8626219        0   491265        0        0  1162114
+         0  1329539        0        0]
+ [       0   412817        0        0        0        0 13732643        0
+         0   853214        0   238419]]
+File number  153
+----------------
+Artist        : Cameo
+Title         : Word Up!
+Target key    : F#m
+Predicted key : F#m
+
+[[ 714835       0 9725553       0       0       0       0       0    1075
+  2819465 7081189       0]
+ [      0       0 5113966       0       0       0       0       0       0
+   393320       0  876605]]
+File number  154
+----------------
+Artist        : Camo & Krooked
+Title         : Afterlife
+Target key    : Dm
+Predicted key : D
+
+[[       0 25073391        0  3581859        0  6260131        0        0
+         0        0  1258709        0]
+ [ 4222872        0   397897        0        0  5849951        0        0
+         0   116006   410187        0]]
+File number  155
+----------------
+Artist        : Camo & Krooked
+Title         : In The Future (feat Jenna G and Futurebound)
+Target key    : Fm
+Predicted key : C#
+
+[[ 2238598  1142564        0        0        0 21753593   595794        0
+         0        0 10581574        0]
+ [ 1321053        0        0        0        0        0        0        0
+         0        0  5545943        0]]
+File number  156
+----------------
+Artist        : Camo & Krooked
+Title         : Reincarnation
+Target key    : Fm
+Predicted key : F
+
+[[       0  1929949        0 25028747        0        0        0  1217009
+         0        0  8635336        0]
+ [ 1159903        0        0  1833253        0        0        0  2959956
+         0        0  1241465        0]]
+File number  157
+----------------
+Artist        : Camo & Krooked
+Title         : Turn Up (The Music)
+Target key    : Gm
+Predicted key : Eb
+
+[[       0        0        0        0   498287        0  1647461        0
+   3380245        0 23254856        0]
+ [       0        0        0        0        0   785638        0 14518984
+         0        0   961141        0]]
+File number  158
+----------------
+Artist        : Caribou
+Title         : All I Ever Need
+Target key    : Bbm
+Predicted key : Bb
+
+[[1968394 1589035       0  651480       0 1428040       0 4447858 6399770
+   821928  194501       0]
+ [3226394       0       0       0       0 2778658       0 1329531   21741
+  2286297       0  295469]]
+File number  159
+----------------
+Artist        : Caribou
+Title         : Back Home
+Target key    : Cm
+Predicted key : G#
+
+[[3735376 5143049       0       0       0       0       0       0 6873769
+        0       0       0]
+ [1595320       0       0  948734       0  801733       0       0       0
+        0  264933       0]]
+File number  160
+----------------
+Artist        : Caribou
+Title         : Dive
+Target key    : Cm
+Predicted key : G#
+
+[[ 4578719   675896        0  1697677        0  8662268        0  2732273
+   7622311        0 12416120        0]
+ [ 3009315        0        0        0        0        0        0 22555681
+         0  1183310   713125        0]]
+File number  161
+----------------
+Artist        : Caribou
+Title         : Our Love
+Target key    : Cm
+Predicted key : Gm
+
+[[      0  422379  491169       0       0       0  128696       0       0
+   305719  360534 8345171]
+ [      0 1179200       0  363206       0       0       0       0  776462
+        0 5130578 5087807]]
+File number  162
+----------------
+Artist        : Cate Ferris
+Title         : Blaze Bright
+Target key    : Bm
+Predicted key : B
+
+[[       0        0        0        0        0        0        0        0
+    353965  3982802 10985101   383301]
+ [       0        0        0        0        0        0        0   596482
+    643443   717105  4688453   373023]]
+File number  163
+----------------
+Artist        : Ce-Ce Peniston
+Title         : Finally
+Target key    : Bm
+Predicted key : Bb
+
+[[ 2568462    20992  6130972        0  7881845   489478     1679        0
+         0 14328386        0  1191546]
+ [       0  4889083        0        0        0        0        0        0
+         0  9781880  7290724  8941102]]
+File number  164
+----------------
+Artist        : Cellardore
+Title         : Tubular Bass
+Target key    : Am
+Predicted key : A
+
+[[ 884480  876148  289145       0       0       0  237425  326327       0
+   449189  426229 5190641]
+ [ 270264  303242       0       0       0       0       0  217177  596824
+  1380215 2261112  819480]]
+File number  165
+----------------
+Artist        : Chad Jackson
+Title         : Hear The Drummer (Get Wicked)
+Target key    : Cm
+Predicted key : B
+
+[[ 932267       0       0       0       0 3633731       0 1711607       0
+  1438955  221320       0]
+ [      0       0       0       0  464036       0  521188       0       0
+  1221706       0       0]]
+File number  166
+----------------
+Artist        : Chairmen Of The Board
+Title         : Give Me Just A Little More Time
+Target key    : C
+Predicted key : F
+
+[[      0 5027815       0  891796 4518188       0 3160840  682534 2636807
+        0  932622       0]
+ [      0 1347575       0       0       0       0 1592839  324677 4246484
+        0 1870748 4007803]]
+File number  169
+----------------
+Artist        : Chase & Status
+Title         : Can't Get Enough
+Target key    : C#m
+Predicted key : C#
+
+[[ 487186  340932       0 1524912 6617549 1348204       0  694856 2772840
+        0  313270  127001]
+ [      0  734071       0  117441 2791262       0       0  706985       0
+   101073       0  208058]]
+File number  170
+----------------
+Artist        : Chase & Status
+Title         : Eastern Jam
+Target key    : Em
+Predicted key : E
+
+[[ 1238673        0        0   790248 18418575  5309660        0  4854020
+         0   828924        0        0]
+ [       0        0        0   837237  5170452        0        0   800420
+         0  1398016        0        0]]
+File number  173
+----------------
+Artist        : Chase & Status
+Title         : Hypest Hype (feat Tempa T)
+Target key    : Em
+Predicted key : E
+
+[[  243219   423504  2437880        0        0 16938290        0        0
+   1739326   161225  1256148   220195]
+ [       0        0  1143530        0        0  1834450        0   435699
+         0   165100        0        0]]
+File number  174
+----------------
+Artist        : Chase & Status
+Title         : Is It Worth It
+Target key    : Dm
+Predicted key : F
+
+[[       0  2839486        0        0        0 17993909  5093916   311980
+   5308160   332925  3367161        0]
+ [       0        0   314849        0        0  2415042        0   812980
+         0   257466  2116795        0]]
+File number  175
+----------------
+Artist        : Chase & Status
+Title         : No Problem
+Target key    : Fm
+Predicted key : F
+
+[[ 1032835  1137889        0   680196 14906975  3811940   917181   877915
+   1467654  1021864        0  3068882]
+ [       0   421146        0   648651  3813050  3031598        0        0
+         0        0   493852        0]]
+File number  178
+----------------
+Artist        : Chewie
+Title         : Isolation
+Target key    : Em
+Predicted key : E
+
+[[ 4038272        0   467037  2361505   863828 16097403        0   951102
+    432571  1343377  8550575        0]
+ [       0        0   299129        0  1470193   932258        0  4316822
+         0  4099258   888320        0]]
+File number  180
+----------------
+Artist        : Chic
+Title         : "Everybody Dance (12"" Version)"
+Target key    : Cm
+Predicted key : F
+
+[[       0 13356362        0  2420735  1530563   760247        0    47929
+   6877827   259575        0        0]
+ [ 1194138        0        0  5246920        0  3626347        0     6842
+         0        0        0        0]]
+File number  181
+----------------
+Artist        : Chicane
+Title         : Offshore (Disco Citizens Remix)
+Target key    : Fm
+Predicted key : C#
+
+[[       0        0        0        0        0        0        0        0
+   2555850        0        0 12966135]
+ [       0   709486        0  1323036        0        0        0        0
+   2979876        0  1258167        0]]
+File number  182
+----------------
+Artist        : Chris Malinchak
+Title         : So Good To Me (Radio Edit)
+Target key    : B
+Predicted key : B
+
+[[       0        0        0   445427  7930815 15538731  2525225        0
+         0        0  2393470        0]
+ [       0        0  4133572        0  2365299  1563579        0        0
+         0        0        0        0]]
+File number  183
+----------------
+Artist        : Chromatic
+Title         : Tell Her
+Target key    : Fm
+Predicted key : F
+
+[[ 2084717        0        0        0   171187  3680652 11671069        0
+    213521        0        0  2975097]
+ [       0        0        0        0        0  9274854        0        0
+         0        0        0        0]]
+File number  184
+----------------
+Artist        : Claude VonStroke
+Title         : Who's Afraid Of Detroit? (Stanton Warriors Remix)
+Target key    : Fm
+Predicted key : F#
+
+[[2549680  578124 7032412  496891       0       0  341511 3156780       0
+   374099  926159 1659251]
+ [ 933080  474811 1419488       0 1774403   40257  141172  462989       0
+        0       0 4972871]]
+File number  185
+----------------
+Artist        : Clifford Gilberto
+Title         : The 10th Victim
+Target key    : Dm
+Predicted key : D
+
+[[       0   288973        0   701065        0        0 15661402        0
+  15348270   781551  1478442  5965476]
+ [       0    74259        0  1136209        0  8769695        0    31326
+   2446147        0        0        0]]
+File number  188
+----------------
+Artist        : Commix
+Title         : Be True
+Target key    : G#m
+Predicted key : F#
+
+[[  415883        0        0        0        0  2139344        0   918552
+  11983756   742713   385493        0]
+ [  521542        0   139247        0   360264  1849359        0  3961351
+         0   779127   410564        0]]
+File number  190
+----------------
+Artist        : Coolio
+Title         : Gangsta's Paradise
+Target key    : Cm
+Predicted key : G#
+
+[[ 3619174        0        0        0   296646 10887680  2252173        0
+         0        0 17833644  2082104]
+ [       0        0   284408        0        0   683477        0  2680748
+         0   744230 17609241        0]]
+File number  196
+----------------
+Artist        : Crisp Biscuit
+Title         : Soggy Bottomz
+Target key    : Fm
+Predicted key : Bb
+
+[[     203        0        0        0        0        0   201647  1390137
+  26983782        0        0  2080466]
+ [       0        0   507201        0   479364   559081        0        0
+  10824653        0        0  1575939]]
+File number  197
+----------------
+Artist        : Crystal Castles
+Title         : Baptism
+Target key    : Em
+Predicted key : G#
+
+[[       0        0        0        0   393365   185855   203083        0
+  20707796   562808        0        0]
+ [       0        0        0        0        0        0   991460        0
+         0        0        0        0]]
+File number  198
+----------------
+Artist        : Crystal Castles
+Title         : Reckless
+Target key    : F#m
+Predicted key : G#
+
+[[       0        0        0        0        0        0 29064413        0
+         0        0        0        0]
+ [       0        0        0  1761644        0        0        0        0
+         0        0        0        0]]
+File number  199
+----------------
+Artist        : Crystal Castles
+Title         : Untrust Us
+Target key    : Gm
+Predicted key : F#
+
+[[ 306094       0       0       0 1888099 2979056       0       0       0
+   900148  522650  234463]
+ [      0  249459  324294       0  587305  139449  222048       0       0
+  2632024  251616       0]]
+File number  200
+----------------
+Artist        : Crystal Waters
+Title         : Gypsy Woman
+Target key    : Dm
+Predicted key : F
+
+[[ 1895364        0        0        0        0        0        0        0
+  22071472        0        0        0]
+ [ 5761495        0        0        0        0  2417190        0        0
+         0        0        0        0]]
+File number  201
+----------------
+Artist        : CSS
+Title         : Let's Make Love And Listen To Death From Above
+Target key    : Cm
+Predicted key : G#
+
+[[       0        0        0    64875        0        0        0        0
+    649953 20002149        0        0]
+ [       0        0        0        0        0        0  7743364        0
+         0  5764554        0        0]]
+File number  202
+----------------
+Artist        : CSS
+Title         : Meeting Paris Hilton
+Target key    : G#m
+Predicted key : A
+
+[[      0 7522493       0  531232 8961540       0       0       0 8809104
+  2001336       0 3283762]
+ [      0  520631       0       0       0       0       0       0       0
+        0 1349194       0]]
+File number  203
+----------------
+Artist        : Culture Shock
+Title         : I Remember
+Target key    : G#m
+Predicted key : E
+
+[[  223003        0   274010        0 35054159        0   529101   320286
+         0  1491542   599021 15260395]
+ [       0   396036   434038        0  1490118        0   472099        0
+    736916        0        0  3919168]]
+File number  204
+----------------
+Artist        : Curtis Mayfield
+Title         : Move On Up
+Target key    : Bm
+Predicted key : E
+
+[[       0  3105827   332523   854471        0   682948  3485099        0
+   8060679        0  2624617        0]
+ [       0        0        0 13696141        0  1072918        0        0
+    324243        0  4586968        0]]
+File number  205
+----------------
+Artist        : Cut Copy
+Title         : Lights And Music
+Target key    : Bbm
+Predicted key : Ebm
+
+[[1342239  237686  400302       0       0 1281934       0 2688386  674936
+   268015 3394493 9490268]
+ [      0       0  310318       0 1369125       0       0 1069097 5623853
+   342973  909613 6994188]]
+File number  206
+----------------
+Artist        : Cut Copy
+Title         : Out There On The Ice
+Target key    : Bb
+Predicted key : B
+
+[[       0        0 10125457   280043   241514        0 10206124  1002917
+         0  2735276        0        0]
+ [  286670   465403        0  2878464        0        0  5377920   274096
+    275510   564227        0        0]]
+File number  207
+----------------
+Artist        : Cyantific
+Title         : Brighter Day (feat Natalie Williams)
+Target key    : F#m
+Predicted key : F#
+
+[[       0        0        0        0   709756        0   352847        0
+  11804661 16166587        0  1925515]
+ [       0        0        0        0        0        0        0        0
+         0   574750        0   404182]]
+File number  209
+----------------
+Artist        : D Double E
+Title         : Street Fighter Riddim
+Target key    : Am
+Predicted key : A
+
+[[3982995 3860254 1247511 3835491       0 3078505 1025346  531856  879620
+        0 2649108 4695194]
+ [1169704 1063033 2408689 1496924  927855 2846581       0 2514591       0
+  6924877       0 2107552]]
+File number  211
+----------------
+Artist        : Daft Punk
+Title         : Aerodynamic (Daft Punk Remix)
+Target key    : Bm
+Predicted key : Am
+
+[[4718310       0  393079       0  501171       0       0 3686216  539114
+        0       0 3587061]
+ [ 485524       0       0       0 5463291       0 1885490       0 5626038
+   541683       0 1086981]]
+File number  212
+----------------
+Artist        : Daft Punk
+Title         : Around The World
+Target key    : Em
+Predicted key : G#m
+
+[[      0   50297       0  276957  233082  792498 3880961 7848776 1179688
+  2754991  264699  890021]
+ [      0       0       0  504648  858305  361709 3524207 4312880 3331788
+  2629893  250442  487821]]
+File number  214
+----------------
+Artist        : Daft Punk
+Title         : Da Funk
+Target key    : Gm
+Predicted key : G
+
+[[  581747   859179        0  1501766  3961974  2049000  1741662 24420926
+   1491021  3406311  1421763   134706]
+ [  474574   466633   599923   251506  7208560        0  3711560  3400041
+   3093660  2987956        0   997204]]
+File number  216
+----------------
+Artist        : Daft Punk
+Title         : Giorgio By Moroder (feat Giorgio Moroder)
+Target key    : Em
+Predicted key : G
+
+[[ 1383813   267965        0        0        0    74528  1026383   300826
+    281705   966460        0 10199637]
+ [       0  4559864        0        0        0        0  1140919        0
+    561451  1077683   313715   281244]]
+File number  217
+----------------
+Artist        : Daft Punk
+Title         : Harder, Better, Faster, Stronger
+Target key    : F#m
+Predicted key : B
+
+[[       0        0  2198957   710484   359859        0        0 20115564
+         0   942618   148936   912388]
+ [       0        0        0        0   148598        0        0   454126
+         0   656819        0  4878911]]
+File number  218
+----------------
+Artist        : Daft Punk
+Title         : One More Time
+Target key    : Bm
+Predicted key : G
+
+[[      0 1771898       0 3257371       0       0       0       0       0
+     4080 3491939 2294134]
+ [ 797575       0       0  248714       0  163459       0       0       0
+        0  385437       0]]
+File number  219
+----------------
+Artist        : Daft Punk
+Title         : Solar Sailer
+Target key    : Ebm
+Predicted key : Bb
+
+[[ 3779245   684678 12270339        0        0  1071864        0   496572
+         0        0   585223        0]
+ [  667406  1546941  1380819   596489  2732005        0        0        0
+         0        0   547583  7177129]]
+File number  220
+----------------
+Artist        : Damian Jr Gong Marley
+Title         : One Loaf Of Bread (Something For You)
+Target key    : Dm
+Predicted key : D
+
+[[       0 39094095        0        0        0   313385   349548        0
+         0        0   320037        0]
+ [       0   209747        0        0        0        0        0        0
+         0   259682   368138        0]]
+File number  221
+----------------
+Artist        : Dan Le Sac
+Title         : Thou Shalt Always Kill (feat Scroobius Pip)
+Target key    : Bbm
+Predicted key : C#
+
+[[       0  2602926  1465676 16597861        0   620741  1539654  3377222
+   9160063        0   989189  9429877]
+ [       0        0  9035014        0        0        0        0  1915468
+   2388869        0  1796659        0]]
+File number  223
+----------------
+Artist        : Daphni
+Title         : Ye Ye
+Target key    : Ebm
+Predicted key : Eb
+
+[[      0 3790818       0   16221  376059       0   67331       0 3278414
+  4190247       0       0]
+ [  47986  410269       0   46046       0       0 1387667       0   42396
+   765069  174640       0]]
+File number  224
+----------------
+Artist        : Dark Sky
+Title         : Drowned City
+Target key    : C#m
+Predicted key : A
+
+[[ 1997811        0        0        0 18069064        0        0   918672
+  35025393  5993076        0        0]
+ [       0        0        0        0  1495717        0   361443        0
+   4741593  6290422        0        0]]
+File number  226
+----------------
+Artist        : David August
+Title         : Hamburg Is For Lovers
+Target key    : Em
+Predicted key : G#
+
+[[ 707796  245672 2094772       0 1693425  250885       0 1206453       0
+  1189237       0 1750562]
+ [      0  496306       0  240399 3847140       0       0       0  502473
+   727439       0  500923]]
+File number  227
+----------------
+Artist        : David Bowie
+Title         : China Girl
+Target key    : Em
+Predicted key : Em
+
+[[       0        0  1574432        0        0   905490   343824 26082021
+         0        0        0  1331130]
+ [       0        0        0        0 11831069   409398   450969  4916800
+    447004        0        0        0]]
+File number  228
+----------------
+Artist        : David Guetta
+Title         : GRRRR (Club Mix)
+Target key    : Gm
+Predicted key : G
+
+[[       0  3746756        0        0  4895315        0        0   668718
+         0        0        0   249665]
+ [  251537 29392960        0   493015   494947        0   254828        0
+   1018908        0        0        0]]
+File number  229
+----------------
+Artist        : David Morales
+Title         : Needin' U (Original Mistake Edit)
+Target key    : C
+Predicted key : C#m
+
+[[       0        0   346853        0        0        0 16455281        0
+         0  2406675        0   578758]
+ [       0        0        0  2099371        0        0  4027058        0
+   1426422        0   589292   409301]]
+File number  230
+----------------
+Artist        : DC Breaks
+Title         : Horror
+Target key    : F#m
+Predicted key : F#
+
+Perfect matches : 14
+Out by a fifth : 8
+Parallel keys : 0
+Relative keys : 9
+Wrong keys : 158
+Total : 189
+[ 14.  12.   8.  10.  13.  22.   2.  15.  19.  10.   5.   6.  53.   0.   0.
+   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+Finished

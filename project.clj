@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [commons-io "2.5"]
                  [org.clojure/data.csv "0.1.3"]
+                 [intervox/clj-progress "0.2.1"]
                  [net.mikera/core.matrix "0.58.0"]]
   :javac-options {:destdir "classes/"}
   :java-source-path "src/neuhon"
