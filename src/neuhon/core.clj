@@ -16,4 +16,20 @@
         [neuhon.validation]
         [neuhon.utils]))
 
-(process-all-for-evaluation db-base-path)
+(defn process-all
+  "Processing all the wav files contained in folder-path"
+  [folder-path]
+  (map
+    #(try 
+      (do
+        (println (format "\nProcessing file %s" (str %1)))
+        (println 
+          (format "\nPredicted key : %s" 
+            (find-key-globally (str %1))))
+      (do)) ;; TODO : return something useful
+      (catch java.io.FileNotFoundException e (do)))
+    (file-seq
+      (file folder-path))))
+
+;; (process-all-for-evaluation db-base-path)
+;; (process-all "D://KeyFinderDB/test")

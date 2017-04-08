@@ -1,20 +1,28 @@
 # Neuhon
 
 Mini-thesis on key signature detection, where both accuracy and efficiency of 
-different algorithms are discussed. Some of the latter are implemented in Clojure,
-and some are written in Python.
+different algorithms are discussed. Python has been used for prototyping and research purposes only : the final end-user program is available in Clojure only.
+
+## How to use Neuhon
+
+```clj
+    (use 'neuhon.core)
+
+    ;; Predict the key of all files located in path/to/your/wave/folder
+    (process-all "path/to/your/wave/folder")
+```
 
 ## Clojure algorithms
 
-- Comparing chromatic vectors and Krumhansl's tone profiles (using Constant-Q Transform)
-- Comparing chromatic vectors and Krumhansl's tone profiles (using Average Magnitude Difference Function) - TODO
+- Comparing chromatic vectors and Krumhansl's tone profiles
 
 ### Clojure dependencies
 
 - JTransforms
-- clojure.core.matrix
-- clojure.data.csv
-- commons-io
+- clojure.core.matrix 0.58.0
+- clojure.data.csv 0.1.3
+- commons-io 2.5
+- intervox/clj-progress 0.2.1
 
 ## Python algorithms
 
