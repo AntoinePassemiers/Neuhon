@@ -51,10 +51,9 @@
   different locations to enhance its accuracy. This can be operated
   using a sliding window, and making a weighted average of the local predictions."
   [signal]
-  (let [periodogram (compute-periodogram signal)
-        chromatic-vector (reshape-into-chromatic-vector periodogram)]
-    (do
-      (find-best-profile chromatic-vector))))
+  (find-best-profile
+    (reshape-into-chromatic-vector
+      (compute-periodogram signal))))
 
 (defn find-key-globally
   "Predict the key signature of a song by making multiple local predictions

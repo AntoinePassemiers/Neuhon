@@ -8,9 +8,8 @@
 *.jar
 *.class
 *.pyc
-python_wav.txt
-wav.txt
-output.txt
+*.npy
+*.txt
 pom.xml
 pom.xml.asc
 /target
