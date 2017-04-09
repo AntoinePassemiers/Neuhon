@@ -19,8 +19,14 @@
 ;; Sha'ath's average profile of the minor scale
 (def shaath-minor-base-profile (normalize [6.5 2.8 3.5 5.4 2.7 3.5 2.5 5.1 4.0 2.7 4.3 3.2]))
 
-(def major-base-profile shaath-major-base-profile)
-(def minor-base-profile shaath-minor-base-profile)
+;; Custom profile for the major scale
+(def custom-major-base-profile (normalize [6.5 4.8 3.5 6.4 2.7 3.5 2.5 5.1 4.0 2.7 4.3 4.2]))
+
+;; Custom profile for the minor scale
+(def custom-minor-base-profile (normalize [6.6 4.0 3.5 4.2 4.6 4.0 2.5 5.2 2.4 3.8 2.3 4.4]))
+
+(def major-base-profile custom-major-base-profile)
+(def minor-base-profile custom-minor-base-profile)
 
 
 ;; Key signature names 
@@ -144,5 +150,5 @@
         best-minor   (arg-max minor-scores)]
     (if 
       (> (nth major-scores best-major) (nth minor-scores best-minor))
-      (add-frequency-range-offset best-major)
-      (add-frequency-range-offset (+ 12 best-minor)))))
+      (add-frequency-range-offset (- 12 best-major))
+      (add-frequency-range-offset (+ 12 (- 12 best-minor))))))

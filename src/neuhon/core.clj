@@ -31,5 +31,5 @@
     (file-seq
       (file folder-path))))
 
-;; (process-all-for-evaluation db-base-path)
+(process-all-for-evaluation db-base-path)
 ;; (process-all "D://KeyFinderDB/test")

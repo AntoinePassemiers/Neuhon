@@ -30,8 +30,8 @@ KRUMHANSL_MINOR_BASE_PROFILE = np.array([6.4, 2.8, 3.6, 5.4, 2.7, 3.6, 2.6, 4.8,
 SHAATH_MAJOR_BASE_PROFILE    = np.array([6.6, 2.0, 3.5, 2.2, 4.6, 4.0, 2.5, 5.2, 2.4, 3.8, 2.3, 3.4])
 SHAATH_MINOR_BASE_PROFILE    = np.array([6.5, 2.8, 3.5, 5.4, 2.7, 3.5, 2.5, 5.1, 4.0, 2.7, 4.3, 3.2])
 
-CUSTOM_MAJOR_BASE_PROFILE    = np.array([6.6, 4.0, 3.5, 4.2, 4.6, 4.0, 2.5, 5.2, 2.4, 3.8, 2.3, 4.4])
-CUSTOM_MINOR_BASE_PROFILE    = np.array([6.5, 4.8, 3.5, 6.4, 2.7, 3.5, 2.5, 5.1, 4.0, 2.7, 4.3, 4.2])
+CUSTOM_MAJOR_BASE_PROFILE    = np.array([6.5, 4.8, 3.5, 6.4, 2.7, 3.5, 2.5, 5.1, 4.0, 2.7, 4.3, 4.2])
+CUSTOM_MINOR_BASE_PROFILE    = np.array([6.6, 4.0, 3.5, 4.2, 4.6, 4.0, 2.5, 5.2, 2.4, 3.8, 2.3, 4.4])
 
 MAJOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MAJOR_BASE_PROFILE)
 MINOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MINOR_BASE_PROFILE)
@@ -39,6 +39,11 @@ MINOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MINOR_BASE_PROFILE)
 KEY_NAMES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B",
     "Cm", "C#m", "Dm", "Ebm", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "Bbm", "Bm"]
 KEY_DICT = { keyname : i for i, keyname in enumerate(KEY_NAMES) }
+
+class ExtraFeatures:
+    def __init__(self):
+        self.ZCR = None
+        self.STE = None
 
 def w_xk(x, lk, rk):
     return 1.0 - np.cos(2 * np.pi * (x - lk) / (rk - lk))
@@ -162,13 +167,16 @@ def findKey(filename, method = METHOD_CQT):
     """ Averaging the 2 channels (stereo -> mono) """
     signal = stereoToMono(stereo_signal) # Mean of left and right channels
     """ Low-pass filtering """
-    signal = lowPassFiltering(signal)
+    # signal = lowPassFiltering(signal)
     """ Downsampling """
     signal = downSampling(signal, framerate = Parameters.target_sampling_rate)
     """ Spectral windows for getting CQT from real spectrum """
     wins = getSpectralWindows(framerate = Parameters.target_sampling_rate)
     """ Computing Short-Term Energies """
     ste_sequence, zcr_sequence = getSTEandZCRs(signal)
+    extra_features = ExtraFeatures()
+    extra_features.STE = ste_sequence
+    extra_features.ZCR = zcr_sequence
 
     if method == METHOD_CQT:
         """ Computing real Fast Fourier Transforms """
@@ -209,7 +217,7 @@ def findKey(filename, method = METHOD_CQT):
 
     print(hist.reshape(2, 12))
     predicted_key_name = predictKeyFromHistogram(hist)
-    return predicted_key_name, chromatic_matrix, hist
+    return predicted_key_name, chromatic_matrix, hist, extra_features
 
 def findKeyUsingCQT(filename): 
     return findKey(filename, method = METHOD_CQT)

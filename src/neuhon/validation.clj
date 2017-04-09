@@ -37,7 +37,7 @@
   "Generic print function for displaying a prediction.
   The results can be displayed in a file or in the standard output."
   [metadata print-function]
-  (print-function (format "File number %4d\n" (.file-id metadata)))
+  (print-function (format "\nFile number %4d\n" (.file-id metadata)))
   (print-function "----------------\n")
   (print-function (format "Artist        : %s\n" (.artist metadata)))
   (print-function (format "Title         : %s\n" (.title metadata)))
@@ -94,6 +94,7 @@
               (swap! current-partition-id inc)
               (tick))
           (range 0 (* n-slides window-size) window-size)))
+      (println (seq key-counters))
       (key-to-str (arg-max (seq key-counters))))))
 
 ;;(clojure.java.io/file out-filename)
@@ -113,7 +114,7 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 2) ;; 230
+        (when (< i 230) ;; 230
           (try
             (let [line (nth csv-seq i)
                   artist (nth line 0)

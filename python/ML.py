@@ -2,7 +2,7 @@
 # ML.py : Key prediction using machine learning algorithms
 # author: Antoine Passemiers
 
-import os, operator, pickle
+import os, operator, pickle, sys
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io.wavfile import read as scipy_read
@@ -14,7 +14,12 @@ from archmm.core import *
 from archmm.iohmm import *
 
 from utils import *
-from prototype import *
+from cognitive import *
+from spectral import *
+
+FFT_METHOD = 0
+CQT_METHOD = 1
+LOMB_SCARGLE_METHOD = 2
 
 # Key names of the 12 major scales and the 12 minor scales
 KEY_NAMES = frozenset(("C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "Cm", "C#m",
@@ -44,7 +49,7 @@ config.pi_nepochs = 4  # Number of training epochs per iteration for the initial
 config.s_nepochs  = 4  # Number of training epochs per iteration for the state transition units
 config.o_nepochs  = 4  # Number of training epochs per iteration for the output units
 
-config.use_chromatic_vector = False # Use chromatic features or FFT coefficients
+config.use = LOMB_SCARGLE_METHOD
 
 def extractCQTs(filename):
     """ Loading wav file """
@@ -71,10 +76,26 @@ def extractFeatures(dataset):
         target_key, filename = entry[2], entry[3]
         try:
             print("Processing file %i" % i)
-            if config.use_chromatic_vector:
-                _, feature_matrix = findKey(filename)
-            else:
-                _, feature_matrix = extractCQTs(filename)
+            if config.use == FFT_METHOD:
+                _, feature_matrix, vec = findKey(filename)
+            elif config.use == CQT_METHOD:
+                _, feature_matrix, vec = extractCQTs(filename)
+            elif config.use == LOMB_SCARGLE_METHOD:
+                _, feature_matrix, vec = extractCQTs(filename)
+            inputs.append(feature_matrix)
+            targets.append(np.full((len(feature_matrix),), labels[target_key], dtype = np.int32))
+        except IOError:
+            pass
+    pickle.dump([inputs, targets], open("temp", "wb"))
+
+def extractFeaturesForDecisionTrees(dataset):
+    inputs, targets = list(), list()
+    for i, entry in enumerate(dataset):
+        target_key, filename = entry[2], entry[3]
+        try:
+            print("Processing file %i" % i)
+            _, feature_matrix, vec, extra = findKeyUsingLombScargle(filename)
+            feature_vec = np.concatenate([vec, extra.ZCR, extra.STE])
             inputs.append(feature_matrix)
             targets.append(np.full((len(feature_matrix),), labels[target_key], dtype = np.int32))
         except IOError:
@@ -153,6 +174,6 @@ if __name__ == "__main__":
     np.random.seed(0)
     training_set, test_set = splitDataset(230, split_proportion = 0.5)
     
-    # extractFeatures(training_set)
-    model = train()
+    extractFeaturesForDecisionTrees(training_set)
+    # model = train()
     predict(test_set)

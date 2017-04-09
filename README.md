@@ -3,7 +3,7 @@
 Mini-thesis on key signature detection, where both accuracy and efficiency of 
 different algorithms are discussed. Python has been used for prototyping and research purposes only : the final end-user program is available in Clojure only.
 
-## How to use Neuhon
+## How to use it
 
 ```clj
     (use 'neuhon.core)
