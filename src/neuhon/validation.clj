@@ -95,7 +95,7 @@
                     signal-partition))
                 (tick)))
             partitions))
-        (println (seq key-counters))
+        (println (seq key-counters)) ;; TO REMOVE
         (key-to-str (arg-max (seq key-counters)))))))
 
 (defn process-all-for-evaluation
