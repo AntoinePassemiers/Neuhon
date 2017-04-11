@@ -71,33 +71,33 @@
   5) Slide the temporal window
   6) Start over from step 3
   7) Predict using the highest key counter"
-  [filepath]
-  (let [signal (load-wav filepath :rate target-sampling-rate)
-        N (count signal)
-        key-counters (make-array Integer/TYPE 24)
-        n-slides (int (Math/floor (/ N window-size)))
-        partitions (partition 
-          window-size
-          window-size ;; slide
-          (repeat window-size padding-default-value)
-          signal)
-        current-partition-id (atom 0)]
-    (do
-      (init n-slides)
-      (doall
-        (map
-          (fn [i]
-            (do
-              (inc-array-element key-counters
-                (find-key-locally 
-                  (nth partitions @current-partition-id))))
-              (swap! current-partition-id inc)
-              (tick))
-          (range 0 (* n-slides window-size) window-size)))
-      (println (seq key-counters))
-      (key-to-str (arg-max (seq key-counters))))))
+  ([filepath]
+    (find-key-globally filepath false))
+  ([filepath threading?]
+    (let [signal (load-wav filepath :rate target-sampling-rate)
+          N (count signal)
+          key-counters (make-array Integer/TYPE 24)
+          n-slides (int (Math/floor (/ N window-size)))
+          partitions (partition 
+            window-size
+            window-size ;; slide
+            (repeat window-size padding-default-value)
+            signal)
+          umap (if threading? pmap map)]
+      (do
+        (init (+ 1 n-slides))
+        (doall
+          (umap
+            (fn [signal-partition]
+              (do
+                (inc-array-element key-counters
+                  (find-key-locally 
+                    signal-partition))
+                (tick)))
+            partitions))
+        (println (seq key-counters))
+        (key-to-str (arg-max (seq key-counters)))))))
 
-;;(clojure.java.io/file out-filename)
 (defn process-all-for-evaluation
   "Function for evaluating the final key prediction algorithm.
   This is done by parsing a csv file (containing titles, artists, filenames
@@ -114,7 +114,7 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 230) ;; 230
+        (when (< i 2) ;; 230
           (try
             (let [line (nth csv-seq i)
                   artist (nth line 0)
@@ -129,7 +129,7 @@
                 (cond
                   (is-same-key? predicted-key target-key)
                     (swap! perfect-matches inc)
-                  (is-out-of-a-fifth? predicted-key target-key)
+                  (is-out-by-a-fifth? predicted-key target-key)
                     (swap! out-by-a-fifth-matches inc)
                   ;; (is-relative? predicted-key target-key) 
                   ;;   (swap! relative-matches inc)

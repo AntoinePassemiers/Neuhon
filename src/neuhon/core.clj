@@ -18,18 +18,18 @@
 
 (defn process-all
   "Processing all the wav files contained in folder-path"
-  [folder-path]
+  [folder-path & {:keys [threading] :or {threading false}}]
   (map
     #(try 
       (do
         (println (format "\nProcessing file %s" (str %1)))
         (println 
           (format "\nPredicted key : %s" 
-            (find-key-globally (str %1))))
+            (find-key-globally (str %1) threading)))
       (do)) ;; TODO : return something useful
       (catch java.io.FileNotFoundException e (do)))
     (file-seq
       (file folder-path))))
 
-(process-all-for-evaluation db-base-path)
-;; (process-all "D://KeyFinderDB/test")
+;; (process-all-for-evaluation db-base-path)
+;; (process-all "D://KeyFinderDB/test" :threading true)

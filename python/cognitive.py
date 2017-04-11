@@ -2,7 +2,7 @@
 # cognitive.py
 # author : Antoine Passemiers
 
-import os, operator
+import os, operator, pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io.wavfile import read as scipy_read
@@ -30,15 +30,19 @@ KRUMHANSL_MINOR_BASE_PROFILE = np.array([6.4, 2.8, 3.6, 5.4, 2.7, 3.6, 2.6, 4.8,
 SHAATH_MAJOR_BASE_PROFILE    = np.array([6.6, 2.0, 3.5, 2.2, 4.6, 4.0, 2.5, 5.2, 2.4, 3.8, 2.3, 3.4])
 SHAATH_MINOR_BASE_PROFILE    = np.array([6.5, 2.8, 3.5, 5.4, 2.7, 3.5, 2.5, 5.1, 4.0, 2.7, 4.3, 3.2])
 
-CUSTOM_MAJOR_BASE_PROFILE    = np.array([6.5, 4.8, 3.5, 6.4, 2.7, 3.5, 2.5, 5.1, 4.0, 2.7, 4.3, 4.2])
-CUSTOM_MINOR_BASE_PROFILE    = np.array([6.6, 4.0, 3.5, 4.2, 4.6, 4.0, 2.5, 5.2, 2.4, 3.8, 2.3, 4.4])
+CUSTOM_MAJOR_BASE_PROFILE    = np.array([6.6, 4.0, 3.5, 4.2, 4.6, 4.0, 2.5, 5.2, 2.4, 3.8, 2.3, 4.4])
+CUSTOM_MINOR_BASE_PROFILE    = np.array([6.5, 4.8, 3.5, 6.4, 2.7, 3.5, 2.5, 5.1, 4.0, 2.7, 4.3, 4.2])
 
+alpha, gamma = 0.5, 0.5
+print(alpha, gamma)
+
+CUSTOM_MAJOR_BASE_PROFILE = alpha * CUSTOM_MAJOR_BASE_PROFILE + (1.0 - alpha) * SHAATH_MAJOR_BASE_PROFILE
+CUSTOM_MINOR_BASE_PROFILE = gamma * CUSTOM_MINOR_BASE_PROFILE + (1.0 - gamma) * SHAATH_MINOR_BASE_PROFILE
+
+print(CUSTOM_MAJOR_BASE_PROFILE)
+print(CUSTOM_MINOR_BASE_PROFILE)
 MAJOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MAJOR_BASE_PROFILE)
 MINOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MINOR_BASE_PROFILE)
-
-KEY_NAMES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B",
-    "Cm", "C#m", "Dm", "Ebm", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "Bbm", "Bm"]
-KEY_DICT = { keyname : i for i, keyname in enumerate(KEY_NAMES) }
 
 class ExtraFeatures:
     def __init__(self):
@@ -76,6 +80,9 @@ def stereoToMono(signal):
         return signal
     else:
         return signal.mean(axis = 1)
+
+def moving_average(signal, n = 15):
+    return np.convolve(signal, np.ones((n,)) / n, mode = "valid")
 
 def butter_lowpass_filter(data, cutoff, fs, order = Parameters.lowpass_filter_order):
     nyquist = 0.5 * fs
@@ -158,7 +165,19 @@ def predictKeyFromHistogram(hist):
     predicted_key_name = KEY_NAMES[kk]
     return predicted_key_name
 
+def matchWithProfiles(coefs, major_profile_matrix, minor_profile_matrix):
+    major_scores, minor_scores = np.zeros(12), np.zeros(12)
+    for j in range(12):
+        major_scores[j] = pearsonr(coefs, major_profile_matrix[j])[0]
+        minor_scores[j] = pearsonr(coefs, minor_profile_matrix[j])[0]
 
+    best_major_key = major_scores.argmax()
+    best_minor_key = minor_scores.argmax()
+    if major_scores[best_major_key] > minor_scores[best_minor_key]:
+        kk = (Parameters.min_midi_note - 1 + best_major_key) % 12 + 12
+    else:
+        kk = (Parameters.min_midi_note - 1 + best_minor_key) % 12
+    return kk
 
 def findKey(filename, method = METHOD_CQT):
     hist = np.zeros(24, dtype = np.int)
@@ -168,6 +187,7 @@ def findKey(filename, method = METHOD_CQT):
     signal = stereoToMono(stereo_signal) # Mean of left and right channels
     """ Low-pass filtering """
     # signal = lowPassFiltering(signal)
+    # signal = moving_average(signal)
     """ Downsampling """
     signal = downSampling(signal, framerate = Parameters.target_sampling_rate)
     """ Spectral windows for getting CQT from real spectrum """
@@ -198,21 +218,8 @@ def findKey(filename, method = METHOD_CQT):
         coefs = p * coefs.max(axis = 0) + (1.0 - p) * coefs.sum(axis = 0)
         chromatic_matrix[n_vectors, :] = coefs[:]
 
-        major_scores, minor_scores = np.zeros(12), np.zeros(12)
-        for j in range(12):
-            major_scores[j] = pearsonr(coefs, MAJOR_PROFILE_MATRIX[j])[0]
-            minor_scores[j] = pearsonr(coefs, MINOR_PROFILE_MATRIX[j])[0]
-
-        best_major_key = major_scores.argmax()
-        best_minor_key = minor_scores.argmax()
-        best_score = max(major_scores[best_major_key], minor_scores[best_minor_key])
-        if major_scores[best_major_key] > minor_scores[best_minor_key]:
-            kk = (Parameters.min_midi_note - 1 + best_major_key) % 12
-        else:
-            kk = (Parameters.min_midi_note - 1 + best_minor_key) % 12 + 12
-        if best_score >= 0.0:
-            # hist[kk] += np.sqrt(ste_sequence[n_vectors])
-            hist[kk] += 1
+        kk = matchWithProfiles(coefs, MAJOR_PROFILE_MATRIX, MINOR_PROFILE_MATRIX)
+        hist[kk] += 1
         n_vectors += 1
 
     print(hist.reshape(2, 12))
@@ -224,3 +231,46 @@ def findKeyUsingCQT(filename):
 
 def findKeyUsingLombScargle(filename): 
     return findKey(filename, method = METHOD_LOMB_SCARGLE)
+
+def searchForBestProfile():
+    dataset = pickle.load(open("profile_dataset.npy", "rb"))
+
+    for m in range(1):
+        distances = np.zeros(24)
+        tp, fp, relatives, parallels, out_by_a_fifth, n_total = 0, 0, 0, 0, 0, 0
+        hist = np.zeros(24, dtype = np.int)
+
+        alpha = np.random.rand(12)
+        gamma = np.random.rand(12)
+        for i, row in enumerate(dataset):
+            (chromatic_matrix, target_key) = row
+            for j in range(len(chromatic_matrix)):
+                hist[matchWithProfiles(
+                    chromatic_matrix[j],
+                    MAJOR_PROFILE_MATRIX,
+                    MINOR_PROFILE_MATRIX)] += 1
+            predicted_key = predictKeyFromHistogram(hist)
+            distance = getDistance(predicted_key, target_key)
+            distances[distance] += 1
+
+            n_total += 1
+
+            if predicted_key == target_key:
+                tp += 1
+            elif isParallel(predicted_key, target_key):
+                parallels += 1
+            elif isRelative(predicted_key, target_key):
+                relatives += 1
+            elif isOutByAFifth(predicted_key, target_key):
+                out_by_a_fifth += 1
+            else:
+                fp += 1
+        print(CUSTOM_MAJOR_BASE_PROFILE)
+        print(CUSTOM_MINOR_BASE_PROFILE)
+        print(distances)
+        print(tp, parallels, relatives, out_by_a_fifth, fp)
+        print("")
+
+if __name__ == "__main__":
+    searchForBestProfile()
+    print("Finished")

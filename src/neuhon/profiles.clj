@@ -89,7 +89,7 @@
   [key-a key-b]
   (= 0 (compare key-a key-b)))
 
-(defn is-out-of-a-fifth?
+(defn is-out-by-a-fifth?
   "Tells whether two keys have a distance of 5 semi-tones
   between them or not"
   [key-a key-b]
@@ -100,7 +100,6 @@
       (= (get key-types key-a) (get key-types key-b))
       (or (= distance 5) (= distance 7)))))
 
-;; TODO
 (defn is-relative? 
   "Tells whether two keys correspond to parallel scales or not"
   [key-a key-b]

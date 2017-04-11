@@ -5,6 +5,12 @@
 import sys
 import numpy as np
 
+sys.stdout = open('py_output.txt', 'w')
+
+KEY_NAMES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B",
+    "Cm", "C#m", "Dm", "Ebm", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "Bbm", "Bm"]
+KEY_DICT = { keyname : i for i, keyname in enumerate(KEY_NAMES) }
+
 def midiToHertz(note):
     """ Converts from a midi value to a frequency """
     return 440.0 * 2.0 ** ((note - 69.0) / 12.0)
@@ -57,3 +63,35 @@ def showFinalResults(tp, out_by_a_fifth, parallels, relatives, fp, n_total):
     print("Relative keys : %s" % str(relatives))
     print("Wrong keys : %s" % str(fp))
     print("Total : %s" % str(n_total))
+
+def isDifferentToneType(predicted_key, target_key):
+    if "m" in predicted_key and not "m" in target_key:
+        return True
+    elif "m" in target_key and not "m" in predicted_key:
+        return True
+    else:
+        return False
+
+def getDistance(predicted_key, target_key, with_offset = True):
+    predicted_key_index = KEY_DICT[predicted_key.replace("m", "")]
+    target_key_index = KEY_DICT[target_key.replace("m", "")]
+    distance = (predicted_key_index - target_key_index + 12) % 12
+    if isDifferentToneType(predicted_key, target_key) and with_offset:
+        distance += 12
+    return distance
+
+def isParallel(predicted_key, target_key):
+    distance = getDistance(predicted_key, target_key, with_offset = False)
+    return (distance == 0) and predicted_key != target_key
+
+def isOutByAFifth(predicted_key, target_key):
+    rel = ("m" in predicted_key) == ("m" in target_key)
+    distance = getDistance(predicted_key, target_key, with_offset = False)
+    return rel and (distance == 5 or distance == 7)
+
+def isRelative(predicted_key, target_key):
+    distance = getDistance(predicted_key, target_key, with_offset = False)
+    if "m" in predicted_key:
+        return (not "m" in target_key) and distance == 9
+    else:
+        return "m" in target_key and distance == 3
