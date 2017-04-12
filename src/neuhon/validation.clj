@@ -2,7 +2,6 @@
   ^{:doc "Main features of the software"
     :author "Antoine Passemiers"}
   (:gen-class)
-  (:import (org.jtransforms.fft DoubleFFT_1D))
   (:require [clojure.data.csv :as csv]
             [clojure.java.io :as io])
   (:use [clojure.java.io]
@@ -45,6 +44,29 @@
   (print-function (format "Predicted key : %s (%s)\n\n"
     (.predicted-key metadata) (str (.distance metadata)))))
 
+(defn extract-chromatic-vector
+  "Compute the chromatic vector of a song's segment"
+  [signal]
+  (reshape-into-chromatic-vector
+    (compute-periodogram signal)))
+
+(defn extract-all-chromatic-vectors
+  "Compute the chromatic vectors of the whole song"
+  [filepath threading? overlap]
+    (let [signal (load-wav filepath :rate target-sampling-rate)
+          N (count signal)
+          n-slides (int (Math/floor (/ N window-size)))
+          partitions (partition 
+            window-size
+            window-size ;; slide
+            (repeat window-size padding-default-value)
+            signal)
+          umap (if threading? pmap map)]
+      (umap
+        (fn [signal-partition]
+          (extract-chromatic-vector signal-partition))
+        partitions)))
+
 (defn find-key-locally
   "Predict the key signature of a song at a certain location of it.
   This function must be called multiple times for a same song at 
@@ -52,8 +74,7 @@
   using a sliding window, and making a weighted average of the local predictions."
   [signal]
   (find-best-profile
-    (reshape-into-chromatic-vector
-      (compute-periodogram signal))))
+    (extract-chromatic-vector signal)))
 
 (defn find-key-globally
   "Predict the key signature of a song by making multiple local predictions
@@ -72,8 +93,8 @@
   6) Start over from step 3
   7) Predict using the highest key counter"
   ([filepath]
-    (find-key-globally filepath false))
-  ([filepath threading?]
+    (find-key-globally filepath false 0.0))
+  ([filepath threading? overlap]
     (let [signal (load-wav filepath :rate target-sampling-rate)
           N (count signal)
           key-counters (make-array Integer/TYPE 24)
@@ -95,8 +116,28 @@
                     signal-partition))
                 (tick)))
             partitions))
-        (println (seq key-counters)) ;; TO REMOVE
+        (println (seq key-counters))
         (key-to-str (arg-max (seq key-counters)))))))
+
+(deftype input-pair [X y])
+
+(defn get-db-chromatic-vectors
+  "Extract all chromatic vectors from the database"
+  [db-path]
+  (with-open [in-file (io/reader csv-path)]
+    (let [csv-seq (csv/read-csv in-file :separator (first ";"))]
+      (doall
+        (map
+          #(try
+            (let [line (nth csv-seq %1)
+                  target-key (nth line 2)
+                  audio-filename (nth line 3)
+                  audio-filepath (clojure.string/join [db-path audio-filename])]
+              (input-pair.
+                (extract-all-chromatic-vectors audio-filepath true 0.0)
+                target-key))
+            (catch Exception e (do)))
+          (range 1 230))))))
 
 (defn process-all-for-evaluation
   "Function for evaluating the final key prediction algorithm.
@@ -114,7 +155,7 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 2) ;; 230
+        (when (< i 20) ;; 230
           (try
             (let [line (nth csv-seq i)
                   artist (nth line 0)
@@ -122,7 +163,7 @@
                   target-key (nth line 2)
                   audio-filename (nth line 3)
                   audio-filepath (clojure.string/join [db-path audio-filename])
-                  predicted-key (find-key-globally audio-filepath)
+                  predicted-key (find-key-globally audio-filepath true 0.0)
                   metadata (Metadata. i artist title target-key predicted-key
                     (key-distance predicted-key target-key))]
               (do
@@ -137,7 +178,7 @@
                 (display-result metadata print)
                 (flush)
                 (display-result metadata (fn [s] (.write wrtr s)))))
-            (catch Exception e (do)))
+            (catch Exception e (println e)))
           (recur (inc i))))
         (println (format "---> Perfect matches        : %4d" @perfect-matches))
         (println (format "---> Out-by-a-fifth matches : %4d" @out-by-a-fifth-matches))

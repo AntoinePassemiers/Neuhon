@@ -140,7 +140,7 @@
     (map 
       (fn [d]
         (cosine-win 
-          (get-Q-from-p chromatic_max_weight) 
+          (get-Q-from-p chromatic-max-weight) 
           (midi-to-hertz d) window-size target-sampling-rate))
       (range min-midi-note max-midi-note))))
 

@@ -10,7 +10,9 @@
   "Converts a spectrum/periodogram to a chromatic vector"
   [periodogram]
   (map 
-    #(+ (* 0.8 (apply max %1)) (* 0.2 (esum %1)))
+    #(+ 
+      (* chromatic-max-weight (apply max %1))
+      (* (- 1.0 chromatic-max-weight) (esum %1)))
     (transpose 
       (object-array 
         (partition 12 12 periodogram)))))

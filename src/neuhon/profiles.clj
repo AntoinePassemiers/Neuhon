@@ -20,10 +20,10 @@
 (def shaath-minor-base-profile (normalize [6.5 2.8 3.5 5.4 2.7 3.5 2.5 5.1 4.0 2.7 4.3 3.2]))
 
 ;; Custom profile for the major scale
-(def custom-major-base-profile (normalize [6.5 4.8 3.5 6.4 2.7 3.5 2.5 5.1 4.0 2.7 4.3 4.2]))
+(def custom-major-base-profile (normalize [6.6 3.0 3.5 3.2 4.6 4.0 2.5 5.2 2.4 3.8 2.3 3.9]))
 
 ;; Custom profile for the minor scale
-(def custom-minor-base-profile (normalize [6.6 4.0 3.5 4.2 4.6 4.0 2.5 5.2 2.4 3.8 2.3 4.4]))
+(def custom-minor-base-profile (normalize [6.5 3.8 3.5 5.9 2.7 3.5 2.5 5.1 4.0 2.7 4.3 3.7]))
 
 (def major-base-profile custom-major-base-profile)
 (def minor-base-profile custom-minor-base-profile)
@@ -134,10 +134,7 @@
 (defn add-frequency-range-offset
   "Take into account the fact that the first note starts at min-midi-note"
   [key-index]
-  (if
-    (>= key-index 12)
-    (+ 12 (mod (+ key-index (- min-midi-note 1)) 12))
-    (mod (+ key-index (- min-midi-note 1)) 12)))
+  (mod (- 14 (mod (+ key-index (- min-midi-note 1)) 12)) 12))
 
 (defn find-best-profile 
   "Matches an input chromatic vector with every major or every minor profiles,
@@ -149,5 +146,5 @@
         best-minor   (arg-max minor-scores)]
     (if 
       (> (nth major-scores best-major) (nth minor-scores best-minor))
-      (add-frequency-range-offset (- 12 best-major))
-      (add-frequency-range-offset (+ 12 (- 12 best-minor))))))
+      (+ 12 (add-frequency-range-offset best-major))
+      (add-frequency-range-offset best-minor))))

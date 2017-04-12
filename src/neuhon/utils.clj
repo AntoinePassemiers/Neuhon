@@ -30,7 +30,7 @@
 (assert (= (/ (- max-midi-note min-midi-note) 12) n-octaves))
 
 ;; Proportion between highest amplitude and mean amplitude to build chromatic vectors
-(def ^:const chromatic_max_weight 0.8)
+(def ^:const chromatic-max-weight 0.8)
 
 
 (defn arg-max
