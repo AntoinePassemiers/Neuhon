@@ -50,23 +50,6 @@
   (reshape-into-chromatic-vector
     (compute-periodogram signal)))
 
-(defn extract-all-chromatic-vectors
-  "Compute the chromatic vectors of the whole song"
-  [filepath threading? overlap]
-    (let [signal (load-wav filepath :rate target-sampling-rate)
-          N (count signal)
-          n-slides (int (Math/floor (/ N window-size)))
-          partitions (partition 
-            window-size
-            window-size ;; slide
-            (repeat window-size padding-default-value)
-            signal)
-          umap (if threading? pmap map)]
-      (umap
-        (fn [signal-partition]
-          (extract-chromatic-vector signal-partition))
-        partitions)))
-
 (defn find-key-locally
   "Predict the key signature of a song at a certain location of it.
   This function must be called multiple times for a same song at 
@@ -119,26 +102,6 @@
         (println (seq key-counters))
         (key-to-str (arg-max (seq key-counters)))))))
 
-(deftype input-pair [X y])
-
-(defn get-db-chromatic-vectors
-  "Extract all chromatic vectors from the database"
-  [db-path]
-  (with-open [in-file (io/reader csv-path)]
-    (let [csv-seq (csv/read-csv in-file :separator (first ";"))]
-      (doall
-        (map
-          #(try
-            (let [line (nth csv-seq %1)
-                  target-key (nth line 2)
-                  audio-filename (nth line 3)
-                  audio-filepath (clojure.string/join [db-path audio-filename])]
-              (input-pair.
-                (extract-all-chromatic-vectors audio-filepath true 0.0)
-                target-key))
-            (catch Exception e (do)))
-          (range 1 230))))))
-
 (defn process-all-for-evaluation
   "Function for evaluating the final key prediction algorithm.
   This is done by parsing a csv file (containing titles, artists, filenames
@@ -155,7 +118,7 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 20) ;; 230
+        (when (< i 30) ;; 230
           (try
             (let [line (nth csv-seq i)
                   artist (nth line 0)

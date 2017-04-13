@@ -20,10 +20,16 @@
 (def shaath-minor-base-profile (normalize [6.5 2.8 3.5 5.4 2.7 3.5 2.5 5.1 4.0 2.7 4.3 3.2]))
 
 ;; Custom profile for the major scale
-(def custom-major-base-profile (normalize [6.6 3.0 3.5 3.2 4.6 4.0 2.5 5.2 2.4 3.8 2.3 3.9]))
+(def custom-major-base-profile 
+  (normalize 
+    [ 8.85003345  2.55626553  4.15097735  7.0429511   4.69613877  3.37875891
+     -0.09147103  6.04799802  3.4338048  -0.37593573  3.97494554  5.64818483]))
 
 ;; Custom profile for the minor scale
-(def custom-minor-base-profile (normalize [6.5 3.8 3.5 5.9 2.7 3.5 2.5 5.1 4.0 2.7 4.3 3.7]))
+(def custom-minor-base-profile 
+  (normalize 
+    [ 6.4870956   3.23523279  3.07355565  3.45581634  4.85043354  4.96966877
+      2.75298759  6.39271897  0.49290184  5.12401634  1.67300141  4.63196307]))
 
 (def major-base-profile custom-major-base-profile)
 (def minor-base-profile custom-minor-base-profile)

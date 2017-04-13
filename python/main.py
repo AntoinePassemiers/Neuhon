@@ -51,7 +51,7 @@ def main(prediction_func):
     tp, fp, relatives, parallels, out_by_a_fifth, n_total = 0, 0, 0, 0, 0, 0
     distances = np.zeros(24)
     chromatic_dataset = list()
-    for i in range(1): # 230
+    for i in range(230): # 230
         row = csv_file.readline().replace('\n', '').split(';')
         artist, title, target_key, filename = row[0], row[1], row[2], row[3]
 

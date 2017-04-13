@@ -30,17 +30,13 @@ KRUMHANSL_MINOR_BASE_PROFILE = np.array([6.4, 2.8, 3.6, 5.4, 2.7, 3.6, 2.6, 4.8,
 SHAATH_MAJOR_BASE_PROFILE    = np.array([6.6, 2.0, 3.5, 2.2, 4.6, 4.0, 2.5, 5.2, 2.4, 3.8, 2.3, 3.4])
 SHAATH_MINOR_BASE_PROFILE    = np.array([6.5, 2.8, 3.5, 5.4, 2.7, 3.5, 2.5, 5.1, 4.0, 2.7, 4.3, 3.2])
 
-CUSTOM_MAJOR_BASE_PROFILE    = np.array([6.6, 4.0, 3.5, 4.2, 4.6, 4.0, 2.5, 5.2, 2.4, 3.8, 2.3, 4.4])
-CUSTOM_MINOR_BASE_PROFILE    = np.array([6.5, 4.8, 3.5, 6.4, 2.7, 3.5, 2.5, 5.1, 4.0, 2.7, 4.3, 4.2])
+CUSTOM_MAJOR_BASE_PROFILE    = np.array(
+    [ 8.85003345,  2.55626553,  4.15097735,  7.0429511,   4.69613877,  3.37875891,
+     -0.09147103,  6.04799802,  3.4338048,  -0.37593573,  3.97494554,  5.64818483])
+CUSTOM_MINOR_BASE_PROFILE    = np.array(
+    [ 6.4870956,   3.23523279,  3.07355565,  3.45581634,  4.85043354,  4.96966877,
+      2.75298759,  6.39271897,  0.49290184,  5.12401634,  1.67300141,  4.63196307])
 
-alpha, gamma = 0.5, 0.5
-print(alpha, gamma)
-
-CUSTOM_MAJOR_BASE_PROFILE = alpha * CUSTOM_MAJOR_BASE_PROFILE + (1.0 - alpha) * SHAATH_MAJOR_BASE_PROFILE
-CUSTOM_MINOR_BASE_PROFILE = gamma * CUSTOM_MINOR_BASE_PROFILE + (1.0 - gamma) * SHAATH_MINOR_BASE_PROFILE
-
-print(CUSTOM_MAJOR_BASE_PROFILE)
-print(CUSTOM_MINOR_BASE_PROFILE)
 MAJOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MAJOR_BASE_PROFILE)
 MINOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MINOR_BASE_PROFILE)
 
@@ -235,20 +231,25 @@ def findKeyUsingLombScargle(filename):
 def searchForBestProfile():
     dataset = pickle.load(open("profile_dataset.npy", "rb"))
 
-    for m in range(1):
+    for m in range(60):
         distances = np.zeros(24)
         tp, fp, relatives, parallels, out_by_a_fifth, n_total = 0, 0, 0, 0, 0, 0
-        hist = np.zeros(24, dtype = np.int)
 
-        alpha = np.random.rand(12)
-        gamma = np.random.rand(12)
+        epsilon = 0.15
+        alpha, gamma = np.random.rand(12), np.random.rand(12)
+        major = alpha * (CUSTOM_MAJOR_BASE_PROFILE-epsilon) + (1.0 - alpha) * (CUSTOM_MAJOR_BASE_PROFILE+epsilon)
+        major_profile_matrix = createProfileMatrix(major)
+        minor = gamma * (CUSTOM_MINOR_BASE_PROFILE-epsilon) + (1.0 - gamma) * (CUSTOM_MINOR_BASE_PROFILE+epsilon)
+        minor_profile_matrix = createProfileMatrix(minor)
+
         for i, row in enumerate(dataset):
+            hist = np.zeros(24, dtype = np.int)
             (chromatic_matrix, target_key) = row
             for j in range(len(chromatic_matrix)):
                 hist[matchWithProfiles(
                     chromatic_matrix[j],
-                    MAJOR_PROFILE_MATRIX,
-                    MINOR_PROFILE_MATRIX)] += 1
+                    major_profile_matrix,
+                    minor_profile_matrix)] += 1
             predicted_key = predictKeyFromHistogram(hist)
             distance = getDistance(predicted_key, target_key)
             distances[distance] += 1
@@ -265,8 +266,8 @@ def searchForBestProfile():
                 out_by_a_fifth += 1
             else:
                 fp += 1
-        print(CUSTOM_MAJOR_BASE_PROFILE)
-        print(CUSTOM_MINOR_BASE_PROFILE)
+        print(major)
+        print(minor)
         print(distances)
         print(tp, parallels, relatives, out_by_a_fifth, fp)
         print("")
