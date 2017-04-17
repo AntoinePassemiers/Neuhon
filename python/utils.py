@@ -31,6 +31,7 @@ class Parameters:
 
     """ Parameters of the sliding window """
     window_size = 4096 * 4
+    slide = 4096 * 4
 
     """ Hyper-parameters (for optimization or validation purposes) """
     min_midi_note = 8  # 15

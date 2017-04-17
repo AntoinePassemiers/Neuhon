@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from scipy.io.wavfile import read as scipy_read
 from scipy.signal import butter, lfilter, freqz
 from scipy.stats import pearsonr
+from scipy.spatial.distance import cosine as cosine_similarity
 
 from utils import *
 from spectral import *
@@ -31,11 +32,11 @@ SHAATH_MAJOR_BASE_PROFILE    = np.array([6.6, 2.0, 3.5, 2.2, 4.6, 4.0, 2.5, 5.2,
 SHAATH_MINOR_BASE_PROFILE    = np.array([6.5, 2.8, 3.5, 5.4, 2.7, 3.5, 2.5, 5.1, 4.0, 2.7, 4.3, 3.2])
 
 CUSTOM_MAJOR_BASE_PROFILE    = np.array(
-    [ 8.85003345,  2.55626553,  4.15097735,  7.0429511,   4.69613877,  3.37875891,
-     -0.09147103,  6.04799802,  3.4338048,  -0.37593573,  3.97494554,  5.64818483])
+    [ 8.89868836,  2.46479067,  4.03193409,  7.02790546,  4.55733136,  3.29152325,
+     -0.15983709,  5.96139388,  3.40141878, -0.2675988,   4.10326596,  5.65157946])
 CUSTOM_MINOR_BASE_PROFILE    = np.array(
-    [ 6.4870956,   3.23523279,  3.07355565,  3.45581634,  4.85043354,  4.96966877,
-      2.75298759,  6.39271897,  0.49290184,  5.12401634,  1.67300141,  4.63196307])
+    [ 6.63347485,  3.14954925,  2.94053816,  3.571383,    4.73633031,  4.90456669,
+      2.81810968,  6.45527264,  0.56848472,  5.25402483,  1.7791656,   4.63136019])
 
 MAJOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MAJOR_BASE_PROFILE)
 MINOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MINOR_BASE_PROFILE)
@@ -164,8 +165,17 @@ def predictKeyFromHistogram(hist):
 def matchWithProfiles(coefs, major_profile_matrix, minor_profile_matrix):
     major_scores, minor_scores = np.zeros(12), np.zeros(12)
     for j in range(12):
-        major_scores[j] = pearsonr(coefs, major_profile_matrix[j])[0]
-        minor_scores[j] = pearsonr(coefs, minor_profile_matrix[j])[0]
+        #major_scores[j] = pearsonr(coefs, major_profile_matrix[j])[0]
+        #minor_scores[j] = pearsonr(coefs, minor_profile_matrix[j])[0]
+        try:
+            major_scores[j] = cosine_similarity(
+                coefs / coefs.sum(), major_profile_matrix[j] / major_profile_matrix[j].sum())
+            minor_scores[j] = cosine_similarity(
+                coefs / coefs.sum(), minor_profile_matrix[j] / minor_profile_matrix[j].sum())
+        except:
+            major_scores[j] = -1.0
+            minor_scores[j] = -1.0
+
 
     best_major_key = major_scores.argmax()
     best_minor_key = minor_scores.argmax()
@@ -194,6 +204,7 @@ def findKey(filename, method = METHOD_CQT):
     extra_features.STE = ste_sequence
     extra_features.ZCR = zcr_sequence
 
+    chromatic_matrices = list()
     if method == METHOD_CQT:
         """ Computing real Fast Fourier Transforms """
         fft_matrix = getFFTs(signal)
@@ -204,6 +215,7 @@ def findKey(filename, method = METHOD_CQT):
         feature_matrix = getPeriodograms(signal)
         # print(list(feature_matrix[30]))
 
+    obs_seq = list()
     n_samples = len(feature_matrix)
     chromatic_matrix = np.empty((n_samples, 12), dtype = np.double)
     n_vectors = 0
@@ -215,8 +227,10 @@ def findKey(filename, method = METHOD_CQT):
         chromatic_matrix[n_vectors, :] = coefs[:]
 
         kk = matchWithProfiles(coefs, MAJOR_PROFILE_MATRIX, MINOR_PROFILE_MATRIX)
+        obs_seq.append(kk)
         hist[kk] += 1
         n_vectors += 1
+    print(obs_seq)
 
     print(hist.reshape(2, 12))
     predicted_key_name = predictKeyFromHistogram(hist)
@@ -235,7 +249,7 @@ def searchForBestProfile():
         distances = np.zeros(24)
         tp, fp, relatives, parallels, out_by_a_fifth, n_total = 0, 0, 0, 0, 0, 0
 
-        epsilon = 0.15
+        epsilon = 0.5
         alpha, gamma = np.random.rand(12), np.random.rand(12)
         major = alpha * (CUSTOM_MAJOR_BASE_PROFILE-epsilon) + (1.0 - alpha) * (CUSTOM_MAJOR_BASE_PROFILE+epsilon)
         major_profile_matrix = createProfileMatrix(major)

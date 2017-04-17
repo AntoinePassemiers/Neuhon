@@ -5,7 +5,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage{abstract}
 \usepackage{textcomp}
-\usepackage{amsmath} 
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{placeins}
 
 \title{Étude d\textquotesingle algorithmes pour la détection de la tonalité de fichiers musicaux et implémentation en Clojure}
 \author{Antoine Passemiers$$ \\
@@ -25,8 +27,8 @@ apassemi@ulb.ac.be}
 \begin{abstract}
 
 Le projet consiste en la discussion de différents algorithmes relatifs à la détection 
-automatisée de tonalité de fichiers musicaux, l\textquotesingle implémentation de ceux-ci en Python,
-ainsi qu\textquotesingle une réflexion sur la comptabilité de ces derniers avec le paradigme fonctionnel.
+automatisée de tonalité de fichiers musicaux, le prototypage de ceux-ci en Python,
+ainsi qu\textquotesingle une réflexion sur l\textquotesingle adaptabilité de ces derniers avec le paradigme fonctionnel.
 Le choix de l\textquotesingle algorithme a concevoir selon l\textquotesingle approche fonctionnelle sera basé
 sur des critères de rapidité d\textquotesingle exécution et de précision de la détection. 
 L\textquotesingle algorithme final sera alors implémenté en Clojure.
@@ -46,7 +48,7 @@ En particulier, nous allons nous pencher sur deux catégories d\textquotesingle 
 ceux basés sur des modèles cognitifs, et ceux incluant des notions d\textquotesingle 
 apprentissage automatique. Les premiers tentent d\textquotesingle intégrer au mieux les connaissances
 de la théorie musicale et reposent sur la façon dont les personnes reconnaissent les différentes tonalités,
-alors que les autres utilisent l\textquotesingle inférence statistique pour déterminer celles-ci.\\
+alors que les seconds utilisent l\textquotesingle inférence statistique pour déterminer celles-ci.\\
 
 L\textquotesingle approche cognitive utilisée pour la détection de la tonalité repose en partie
 sur la solution proposée par Ibrahim Sha\textquotesingle ath lors 
@@ -79,11 +81,7 @@ du fichier musical. De fait, la fréquence d\textquotesingle échantillonnage es
 de la fréquence standard (4410 Hz), mais ce sous-échantillonnage est susceptible de provoquer des
 phénomènes d\textquotesingle aliasing. La solution de Sh\textquotesingle ath implique de
 gérer les problèmes d\textquotesingle aliasing sonore par l\textquotesingle application 
-d\textquotesingle un filtre passe-bas. Dans le cadre de ce projet, nous nous limiterons à
-l\textquotesingle application d\textquotesingle une moyenne mobile sur une fenêtre glissante
-de taille arbitraire. L\textquotesingle avantage de la méthode est de bénéficier d\textquotesingle effets
-passe-bas sans devoir effectuer de calculs dans le domaine fréquentiel. Pour ce qui est de la taille
-de la fenêtre temporelle, il s\textquotesingle agit d\textquotesingle un hyper-paramètre fixé durant
+d\textquotesingle un filtre passe-bas. La taille de la fenêtre temporelle est un hyper-paramètre fixé durant
 l\textquotesingle évaluation de l\textquotesingle algorithme. \citep{IS}
 
 \subsection*{2.2. Estimation spectrale}
@@ -173,7 +171,43 @@ TODO : Cepstre, spectre de puissance, ...
 
 \subsection*{2.3. Prédiction de la tonalité}
 
+Une fois le spectre estimé, celui-ci est compacté dans un vecteur chromatique composé de douze coefficients. Dans le cadre de l\textquotesingle évaluation de l\textquotesingle algorithme, il a été trouvé que 6 octaves suffisent à approximer le spectre : l\textquotesingle ajout d\textquotesingle une septième octave n\textquotesingle améliore pas la précision des prédictions. De fait, le spectre dont la résolution est de 72 coefficients (12 x 6 octaves) est redimensionné en une matrice $M_{i, j}$ de dimensions (6 x 12). Enfin, le vecteur chromatique $C_{i}$ est obtenu en formalisant la méthode élaborée par Sha\textquotesingle ath :
+
+\begin{align}
+C_{i} = (1 - p) * \max_{j} M_{i, j} + p * \sum_{j} M_{i, j}
+\end{align}
+
+où p est un hyper-paramètre déterminé durant l\textquotesingle évaluation/validation de l\textquotesingle algorithme. La dernière étape consiste alors à identifier localement la tonalité sur base unique de ce vecteur chromatique. Différentes méthodes ont été discutées, la première se base sur la méthode de
+Sh\textquotesingle ath alors que les suivantes reposent sur des algorithmes d\textquotesingle apprentissage automatique.
+
 \subsubsection*{2.3.1. Modèle cognitif}
+
+Cette solution repose sur les expériences menées par Carol L. Krumhansl et Lola L. Cuddy sur la perception des tonalités chez l\textquotesingle Homme.
+Des gammes incomplètes ont été jouées, suivies de notes additionnelles que les sujets devaient évaluer sur leur capacité à compéter ces gammes. 
+Les scores ont été moyennés pour donner les deux graphiques suivants :
+
+\FloatBarrier
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=3.1in,angle=0]{imgs/Krumhansl.png}
+\caption{Profils de tonalités dérivés de l\textquotesingle expérience de Krumhansl, et représentant respectivement la gamme do majeur
+et la gamme do mineur.}
+\label{fig1}
+\end{center}
+\end{figure}
+
+Bien que ces deux profils de tonalités fournissent des résultats satisfaisants lorsque le spectre est estimé à l\textquotesingle aide de la CQT, il ne sont pas adaptés lorsque la méthode de Lomb-Scargle est utilisée, car il a été observé que les coefficients renvoyés par cette dernières sont globalement plus equidistribués. Cette distribution doit se refléter dans les profils de tonalité, c\textquotesingle est pourquoi l\textquotesingle algorithme a été évalué plusieurs fois jusqu\textquotesingle à obtenir les profils fournissant les meilleurs résultats, et donnés ci-dessous :
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=3.1in,angle=0]{imgs/Custom.png}
+\caption{Meilleurs profils de tonalités, déterminés empiriquement}
+\label{fig1}
+\end{center}
+\end{figure}
+
+\FloatBarrier
 
 \subsubsection*{2.3.2. Modèles de Markov Cachés (HMM)}
 
@@ -190,25 +224,38 @@ TODO : \citep{JP} \citep{DR}
 
 TODO : \citep{YB}
 
-\subsubsection*{2.4. Résultats}
+\subsection*{2.4. Évaluation}
 
-\begin{table}[h]
+Dans le cadre de ce travail, seules les douze gammes majeures et leurs douze gammes mineures relatives correspondantes sont considérées.
+Deux mesures différentes sont utilisées afin d\textquotesingle évaluer la précision de l\textquotesingle algorithme : 
+la précision (le ratio du nombre de prédictions correctes sur le nombre de fichiers analysés), ainsi que l\textquotesingle indice du MIREX.
+Ce dernier est égal à une combinaison du nombre de bonnes prédictions (avec une pondération de 1,0), du nombre de prédictions décalées de
+5 demi-tons (pondération de 0,5), du nombre de prédictions décalées de 4 demi-tons (pondération de 0,5), du nombre de prédictions de gamme
+relative (pondération de 0,3), et du nombre de prédictions de gamme parallèle (pondération de 0,2).
+
+
+\subsubsection*{2.5. Résultats}
+
+\FloatBarrier
+
+\begin{table}[h!]
 \center{
-\begin{tabular}{|c|c|c|c|c|c|}\hline
-Méthode & ACC & REL & PAR & OBF & TOT \\ \hline\hline
-CQT & 0,307  & 0,148 & 0,095 & 0,042 & 0,593 \\
-LS & 0,312 & 0,005 & 0,085 & 0,143 & 0,545 \\
-EAA & -- & -- & -- & -- & -- \\
-HMM & -- & -- & -- & -- & -- \\
-IO-HMM & -- & -- & -- & -- & -- \\ \hline
+\begin{tabular}{|c|c|c|}\hline
+Méthode & Précision & MIREX \\ \hline\hline
+CQT + profiles & 30,7\%  & - \\
+Lomb-Scargle + profiles & - & - \\
+CQT + HMM & -- & -- \\
+FFT + IO-HMM & -- & -- \\
+CQT + IO-HMM & -- & -- \\ 
+Lomb-Scargle + IO-HMM & -- & -- \\ 
+\hline
 \end{tabular}
 }
 \vskip 0.25cm
-\caption{Évaluation des méthodes présentées selon différents indices :
-ACC (accuracy), REL (relative keys), PAR (parallel keys) et OBF (out-by-a-fifth keys).
-Le tableau reprend les scores du modèle cognitif (COGN), du modèle d\textquotesingle autocorrélation,
-des modèles de Markov cachés (HMM), et du modèle de Markov caché d\textquotesingle entrée-sortie (IO-HMM).}
+\caption{Évaluation des méthodes présentées selon la précision et l\textquotesingle indice du MIREX}
 \end{table}
+
+\FloatBarrier
 
 \section{3. Implémentation en Clojure}
 

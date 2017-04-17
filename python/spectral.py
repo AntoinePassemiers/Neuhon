@@ -3,6 +3,7 @@
 # author : Antoine Passemiers
 
 import numpy as np
+import random
 
 from utils import Parameters
 
@@ -105,6 +106,7 @@ class LombScargleRegressor:
 
 	def fit(self, psi):
 		""" Computes the periodogram from input samples """
+		psi = psi[:self.window_size]
 		time = np.arange(self.window_size)
 		Px = np.empty(len(Parameters.note_frequencies), dtype = np.double)
 		for i, freq in enumerate(Parameters.note_frequencies):
@@ -116,17 +118,21 @@ class LombScargleRegressor:
 def getPeriodograms(signal):
 	window_size = Parameters.window_size
 	sampling_rate = Parameters.target_sampling_rate
+
 	regressor = LombScargleRegressor(window_size, sampling_rate)
+
 	i, n_vectors = 0, 0
 	n_coefs = len(Parameters.note_frequencies)
 	n_samples = len(signal)
  	T = n_samples - Parameters.window_size
  	# blackman_win = np.blackman(Parameters.window_size)
-	periodograms = np.empty((T / Parameters.window_size + 1, n_coefs), dtype = np.double)
+	periodograms = np.empty(
+		((T + Parameters.window_size) / Parameters.slide + 1, n_coefs), 
+		dtype = np.double)
 	while i < T:
 		frame = signal[i:i+Parameters.window_size]
 		periodograms[n_vectors, :] = regressor.fit(frame)
-		i += Parameters.window_size
+		i += Parameters.slide
 		n_vectors += 1
 	return periodograms
 
