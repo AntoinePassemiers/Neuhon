@@ -2,6 +2,7 @@
 
 Mini-thesis on key signature detection, where both accuracy and efficiency of 
 different algorithms are discussed. Python has been used for prototyping and research purposes only : the final end-user program is available in Clojure only.
+A Python version will be soon available.
 
 ## How to use it
 
@@ -27,12 +28,21 @@ Using Leiningen :
     $ lein test
 ```
 
-## Clojure main algorithm :
+## Clojure
 
+### Algorithm design
+
+0) Pre-processing : Averaging the channels, downsampling
 1) Spectral density estimation with Lomb-Scargle method
-2) Reshape the Lomb-Scargle periodogram to be a chromatic vector (12 elements)
-3) Compute the correlation between chromatic vectors and custom tone profiles
-4) Take the tone profile that maximizes the Pearson correlation coefficient
+2) Reshaping the Lomb-Scargle periodogram into a chromatic vector (12 elements)
+3) Computing the correlation between chromatic vectors and custom tone profiles
+4) Taking the tone profile that maximizes the Pearson correlation coefficient
+5) Combine local predictions using Markov chains
+
+### TODO
+
+- Use Markov chains to take the temporal factor into account
+- Adapt the ML algorithms to be able to manage imbalanced datasets
 
 ### Clojure dependencies
 
@@ -58,6 +68,7 @@ Tone prediction using machine learning :
 - Hidden Markov Models and Baum-Welch algorithm
 - Input-Output Hidden Markov Model and Generalized Expectation-maximization algorithm
 - Classification trees
+- TODO : Support vector machines
 
 ### Python dependencies
 
