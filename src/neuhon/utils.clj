@@ -4,6 +4,8 @@
   (:use [clojure.core.matrix]))
 
 
+(set! *unchecked-math* true)
+
 ;; Number of channels in the wav files
 (def ^:const n-channels 2)
 

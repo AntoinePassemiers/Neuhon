@@ -43,6 +43,7 @@ Using Leiningen :
 
 - Use Markov chains to take the temporal factor into account
 - Adapt the ML algorithms to be able to manage imbalanced datasets
+- Handle wav files that are not 44100 Hz 2-channels
 
 ### Clojure dependencies
 
