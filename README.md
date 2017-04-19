@@ -7,7 +7,8 @@ A Python version will be soon available.
 ## How to use it
 
 Simply put all the wav files you need in a folder and specify its path.
-All the files will be processed in a single run :
+All the files will be processed in a single run. If you need to analyse
+a single file, specify the filename.
 
 ```clj
     user=> (use 'neuhon.core)
@@ -16,8 +17,15 @@ All the files will be processed in a single run :
     user=> (process-all "path/to/your/wave/folder")
 
     ;; Allow multithreading
-    user=> (process-all "path/to/your/wave/folder"
-                :threading true)
+    user=> (process-all 
+                "path/to/your/wave/folder"
+                :threading? true)
+
+    ;; Sliding window with an overlap of 40% (default to 0.0) -> slower
+    user=> (process-all 
+                "path/to/your/wave/file"
+                :threading? true
+                :overlap 0.40)
 ```
 
 ### Testing

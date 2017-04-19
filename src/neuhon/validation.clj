@@ -71,7 +71,8 @@
      - Reshape the new coefficients into a matrix of 12 columns
      - Make a weighted sum of the coefficients over the rows -> new chromatic vector
      - Find the profile that matches the chromatic vector the best
-     - The best profile indicates which key signature is the most probable
+     - The best local profile indicates which key signature is the most probable
+     - Combine the local predictions using Markov chains
   4) Increment the key counter corresponding to the locally-predicted key
   5) Slide the temporal window
   6) Start over from step 3
@@ -80,17 +81,18 @@
     (find-key-globally filepath false 0.0))
   ([filepath threading? overlap]
     (let [signal (load-wav filepath :rate target-sampling-rate)
-          N (count signal)
           key-counters (make-array Integer/TYPE 24)
-          n-slides (int (Math/floor (/ N window-size)))
+          step (int (* window-size (- 1.0 overlap)))
           partitions (partition 
             window-size
-            window-size ;; slide
+            step
             (repeat window-size padding-default-value)
             signal)
+          n-steps (count partitions)
           umap (if threading? pmap map)]
       (do
-        (init (+ 1 n-slides))
+        (assert (<= 0.0 overlap 0.8))
+        (init (+ 1 n-steps)) ;; Init progress bar
         (doall
           (umap
             (fn [signal-partition]
@@ -98,7 +100,7 @@
                 (inc-array-element key-counters
                   (find-key-locally 
                     signal-partition))
-                (tick)))
+                (tick))) ;; Update progress bar
             partitions))
         (println (seq key-counters))
         (key-to-str (arg-max (seq key-counters)))))))

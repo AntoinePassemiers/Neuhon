@@ -31,5 +31,5 @@
       (file folder-path))))
 
 ;; (process-all-for-evaluation db-base-path)
-;; (process-all "D://KeyFinderDB/test" :threading true)
+(process-all "D://KeyFinderDB/test" :threading? true :overlap 0.5)
 

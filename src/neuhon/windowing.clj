@@ -9,7 +9,7 @@
 ;; Primitive type of the spectral coefficients
 (def win-coef-type Double/TYPE)
 
-(defn generic-blackman-window 
+(defn- generic-blackman-window 
   "Returns a new function with fixed cosine coefficients.
   The new function will generate a Blackan window, based on these coefficients.
   Source : https://en.wikipedia.org/wiki/Window_function#Blackman_windows"
@@ -89,12 +89,12 @@
     (nth (.lks matrix) n) 
     (nth (.rks matrix) n)))
 
-(defn get-Q-from-p 
+(defn- get-Q-from-p 
   "Computes the constant Q, based on an arbitrary parameter p"
   [p]
   (* p (- (Math/pow 2 (/ 1.0 12)) 1)))
 
-(defn win-left-bound
+(defn- win-left-bound
   "Left bound index of the spectral window that corresponds to fk"
   [Q fk N sampling-rate]
   (double 
@@ -105,7 +105,7 @@
           (double (* fk N)) 
           (double sampling-rate))))))
 
-(defn win-right-bound
+(defn- win-right-bound
   "Right bound index of the spectral window that corresponds to fk"
   [Q fk N sampling-rate] 
   (double 
@@ -116,7 +116,7 @@
           (double (* fk N)) 
           (double sampling-rate))))))
 
-(defn cosine-win-element 
+(defn- cosine-win-element 
   "Computes one coefficient of the cosine temporal window"
   [x lk rk]
   (let [relative-pos (/ (double (- x lk)) (- rk lk))]
