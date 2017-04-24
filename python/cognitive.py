@@ -165,16 +165,8 @@ def predictKeyFromHistogram(hist):
 def matchWithProfiles(coefs, major_profile_matrix, minor_profile_matrix):
     major_scores, minor_scores = np.zeros(12), np.zeros(12)
     for j in range(12):
-        #major_scores[j] = pearsonr(coefs, major_profile_matrix[j])[0]
-        #minor_scores[j] = pearsonr(coefs, minor_profile_matrix[j])[0]
-        try:
-            major_scores[j] = cosine_similarity(
-                coefs / coefs.sum(), major_profile_matrix[j] / major_profile_matrix[j].sum())
-            minor_scores[j] = cosine_similarity(
-                coefs / coefs.sum(), minor_profile_matrix[j] / minor_profile_matrix[j].sum())
-        except:
-            major_scores[j] = -1.0
-            minor_scores[j] = -1.0
+        major_scores[j] = pearsonr(coefs, major_profile_matrix[j])[0]
+        minor_scores[j] = pearsonr(coefs, minor_profile_matrix[j])[0]
 
 
     best_major_key = major_scores.argmax()

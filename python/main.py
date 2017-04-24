@@ -48,7 +48,7 @@ def fitModel():
 def main(prediction_func):
     csv_file = open(CSV_PATH, "r")
     csv_file.readline()
-    tp, fp, relatives, parallels, out_by_a_fifth, n_total = 0, 0, 0, 0, 0, 0
+    tp, fp, relatives, parallels, out_by_a_fifth, out_by_a_fourth, n_total = 0, 0, 0, 0, 0, 0, 0
     distances = np.zeros(24)
     chromatic_dataset = list()
     for i in range(230): # 230
@@ -70,12 +70,14 @@ def main(prediction_func):
                 relatives += 1
             elif isOutByAFifth(predicted_key, target_key):
                 out_by_a_fifth += 1
+            elif isOutByAFourth(predicted_key, target_key):
+                out_by_a_fourth += 1
             else:
                 fp += 1
             showWavFileResults(i, artist, title, target_key, predicted_key)
         except IOError:
             pass
-    showFinalResults(tp, out_by_a_fifth, parallels, relatives, fp, n_total)
+    showFinalResults(tp, out_by_a_fifth, out_by_a_fourth, parallels, relatives, fp, n_total)
     csv_file.close()
     pickle.dump(chromatic_dataset, open("profile_dataset.npy", "wb"))
     print(distances)

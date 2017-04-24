@@ -56,10 +56,11 @@ def showWavFileResults(index, artist, title, target_key, predicted_key):
     print("Target key    : %s" % target_key)
     print("Predicted key : %s\n" % predicted_key)
 
-def showFinalResults(tp, out_by_a_fifth, parallels, relatives, fp, n_total):
+def showFinalResults(tp, out_by_a_fifth, out_by_a_fourth, parallels, relatives, fp, n_total):
     """ Displays the results for the whole dataset, given the score metrics """
     print("Perfect matches : %s" % str(tp))
     print("Out by a fifth : %s" % str(out_by_a_fifth))
+    print("Out by a fourth : %s" % str(out_by_a_fourth))
     print("Parallel keys : %s" % str(parallels))
     print("Relative keys : %s" % str(relatives))
     print("Wrong keys : %s" % str(fp))
@@ -89,6 +90,11 @@ def isOutByAFifth(predicted_key, target_key):
     rel = ("m" in predicted_key) == ("m" in target_key)
     distance = getDistance(predicted_key, target_key, with_offset = False)
     return rel and (distance == 5 or distance == 7)
+
+def isOutByAFourth(predicted_key, target_key):
+    rel = ("m" in predicted_key) == ("m" in target_key)
+    distance = getDistance(predicted_key, target_key, with_offset = False)
+    return rel and (distance == 4 or distance == 8)
 
 def isRelative(predicted_key, target_key):
     distance = getDistance(predicted_key, target_key, with_offset = False)
