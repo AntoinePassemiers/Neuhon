@@ -12,6 +12,7 @@
 *.txt
 pom.xml
 pom.xml.asc
+/.ipynb_checkpoints
 /target
 /classes
 /checkouts

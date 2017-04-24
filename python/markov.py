@@ -26,28 +26,31 @@ BACH_MAJOR = np.array(
      [.15, .29, .05, .11, .32, .00, .09],
      [.91, .00, .01, .02, .04, .03, .00]])
 
-BACH_PROBS = np.full((24, 24), NO_TRANSITION, dtype = np.float)
-
+BACH_MAJOR_PROBS = np.full((12, 12), NO_TRANSITION, dtype = np.float)
 for i, x in enumerate([0, 2, 4, 5, 7, 9, 11]):
     for j, y in enumerate([0, 2, 4, 5, 7, 9, 11]):
-        BACH_PROBS[x, y] = BACH_MAJOR[i, j]
+        BACH_MAJOR_PROBS[x, y] = BACH_MAJOR[i, j]
+BACH_MAJOR_PROBS[BACH_MAJOR_PROBS == .00] = NO_TRANSITION
 
-for i, x in enumerate([12, 14, 15, 17, 19, 20, 22]):
-    for j, y in enumerate([12, 14, 15, 17, 19, 20, 22]):
-        BACH_PROBS[x, y] = BACH_MINOR[i, j]
+BACH_MINOR_PROBS = np.full((12, 12), NO_TRANSITION, dtype = np.float)
+for i, x in enumerate([0, 2, 3, 5, 7, 8, 10]):
+    for j, y in enumerate([0, 2, 3, 5, 7, 8, 10]):
+        BACH_MINOR_PROBS[x, y] = BACH_MINOR[i, j]
+BACH_MINOR_PROBS[BACH_MINOR_PROBS == .00] = NO_TRANSITION
 
-BACH_PROBS[BACH_PROBS == .00] = NO_TRANSITION
 
+obs = np.array([6, 7, 7, 0, 0, 19, 12, 0, 22, 19, 12, 19, 19, 7, 19, 7, 0, 17, 10, 15, 14, 14, 5, 7, 5, 5, 0, 5, 12, 5, 3, 14, 19, 10, 12, 19, 19, 5, 10, 17, 3, 10, 5, 5, 0, 12, 4, 20, 18, 20, 18, 8, 11, 20, 20, 15, 8, 11, 11, 15, 11, 15, 4, 4, 20, 13, 6, 11, 14])
+for i in range(len(obs)):
+    if obs[i] >= 12:
+        obs[i] -= 12
 
-obs = np.array([21, 4, 4, 4, 21, 4, 12, 3, 7, 12, 3, 4, 8, 8, 20, 8, 8, 20, 13, 21, 20, 21, 0, 17, 14, 3, 14, 2, 3, 15, 10, 15, 14, 10, 15, 14, 3, 20, 10, 3, 15, 15, 14, 16, 14, 5, 15, 15, 17, 14, 14, 4, 23, 14, 14, 10, 14, 14, 10, 2, 14, 3, 15, 14, 3, 15, 14, 3, 3, 15, 10, 15, 10, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 14, 10, 15, 15, 10, 3, 15, 10, 3, 14, 10, 23, 15, 14, 2, 15, 14, 10, 15, 2, 10, 15, 14, 10, 15, 15, 15, 15, 15, 3, 15, 2, 4, 7])
+scores = np.zeros(12)
 
-scores = np.zeros(24)
-
-for k in range(24):
+for k in range(12):
     loglikelihood = 0.0
     for i in range(1, len(obs)):
-        a, b = (obs[i-1] + 24 - k) % 24, (obs[i] + 24 - k) % 24
-        prob = BACH_PROBS[a, b]
+        a, b = (obs[i-1] + 12 - k) % 12, (obs[i] + 12 - k) % 12
+        prob = BACH_MINOR_PROBS[a, b]
         if a != b:
             loglikelihood += np.log(prob)
         if obs[i] == k:
@@ -57,4 +60,4 @@ for k in range(24):
     scores[index] = loglikelihood
 
 print(scores)
-print(np.argmax(scores) % 24)
+print(np.argmax(scores) % 12)
