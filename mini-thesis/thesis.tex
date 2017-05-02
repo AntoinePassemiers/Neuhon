@@ -9,7 +9,7 @@
 \usepackage{graphicx}
 \usepackage{placeins}
 
-\title{Étude d\textquotesingle algorithmes pour la détection de la tonalité de fichiers musicaux et implémentation en Clojure}
+\title{Study of various algorithms for identifying tones in musical audio files, and proposal of an efficient and suited Clojure implementation}
 \author{Antoine Passemiers$$ \\
 \mbox{}\\
 $$Université Libre de Bruxelles \\
@@ -18,45 +18,45 @@ apassemi@ulb.ac.be}
 \begin{document}
 \maketitle
 
-\renewcommand{\abstractname}{Résumé}    % Change the abstract title
 \renewcommand\bibname{Bibliographie}        % Change the bib title
 \renewcommand{\refname}{Bibliographie}
 
 
 
 \begin{abstract}
-
-Le projet consiste en la discussion de différents algorithmes relatifs à la détection 
-automatisée de tonalité de fichiers musicaux, le prototypage de ceux-ci en Python,
-ainsi qu\textquotesingle une réflexion sur l\textquotesingle adaptabilité de ces derniers avec le paradigme fonctionnel.
-Le choix de l\textquotesingle algorithme a concevoir selon l\textquotesingle approche fonctionnelle sera basé
-sur des critères de rapidité d\textquotesingle exécution et de précision de la détection. 
-L\textquotesingle algorithme final sera alors implémenté en Clojure.
+The project involves the discussion of different approaches to automated tone detection in audio files,
+the prototyping of these methods in Python, a quick reflexion on their consistency with functional programming,
+and the implementation of the most appropriate one in Clojure.
+State of the art comprises various pitch class profile (PCP) approaches and machine learning algorithms, and this
+report aims to implement all of them to be able to discuss them according to their accuracy.
 
 \end{abstract}
 
 \section*{1. Introduction}
 
-La tonalité d\textquotesingle une oeuvre musicale se caractérise par
-l\textquotesingle ensemble des sons formant une même gamme diatonique. 
-A la différence de la gamme, où les sons se succèdent de façon contigüe,
-la tonalité (ou ton) regroupe des sons qui peuvent être disjoints et/ou superposés \citep{AD}.
-En conséquence, nous nous intéressons à l\textquotesingle analyse de mélodies polyphoniques, 
-où plusieurs notes peuvent être jouées en même temps.\\
+The tone of a musical work is characterised by the set of sounds coming from a same diatonic scale.
+Unlike scales, where musical notes follow each other in a contiguous manner, tones assemble notes that can be
+disjoined or even overlapped. \citep{AD} 
+Therefore, our central concern is the analysis of polyphonic melodies, which constitute the overwhelming
+majority of the modern musical works.\\
 
-En particulier, nous allons nous pencher sur deux catégories d\textquotesingle algorithmes :
+More specifically, we will give consideration to two types of tonality prediction methods :
+those based on tone profiles, and those based on machine learning algorithms. Most of the latter base their design on the
+markovian property
+
+[[En particulier, nous allons nous pencher sur deux catégories d\textquotesingle algorithmes :
 ceux basés sur des modèles cognitifs, et ceux incluant des notions d\textquotesingle 
 apprentissage automatique. Les premiers tentent d\textquotesingle intégrer au mieux les connaissances
 de la théorie musicale et reposent sur la façon dont les personnes reconnaissent les différentes tonalités,
-alors que les seconds utilisent l\textquotesingle inférence statistique pour déterminer celles-ci.\\
+alors que les seconds utilisent l\textquotesingle inférence statistique pour déterminer celles-ci.\\]]
 
-L\textquotesingle approche cognitive utilisée pour la détection de la tonalité repose en partie
+[[L\textquotesingle approche cognitive utilisée pour la détection de la tonalité repose en partie
 sur la solution proposée par Ibrahim Sha\textquotesingle ath lors 
 de la conception du logiciel KeyFinder \citep{IS}. La précision de la détection est évaluée 
 à l\textquotesingle aide d\textquotesingle une base 
 de données, constituée de 250 fichiers musicaux au format wav, dont les tonalités sont connues
 et inscrites dans un fichier csv. Ces fichiers font partie de ceux utilisés par 
-Ibrahim Sha\textquotesingle ath dans le cadre de sa recherche.\\
+Ibrahim Sha\textquotesingle ath dans le cadre de sa recherche.\\]]
 
 Pour ce qui est de la partie apprentissage automatique, les méthodes présentées seront principalement
 en lien avec les modèles de Markov cachés. Leur évaluation se fera en divisant la base de données en
@@ -67,24 +67,21 @@ apprentissage automatique, en théorie musicale et en traitement logiciel de sig
 
 TODO : \citep{SP} \citep{AT} -> Partie 2.1.1.
 
-\section*{2. Considérations théoriques}
+\section*{2. Theoretical considerations}
 
-\subsection*{2.1. Pré-traitement}
+\subsection*{2.1. Preprocessing}
 
-Le signal audio est premièrement extrait du fichier wav, puis la moyenne entre les 
-deux canaux est effectuée si le fichier a été enregistré en stéréo. En effet il n\textquotesingle
-est pas nécessaire de prendre en compte le panoramique puisque celui-ci n\textquotesingle a que 
-peu d\textquotesingle influence sur la mélodie dans le domaine spectral. 
-Étant donné que les notes jouées sont uniquement caractérisées par leur fréquence fondamentale,
-il n\textquotesingle est pas nécessaire de considérer l\textquotesingle entièreté du spectre
-du fichier musical. De fait, la fréquence d\textquotesingle échantillonnage est abaissée à un dixième 
-de la fréquence standard (4410 Hz), mais ce sous-échantillonnage est susceptible de provoquer des
-phénomènes d\textquotesingle aliasing. La solution de Sh\textquotesingle ath implique de
-gérer les problèmes d\textquotesingle aliasing sonore par l\textquotesingle application 
-d\textquotesingle un filtre passe-bas. La taille de la fenêtre temporelle est un hyper-paramètre fixé durant
-l\textquotesingle évaluation de l\textquotesingle algorithme. \citep{IS}
+The audio signal is first extracted from the wav file, and then the average of its channels is calculated
+if the file has been written in stereo. It is not required to take the pan into account given that mixing
+channels or analysing the channels separately makes no difference in the spectral domain. Also, there is
+no indispensable need to consider the whole frequential spectrum given that notes are mainly characterised 
+by their fundamental frequency
+and that the harmonics of the highest notes are not relevant for estimating chroma vectors.
+The sampling rate is de facto resampled at a tenth of the standard sampling frequency (4410 Hz).
+Although this drastic downsampling is likely to create aliasing effects (which can be simply avoided by 
+applying a low-pass filter), no loss of accuracy has been pointed out during the evaluation phase.
 
-\subsection*{2.2. Estimation spectrale}
+\subsection*{2.2. Spectral estimation}
 
 Il existe deux catégories de techniques d\textquotesingle estimation de densité spectrale : les méthodes paramétriques et les méthodes non-paramétriques.
 
@@ -100,48 +97,50 @@ coefficients. Ceci doit être réajusté en appliquant des fenêtres spectrales 
 constitue alors la CQT.
 
 
-\subsubsection*{2.2.2. Décomposition harmonique de Pisarenko (PHD)}
+\subsubsection*{2.2.2. Pisarenko Harmonic Decomposition (PHD)}
 
 
 
 \citep{MA}
 
-\subsubsection*{2.2.3. Estimation spectrale par moindres carrés}
+\subsubsection*{2.2.3. Least-squares spectral estimation}
 
-Il est possible d\textquotesingle estimer le spectre par régression, au travers d\textquotesingle algorithmes n\textquotesingle exigeant
-pas de grandes quantités de calcul. Parmi les algorithmes les plus importants résident celui de Vaníček et celui de Lomb-Scargle. Leur particularité est
-de pouvoir traiter des données qui ne sont pas reçues à intervalles réguliers (la majorité des observations se font la nuit). En outre, contrairement à la transformée de Fourier rapide qui possède une résolution aussi précise que la fenêtre d\textquotesingle observation est grande, ces algorithmes
-calculent un périodogramme dont la taille est fixée par le nombre de fréquences qui nous intéressent. Au plus le nombre de fréquences analysées est
-élevé, au plus le temps d\textquotesingle exécution sera conséquent.
+It is also possible to estimate the spectrum using dedicated regression techniques. We will give focus on the most popular of them :
+the Van\'{\i}\v{c}ek method and the Lomb-Scargle method. A spectrum approximated by one of the latter is called a periodogram.
+The incentives for the Van\'{\i}\v{c}ek method are to be able to handle missing data samples, since it has been developped in the fields of
+geology and astrophysics, where data are not received at regular intervals. Furthermore, unlike the Fast Fourier Transform which has a
+variable spectral resolution (depending on the size of the observation window), the least-squares methods output periodograms of a size
+that is equal to the number of frequencies of interest. The more frequencies we will consider, the longer the execution time will be.
+It is a great concern as well that both Van\'{\i}\v{c}ek and Lomb-Scargle methods make the assumption that signals consist of a
+linear combination of sine-waves and white noise (where the sine-wave frequencies are known), and the assumption that the signal has an 
+offset of zero.
 
 \begin{align}
 \hat{\theta}_{k} = (A_{k}^{T} A_{k})^{-1} A_{k}^{T} y
 \end{align}
 
-Selon la méthode de Vanícek, le signal est supposé être centré sur zéro et représenter une combinaison linéaire de sinusoïdes et d\textquotesingle un bruit blanc.
-Les coefficients de cette combinaison linéaire sont réunis dans un vecteur $\theta_{k}$, de telle manière que le signal équivaut à $y \approx A\theta_{k}$.
-La matrice A est telle que chaque ligne de celle-ci constitue une sinusoïde de fréquence d\textquotesingle intérêt. Les coefficients sont alors finalement
-donnés par l\textquotesingle équation 1. \citep{PS}\\
+According to the Van\'{\i}\v{c}ek method, the coefficients of the linear combination are stored in a vector $\theta_{k}$, in such a way that
+the signal equals $y \approx A\theta_{k}$. Each row of the matrix A contains the data samples of the sine-wave of a particular frequency of interest.
+Finally, the coefficients are given by the equation 1. \citep{PS}\\
 
-Le défaut de la méthode est de ne pas considérer les phases des fréquences concernées. En effet chaque sinusoïde contenue dans la matrice A
+[[ Le défaut de la méthode est de ne pas considérer les phases des fréquences concernées. En effet chaque sinusoïde contenue dans la matrice A
 est supposée posséder une phase nulle. La méthode de Lomb-Scargle permet de résoudre ce problème en pré-calculant les phases des sinusoïdes
 utilisées et en tenant compte au mieux de celles-ci lors du calcul du spectre. Le déphasage $\tau$ correspondant à la fréquence $f$ est donné par
-l\textquotesingle équation 2. \citep{LS}
+l\textquotesingle équation 2. \citep{LS} ]]
 
 \begin{align}
 \tan 2\pi f \tau = \frac{\sum\limits_{j=1} \sin 2\pi f t_{j}}{\sum\limits_{j=1} \cos 2\pi f t_{j}}
 \end{align}
 
-Tout comme dans la méthode de Vanícek, la régression consiste en la recherche de coefficients qui expliquent au mieux le signal sous la forme d\textquotesingle
-une pondération de sinusoïdes. Le coefficient associé à la fréquence $f$ est donné par l\textquotesingle équation 3 :
+[[ Tout comme dans la méthode de Vanícek, la régression consiste en la recherche de coefficients qui expliquent au mieux le signal sous la forme d\textquotesingle
+une pondération de sinusoïdes. Le coefficient associé à la fréquence $f$ est donné par l\textquotesingle équation 3 : ]]
 
 \begin{align}
 \Delta R(f) = \frac{(YC)^{2}}{CC} 
 + \frac{(YS)^{2}}{SS}
 \end{align}
 
-Les valeurs CC et SS peuvent être pré-calculées, car les fréquences d\textquotesingle intérêt ne changent pas d\textquotesingle un fichier
-à l\textquotesingle autre.
+CC and SS values are computed only once (when the namespace is loaded), since the frequencies of interest don’t change from a wav file to another.
 
 \begin{align}
 CC = \sum\limits_{j=1} \cos^{2} 2\pi f (t_{j} - \tau)
@@ -151,8 +150,7 @@ CC = \sum\limits_{j=1} \cos^{2} 2\pi f (t_{j} - \tau)
 SS = \sum\limits_{j=1} \sin^{2} 2\pi f (t_{j} - \tau)
 \end{align}
 
-Les valeurs YC et YS cherchent à mesurer respectivement les niveau d\textquotesingle orthogonalité du signal $y$ avec une sinusoïde déphasée de $\pi / 2$
-et avec une sinusoïde de phase nulle. Ces sinusoïdes peuvent également être pré-calculées. Les formules permettant de calculer YC et YS sont :
+[[Les valeurs YC et YS cherchent à mesurer respectivement les niveau d\textquotesingle orthogonalité du signal $y$ avec une sinusoïde déphasée de $\pi / 2$ et avec une sinusoïde de phase nulle. Ces sinusoïdes peuvent également être pré-calculées. Les formules permettant de calculer YC et YS sont : ]]
 
 \begin{align}
 YC = \sum\limits_{j=1} y_{j}\cos 2\pi f (t_{j} - \tau)
@@ -165,11 +163,11 @@ YS = \sum\limits_{j=1} y_{j}\sin 2\pi f (t_{j} - \tau)
 Ainsi, les seules opérations restantes lors de l\textquotesingle exécution de l\textquotesingle algorithme sont les produits scalaires entre les
 sinusoïdes et le signal délimité par la fenêtre glissante, ce qui réduit drastiquement la quantité de calculs requis pour l\textquotesingle estimation du spectre.
 
-\subsubsection*{2.2.4. Autres méthodes}
+\subsubsection*{2.2.4. Other approaches}
 
-TODO : Cepstre, spectre de puissance, ...
+TODO : Cepstral coefficients, ...
 
-\subsection*{2.3. Prédiction de la tonalité}
+\subsection*{2.3. Key identification}
 
 Une fois le spectre estimé, celui-ci est compacté dans un vecteur chromatique composé de douze coefficients. Dans le cadre de l\textquotesingle évaluation de l\textquotesingle algorithme, il a été trouvé que 6 octaves suffisent à approximer le spectre : l\textquotesingle ajout d\textquotesingle une septième octave n\textquotesingle améliore pas la précision des prédictions. De fait, le spectre dont la résolution est de 72 coefficients (12 x 6 octaves) est redimensionné en une matrice $M_{i, j}$ de dimensions (6 x 12). Enfin, le vecteur chromatique $C_{i}$ est obtenu en formalisant la méthode élaborée par Sha\textquotesingle ath :
 
@@ -209,32 +207,57 @@ Bien que ces deux profils de tonalités fournissent des résultats satisfaisants
 
 \FloatBarrier
 
-\subsubsection*{2.3.2. Modèles de Markov Cachés (HMM)}
+\subsubsection*{2.3.2. Hidden Markov Models (HMM)}
 
-Les modèles de Markov cachés sont des machines à états discrets cherchant à représenter des séries multivariées par
-leurs distributions, ainsi que par les probabilités de transition entre les états cachés de la machine. De plus, chaque état
-caché de cette dernière possède ses propres probabilités d\textquotesingle émission. Contrairement à des modèles d\textquotesingle
-apprentissage automatique plus populaires tels que les réseaux de neurones ou les machines à vecteurs de support,
-les HMM sont capables de traiter des séquences de longueur non fixée. Cette caractéristique est appréciable dans le cadre
-de l\textquotesingle analyse de morceaux de musique, qui ont des durées de nature très variables.
+Hidden Markov Models are discrete state machines that represent multivariate series by their distributions and by
+the transition probailities between their states. Their states are called “hidden” because they are not observed directly,
+but can be inferred from the observation sequence using a parameter estimation method (such as the expectation-maximization algorithm
+or the Viterbi algorithm). Each hidden state distinguishes itself by its emission probabilities (or emission probability density function).
+Unlike more popular machine learning models such as neural networks or support vector machines (SVM), Hidden Markov Models are capable of
+processing input sequences of variable length. This characteristic is substantial given that music tracks are of variable length by nature.\\
+
+The old-fashioned way to classify keys using HMMs consists of training a HMM for each distinct music key, and to predict the most probable 
+key of an unlabelled music track by looking for the HMM that maximizes the track\textquotesingle s log-likelihood.
 
 TODO : \citep{JP} \citep{DR}
 
-\subsubsection*{2.2.3. Modèles de Markov Cachés de type entrée-sortie (IO-HMM)}
+\subsubsection{2.2.3. Feedforward neural networks}
+
+Neural networks have already delivered good results for classifying chords inside a same piece of music.
+
+\subsubsection*{2.2.4. Input-Output Hidden Markov Models (IO-HMM)}
+
+The main deficiency of the standard HMM is that it has no discriminative capabilities : if one of the keys appears to be more frequent in the database or
+if it seems to be easily explained by the HMM, the latter will present high risks of predicting the same key every time, regardless of the
+input sequence. On the other hand, feedforward neural networks have the defect that they are not suited for temporal data, since they must 
+process features of fixed size. [[ TODO : recurrent networks ]]
+
+The Input-Output Hidden Markov Model is well suited for our task because it is affected by none of these deficiencies.
 
 TODO : \citep{YB}
 
-\subsection*{2.4. Évaluation}
+\subsection*{2.4. Methodology}
 
-Dans le cadre de ce travail, seules les douze gammes majeures et leurs douze gammes mineures relatives correspondantes sont considérées.
-Deux mesures différentes sont utilisées afin d\textquotesingle évaluer la précision de l\textquotesingle algorithme : 
-la précision (le ratio du nombre de prédictions correctes sur le nombre de fichiers analysés), ainsi que l\textquotesingle indice du MIREX.
-Ce dernier est égal à une combinaison du nombre de bonnes prédictions (avec une pondération de 1,0), du nombre de prédictions décalées de
-5 demi-tons (pondération de 0,5), du nombre de prédictions décalées de 4 demi-tons (pondération de 0,5), du nombre de prédictions de gamme
-relative (pondération de 0,3), et du nombre de prédictions de gamme parallèle (pondération de 0,2).
+\subsubsection{2.4.1. Datasets}
 
+The database consists of 415 music tracks recorded in wav format, 44100 Hz stereo. Each wav file has an associated key. All keys have been determined
+by experts and have been made available by Ibrahim Shat\textquotesingle ath as part of its work. For evaluating algorithms based on tone profiles,
+all the tracks have been used to tune the parameters to their best value. The latter consist of : the major and minor tone profile coefficients,
+the size of the sliding window, and the range of the spectrum frequency bins. For evaluating machine learning techniques,
+the dataset is split into a training set of 138 music tracks and a validation set of 277 tracks.
 
-\subsubsection*{2.5. Résultats}
+\subsubsection{2.4.2. Evaluation}
+
+In the framework of this study, we consider only the twelve heptatonic major scales and the twelve heptatonic minor scales.
+Two different metrics are used to evaluate the accuracy of the algorithms :
+the raw accuracy (the ratio between the number of correct predictions to the number of analyzed files) and the MIREX index.
+The MIREX metric is a weighted sum of the number of correct predictions (C), the number of predictions that are out by a fifth (F), 
+out by a fourth (U), the number of predicted scales that are parallel to the correct ones (P), and the number of predicted scales
+that are relative to the correct ones (R). The index is then given by : \\
+
+$ MIREX = (C + \frac{1}{2}.F + \frac{1}{2}.U + \frac{3}{10}.R + \frac{1}{5}.F) / TOTAL $
+
+\subsubsection*{2.5. Results}
 
 \FloatBarrier
 
@@ -243,7 +266,7 @@ relative (pondération de 0,3), et du nombre de prédictions de gamme parallèle
 \begin{tabular}{|c|c|c|}\hline
 Méthode & Précision & MIREX \\ \hline\hline
 CQT + profiles & 30,7\%  & - \\
-Lomb-Scargle + profiles & - & - \\
+Lomb-Scargle + profiles & 36,6\% & 49,4\% \\
 CQT + HMM & -- & -- \\
 FFT + IO-HMM & -- & -- \\
 CQT + IO-HMM & -- & -- \\ 
@@ -252,12 +275,23 @@ Lomb-Scargle + IO-HMM & -- & -- \\
 \end{tabular}
 }
 \vskip 0.25cm
-\caption{Évaluation des méthodes présentées selon la précision et l\textquotesingle indice du MIREX}
+\caption{Accuracy assessment, according to the raw accuracy and the MIREX index}
 \end{table}
 
 \FloatBarrier
 
-\section{3. Implémentation en Clojure}
+\section{3. Clojure implementation}
+
+Clojure is a dynamic and functional programming language based on the Java Virtual Machine, suited for quickly designing multithreaded programs,
+and featuring a full range of persistent data structures.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=3.1in,angle=0]{imgs/flowChart.png}
+\caption{Flowchart of the solution design}
+\label{fig3}
+\end{center}
+\end{figure}
 
 TODO : \citep{SK}
 

@@ -99,19 +99,20 @@
 (def ls-freqs (doall (lomb-scargle-preprocessing)))
 
 (defn apply-lomb-scargle-on-one-frequency
-  [signal ith]
-  (let [freq-data (nth ls-freqs ith)
-        freq      (.freq freq-data)
-        cos-wave  (.waveform-cos freq-data)
-        sin-wave  (.waveform-sin freq-data)
-        den-cos   (.den-cos freq-data)
-        den-sin   (.den-sin freq-data)]
-    (* 0.5 (+
-      (/ (pow2 (apply-sum (vproduct cos-wave signal))) den-cos)
-      (/ (pow2 (apply-sum (vproduct sin-wave signal))) den-sin)))))
+  "Evaluates the Lomb-Scargle periodogram at a given frequency,
+  where freq-data is of PreprocessedWaveforms type"
+  [signal freq-data]
+  (* 0.5 (+
+    (/ (pow2 
+      (apply-sum 
+        (vproduct (.waveform-cos freq-data) signal))) (.den-cos freq-data))
+    (/ (pow2 
+      (apply-sum 
+        (vproduct (.waveform-sin freq-data) signal))) (.den-sin freq-data)))))
 
 (defn compute-periodogram
+  "Computes the Lomb-Scargle periodogram, given an input sequence"
   [signal]
   (map 
-    #(apply-lomb-scargle-on-one-frequency signal %1)
+    #(apply-lomb-scargle-on-one-frequency signal (nth ls-freqs %1))
     (range n-midi-notes)))

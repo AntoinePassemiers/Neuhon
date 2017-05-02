@@ -5,7 +5,7 @@
 import numpy as np
 
 
-NO_TRANSITION = 0.001
+NO_TRANSITION = 0.005
 FUNDAMENTAL_SCORE = np.log(1.00001)
 
 BACH_MINOR = np.array(

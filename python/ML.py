@@ -22,8 +22,8 @@ CQT_METHOD = 1
 LOMB_SCARGLE_METHOD = 2
 
 # Key names of the 12 major scales and the 12 minor scales
-KEY_NAMES = frozenset(("C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "Cm", "C#m",
-    "Dm", "Ebm", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "Bbm", "Bm"))
+KEY_NAMES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "Cm", "C#m",
+    "Dm", "Ebm", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "Bbm", "Bm"]
 # Mapping between the key signature and its corresponding index in Numpy arrays
 labels = { key : i for i, key in enumerate(KEY_NAMES) }
 # Mapping between the key signature index and its corresponding name
@@ -33,25 +33,52 @@ key_counters = { key : 0 for key in KEY_NAMES }
 
 # Parameters for Input-Output Hidden Markov Models
 config = IOConfig()
-config.architecture = "ergodic"  # Linear topology
-config.n_iterations = 30         # Number of iterations of the GEM
-config.s_learning_rate  = 0.02   # Learning rate of the initial state unit
-config.o_learning_rate  = 0.02   # Learning rate of the state transition units
-config.pi_learning_rate = 0.02   # Learning rate of the output units
+config.architecture = "linear"  # Ergodic topology
+config.n_iterations = 25         # Number of iterations of the GEM
+config.s_learning_rate  = 0.03   # Learning rate of the initial state unit
+config.o_learning_rate  = 0.03   # Learning rate of the state transition units
+config.pi_learning_rate = 0.03   # Learning rate of the output units
 config.missing_value_sym = np.nan_to_num(np.nan) # Default missing value
 config.pi_activation = "sigmoid" # Activation function of the initial state unit
-config.s_activation  = "sigmoid" # Activation function of the state transition units
-config.o_activation  = "sigmoid" # Activation function of the output units
-config.pi_nhidden = 25 # Number of hidden neurons in the initial state unit
-config.s_nhidden  = 25 # Number of hidden neurons in the state transition units
-config.o_nhidden  = 25 # Number of hidden neurons in the output units
-config.pi_nepochs = 4  # Number of training epochs per iteration for the initial state unit
-config.s_nepochs  = 4  # Number of training epochs per iteration for the state transition units
-config.o_nepochs  = 4  # Number of training epochs per iteration for the output units
+config.s_activation  = "tanh" # Activation function of the state transition units
+config.o_activation  = "tanh" # Activation function of the output units
+config.pi_nhidden = 20 # Number of hidden neurons in the initial state unit
+config.s_nhidden  = 20 # Number of hidden neurons in the state transition units
+config.o_nhidden  = 30 # Number of hidden neurons in the output units
+config.pi_nepochs = 1  # Number of training epochs per iteration for the initial state unit
+config.s_nepochs  = 1  # Number of training epochs per iteration for the state transition units
+config.o_nepochs  = 1  # Number of training epochs per iteration for the output units
 
 config.use = LOMB_SCARGLE_METHOD
 
-def extractCQTs(filename):
+TRAINING_SET = np.array([
+    45,  51,  75,  126, 146, 167, # C
+    # C#
+    108, 108, 108, 108, 108, 108, # D
+    276, 276, 276, 276, 276, 276, # Eb
+    56,  149, 56,  149, 56,  149, # E
+    39,  79,  143, 168, 39,  79,  # F
+    150, 150, 150, 150, 150, 150, # F#
+    14,  14,  14,  14,  14,  14,  # G
+    40,  40,  40,  40,  40,  40,  # G#
+    7,   30,  84,  7,   30,  84,  # A
+    49,  133, 207, 49,  133, 207, # Bb
+    183, 237, 183, 237, 183, 237, # B
+    20,  34,  46,  50,  86,  101, # Cm
+    5,   69,  77,  170, 225, 5,   # C#m
+    12,  17,  28,  64,  70,  91,  # Dm
+    3,   6,   9,   25,  26,  41,  # Ebm
+    8,   11,  13,  33,  35,  55,  # Em
+    19,  22,  27,  31,  42,  43,  # Fm
+    21,  48,  82,  88,  89,  93,  # F#m
+    2,   23,  54,  83,  111, 116, # Gm
+    15,  18,  73,  97,  115, 129, # G#m
+    4,   16,  29,  32,  36,  37,  # Am
+    10,  24,  52,  132, 134, 148, # Bbm
+    44,  68,  85,  87,  94,  98,  # Bm
+])
+
+def extractFeatures(filename):
     """ Loading wav file """
     stereo_signal = getSignalFromFile(filename)
     """ Averaging the 2 channels (stereo -> mono) """
@@ -62,42 +89,25 @@ def extractCQTs(filename):
     signal = downSampling(signal)
     """ Computing Short-Term Energies and Zero Crossing Rates """
     ste_sequence, zcr_sequence = getSTEandZCRs(signal)
-    """ Computing real Fast Fourier Transforms """
-    fft_matrix = getFFTs(signal)
-    """ Spectral windows for getting CQT from real spectrum """
-    wins = getSpectralWindows(len(signal))
-    """ Computing Constant-Q Transforms """
-    cqt_matrix = getCQTs(fft_matrix, wins)
-    return ste_sequence, cqt_matrix
+    """ Computing the spectra """
+    feature_matrix = getPeriodograms(signal)
 
-def extractFeatures(dataset):
-    inputs, targets = list(), list()
-    for i, entry in enumerate(dataset):
+    
+    # wins = getSpectralWindows(len(signal))
+    # cqt_matrix = getCQTs(fft_matrix, wins)
+    
+    return feature_matrix
+
+def saveFeatures(dataset):
+    inputs, targets = dict(), dict()
+    for i in dataset.keys():
+        entry = dataset[i]
         target_key, filename = entry[2], entry[3]
         try:
             print("Processing file %i" % i)
-            if config.use == FFT_METHOD:
-                _, feature_matrix, vec = findKey(filename)
-            elif config.use == CQT_METHOD:
-                _, feature_matrix, vec = extractCQTs(filename)
-            elif config.use == LOMB_SCARGLE_METHOD:
-                _, feature_matrix, vec = extractCQTs(filename)
-            inputs.append(feature_matrix)
-            targets.append(np.full((len(feature_matrix),), labels[target_key], dtype = np.int32))
-        except IOError:
-            pass
-    pickle.dump([inputs, targets], open("temp", "wb"))
-
-def extractFeaturesForDecisionTrees(dataset):
-    inputs, targets = list(), list()
-    for i, entry in enumerate(dataset):
-        target_key, filename = entry[2], entry[3]
-        try:
-            print("Processing file %i" % i)
-            _, feature_matrix, vec, extra = findKeyUsingLombScargle(filename)
-            feature_vec = np.concatenate([vec, extra.ZCR, extra.STE])
-            inputs.append(feature_matrix)
-            targets.append(np.full((len(feature_matrix),), labels[target_key], dtype = np.int32))
+            feature_matrix = extractFeatures(filename)
+            inputs[i] = feature_matrix
+            targets[i] = np.full((len(feature_matrix),), labels[target_key], dtype = np.int32)
         except IOError:
             pass
     pickle.dump([inputs, targets], open("temp", "wb"))
@@ -105,33 +115,47 @@ def extractFeaturesForDecisionTrees(dataset):
 def train():
     temps = pickle.load(open("temp", "rb"))
     X, targets = temps[0], temps[1]
-    print(len(X), X[0].shape)
-    for target in targets:
-        key_counters[key_names[target[0]]] += 1
+    train_X, train_y = list(), list()
+    for i in TRAINING_SET:
+        try:
+            print(targets[i][0], i)
+            train_X.append(X[i])
+            train_y.append(targets[i])
+        except KeyError:
+            pass
+    for i in range(len(train_y)):
+        key_counters[key_names[train_y[i][0]]] += 1
     print(key_counters)
+
     iohmm = HMM(5, has_io = True, standardize = False)
-    iohmm.fit(X, targets = targets, n_classes = 24, is_classifier = True, parameters = config)
+    iohmm.fit(train_X, targets = train_y, n_classes = 24, is_classifier = True, parameters = config)
     iohmm.pySave("model")
     return iohmm
 
-def predict(dataset):
+def predict():
     model = HMM(5, has_io = True, standardize = False)
     model.pyLoad("model")
 
-    tp, fp, relatives, parallels, out_by_a_fifth, n_total = 0, 0, 0, 0, 0, 0
+    temps = pickle.load(open("temp", "rb"))
+    X, targets = temps[0], temps[1]
+    validation_X, validation_y = list(), list()
+    for i in range(490):
+        if i not in TRAINING_SET:        
+            try:
+                validation_X.append(X[i])
+                validation_y.append(targets[i])
+            except KeyError:
+                pass
+    tp, fp, relatives, parallels, out_by_a_fifth, out_by_a_fourth, n_total = 0, 0, 0, 0, 0, 0, 0
     distances = np.zeros(12)
-    for i, entry in enumerate(dataset):
-        artist, title, target_key, filename = entry[0], entry[1], entry[2], entry[3]
+    for i, entry in enumerate(validation_X):
         try:
-            if config.use_chromatic_vector:
-                _, feature_matrix = findKey(filename)
-            else:
-                _, feature_matrix = extractCQTs(filename)
-            result = model.predictIO(feature_matrix)
+            result = model.predictIO(validation_X[i])
             predicted_key = key_names[result[0]]
-
+            target_key = key_names[validation_y[i][0]]
             n_total += 1
 
+            print(predicted_key, target_key)
             if predicted_key == target_key:
                 tp += 1
             elif isParallel(predicted_key, target_key):
@@ -140,40 +164,30 @@ def predict(dataset):
                 relatives += 1
             elif isOutByAFifth(predicted_key, target_key):
                 out_by_a_fifth += 1
+            elif isOutByAFourth(predicted_key, target_key):
+                out_by_a_fourth += 1
             else:
                 fp += 1
         except IOError:
             pass
 
-        showWavFileResults(i, artist, title, target_key, predicted_key)
-    showFinalResults(tp, out_by_a_fifth, parallels, relatives, fp, n_total)
+    showFinalResults(tp, out_by_a_fifth, out_by_a_fourth, parallels, relatives, fp, n_total)
     print("Finished")
 
-def splitDataset(n_files, split_proportion = 0.5):
+def loadDataset(n_files, split_proportion = 0.5):
     csv_file = open(CSV_PATH, "r")
     csv_file.readline()
-
-    indexes = np.arange(n_files)
-    np.random.shuffle(indexes)
-    split_index = int(np.round(n_files * split_proportion))
-    training_indexes = indexes[:split_index]
-    test_indexes = indexes[split_index:]
-
-    training_set, test_set = list(), list()
+    dataset = dict()
     for i in range(n_files):
         row = csv_file.readline().replace('\n', '').split(';')
         artist, title, target_key, filename = row[0], row[1], row[2], row[3]
-        if i in training_indexes:
-            training_set.append([artist, title, target_key, filename])
-        else:
-            test_set.append([artist, title, target_key, filename])
+        dataset[i + 2] = [artist, title, target_key, filename]
     csv_file.close()
-    return training_set, test_set
+    return dataset
 
 if __name__ == "__main__":
-    np.random.seed(0)
-    training_set, test_set = splitDataset(230, split_proportion = 0.5)
+    #dataset = loadDataset(490, split_proportion = 0.5)
+    #saveFeatures(dataset)
     
-    extractFeaturesForDecisionTrees(training_set)
-    # model = train()
-    predict(test_set)
+    # train()
+    predict()

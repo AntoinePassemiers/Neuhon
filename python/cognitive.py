@@ -38,6 +38,25 @@ CUSTOM_MINOR_BASE_PROFILE    = np.array(
     [ 6.63347485,  3.14954925,  2.94053816,  3.571383,    4.73633031,  4.90456669,
       2.81810968,  6.45527264,  0.56848472,  5.25402483,  1.7791656,   4.63136019])
 
+CUSTOM_MAJOR_BASE_PROFILE_4096 = np.array(
+    [ 8.65320429,  2.16161292,  4.30865426,  6.90719602,  4.3678239,  2.85374645,
+     -0.53883001,  6.44311905,  3.38053384, -0.02761278,  3.76937104, 5.52525848])
+CUSTOM_MINOR_BASE_PROFILE_4096 = np.array(
+    [ 6.4305449,   3.26399386,  2.96707701,  3.93445561,  4.55335791,  5.25911852,
+      2.9317162,   6.13092016,  0.73633773,  4.92132766,  2.10301337,  4.67029709])
+
+CUSTOM_MAJOR_BASE_PROFILE_8192 = np.array(
+    [ 8.92791746,  1.70644342,  4.17007094,  6.67571849,  3.998989,    3.60122426,
+     -0.25388689,  5.43016949,  3.52426918, -0.51756371,  4.23489221,  5.66412442])
+CUSTOM_MINOR_BASE_PROFILE_8192 = np.array(
+    [ 6.71046683,  3.27273742,  2.93668832,  3.53786066,  4.97184582,  5.56732173,
+      3.22601953,  5.78441785,  0.25167037,  4.93972928,  1.5874453,   4.37988104])
+
+# (148, 17, 11, 57, 39, 143)
+
+CUSTOM_MAJOR_BASE_PROFILE = CUSTOM_MAJOR_BASE_PROFILE_8192
+CUSTOM_MINOR_BASE_PROFILE = CUSTOM_MINOR_BASE_PROFILE_8192
+
 MAJOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MAJOR_BASE_PROFILE)
 MINOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MINOR_BASE_PROFILE)
 
@@ -237,9 +256,9 @@ def findKeyUsingLombScargle(filename):
 def searchForBestProfile():
     dataset = pickle.load(open("profile_dataset.npy", "rb"))
 
-    for m in range(60):
+    for m in range(20):
         distances = np.zeros(24)
-        tp, fp, relatives, parallels, out_by_a_fifth, n_total = 0, 0, 0, 0, 0, 0
+        tp, fp, relatives, parallels, out_by_a_fifth, out_by_a_fourth, n_total = 0, 0, 0, 0, 0, 0, 0
 
         epsilon = 0.5
         alpha, gamma = np.random.rand(12), np.random.rand(12)
@@ -270,12 +289,14 @@ def searchForBestProfile():
                 relatives += 1
             elif isOutByAFifth(predicted_key, target_key):
                 out_by_a_fifth += 1
+            elif isOutByAFourth(predicted_key, target_key):
+                out_by_a_fourth += 1
             else:
                 fp += 1
         print(major)
         print(minor)
         print(distances)
-        print(tp, parallels, relatives, out_by_a_fifth, fp)
+        print(tp, parallels, relatives, out_by_a_fifth, out_by_a_fourth, fp)
         print("")
 
 if __name__ == "__main__":
