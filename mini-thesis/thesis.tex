@@ -283,7 +283,10 @@ Lomb-Scargle + IO-HMM & -- & -- \\
 \section{3. Clojure implementation}
 
 Clojure is a dynamic and functional programming language based on the Java Virtual Machine, suited for quickly designing multithreaded programs,
-and featuring a full range of persistent data structures.
+and featuring a full range of immutable and/or persistent data structures. It benefits from both the advantages of compiled languages and dynamic typed
+languages, which allows us to write optimized code in a small amount of time, using a fancy syntax. However, although Java libraries can be imported into the Clojure environnement, there is a comparatively small number of libraries that are natively implemented in Clojure. In our case, the majority of the functionalities
+are implemented exclusively for the project. Because the Clojure machine learning libraries are at their first steps, we approach the problem using methods based
+on tone profiles.
 
 \begin{figure}[h!]
 \begin{center}

@@ -30,8 +30,8 @@ class Parameters:
     lowpass_filter_cutoff_freq = 5500.0
 
     """ Parameters of the sliding window """
-    window_size = 4096 * 2
-    slide = 4096 * 2
+    window_size = 4096 * 3
+    slide       = 4096 * 3
 
     """ Hyper-parameters (for optimization or validation purposes) """
     min_midi_note = 8  # 15
@@ -66,7 +66,7 @@ def showFinalResults(tp, out_by_a_fifth, out_by_a_fourth, parallels, relatives, 
     print("Wrong keys : %s" % str(fp))
     print("Total : %s" % str(n_total))
     print("Accuracy : %f" % (float(tp) / n_total))
-    print("MIREX : %f" % (tp + 0.5 * (out_by_a_fourth + out_by_a_fifth) + 0.2 * parallels + 0.3 * relatives))
+    print("MIREX : %f" % (tp + 0.5 * (out_by_a_fourth + out_by_a_fifth) + 0.2 * parallels + 0.3 * relatives) / float(n_total))
 
 def isDifferentToneType(predicted_key, target_key):
     if "m" in predicted_key and not "m" in target_key:
