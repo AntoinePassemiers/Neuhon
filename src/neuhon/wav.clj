@@ -4,7 +4,8 @@
   (:require [clojure.java.io :as io])
   (:import [java.io DataInputStream DataOutputStream]
            [org.apache.commons.io IOUtils])
-  (:use [clojure.java.io]))
+  (:use [clojure.java.io]
+        [neuhon.utils]))
 
 ;; Header structure, with a default total size of 44 bytes
 ;; Each of the values below indicates the location (in bytes) of
@@ -94,15 +95,14 @@
       ;; Assumes the audio has been recorded in stereo mode (2 channels)
       (assert (= number-of-channels 2))
       ;; Loads the audio samples and computes the mean of the two channels
-      (doall
-        (map 
-          (fn [i] (float (/ 
-            (+ (int-converter data i) 
-              (int-converter data (+ i bytes-per-sample))) 2)))
-          (range 
-            (+ 12 header-size)
-            number-of-bytes
-            bytes-step))))))
+      (map 
+        (fn [i] (float (/ 
+          (+ (int-converter data i) 
+            (int-converter data (+ i bytes-per-sample))) 2)))
+        (range 
+          (+ 12 header-size)
+          number-of-bytes
+          bytes-step)))))
 
 (defn load-wav
   "Loading an audio Clojure sequence from a filepath"
@@ -114,11 +114,7 @@
       :rate rate)))
 
 
-;;(def tmp-db-base-path (str "D://KeyFinderDB/"))
-;;(def tmp-audio-filename (str "10cc_-_Dreadlock_Holiday.wav"))
-;;(def tmp-filepath (clojure.string/join [tmp-db-base-path tmp-audio-filename]))
-;;(def tmp-out-filename (str "wav.txt"))
-;;(with-open [wrtr (writer tmp-out-filename)]
-;;  (.write wrtr 
-;;      (pr-str
-;;        (load-wav tmp-filepath :rate 4410.0))))
+;; (def tmp-db-base-path (str "D://KeyFinderDB/"))
+;; (def tmp-audio-filename (str "10cc_-_Dreadlock_Holiday.wav"))
+;; (def tmp-filepath (clojure.string/join [tmp-db-base-path tmp-audio-filename]))
+;; (profile (dotimes [_ 5] (load-wav tmp-filepath :rate 4410.0)))

@@ -20,19 +20,31 @@
 (def shaath-minor-base-profile (normalize [6.5 2.8 3.5 5.4 2.7 3.5 2.5 5.1 4.0 2.7 4.3 3.2]))
 
 ;; Custom profile for the major scale
-(def custom-major-base-profile 
+(def dsk-major-base-profile 
   (normalize 
-    [ 8.85003345  2.55626553  4.15097735  7.0429511   4.69613877  3.37875891
-     -0.09147103  6.04799802  3.4338048  -0.37593573  3.97494554  5.64818483]))
+    [ 10.00643334,   4.13811934,   5.35888415,   6.56697766,   5.20696616,
+       3.5933301,   -0.01040525,   7.64893975,   4.38476923,   0.01892959,
+       7.28812808,   2.52406253]))
 
 ;; Custom profile for the minor scale
-(def custom-minor-base-profile 
+(def dsk-minor-base-profile 
   (normalize 
-    [ 6.4870956   3.23523279  3.07355565  3.45581634  4.85043354  4.96966877
-      2.75298759  6.39271897  0.49290184  5.12401634  1.67300141  4.63196307]))
+    [ 3.54340645,  3.02966769,  3.4538301,   5.65823449,  2.9327288,   4.92434278,
+      2.52811186,  5.88819169, -0.40295669,  4.90074726,  0.36529196,  5.10784805]))
 
-(def major-base-profile custom-major-base-profile)
-(def minor-base-profile custom-minor-base-profile)
+(def ls-major-base-profile 
+  (normalize 
+    [  9.28376660e+00,   4.74244626e+00,   4.68856758e+00,   6.46091384e+00,
+       4.91450998e+00,   3.56101998e+00,  -4.25175873e-03,   7.76621866e+00,
+       4.41611987e+00,   5.84291796e-01,   6.00089530e+00,   3.02445090e+00]))
+
+(def ls-minor-base-profile 
+  (normalize 
+    [ 3.97941074,  2.83186428,  3.47202171,  4.60659078,  2.93005446,  5.63382232,
+      2.63924404,  6.49747473, -0.78941772,  5.35740125,  1.35922185,  5.05482862]))
+
+(def major-base-profile dsk-major-base-profile)
+(def minor-base-profile dsk-minor-base-profile)
 
 
 ;; Key signature names 
@@ -119,23 +131,21 @@
   major C -> major C, major C#, ... major B
   minor C -> minor C, minor C#, ... minor B")
 (def all-major-profiles
-  (doall 
-    (map 
-      (fn [i] (rotate-left major-base-profile i)) 
-      (range 12))))
+  (mapv 
+    (fn [i] (rotate-left major-base-profile i)) 
+    (range 12)))
 (def all-minor-profiles
-  (doall 
-    (map 
-      (fn [i] (rotate-left minor-base-profile i)) 
-      (range 12))))
+  (mapv 
+    (fn [i] (rotate-left minor-base-profile i)) 
+    (range 12)))
 
 (defn match-with-profiles 
   "Matches an input chromatic vector with every major or every minor profiles
   and return all the scores"
   [chromatic-vector profiles]
-  (doall (map
+  (mapv
     (fn [i] (pearsonr chromatic-vector (nth profiles i)))
-    (range 12))))
+    (range 12)))
 
 (defn add-frequency-range-offset
   "Take into account the fact that the first note starts at min-midi-note"

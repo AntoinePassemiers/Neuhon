@@ -1,8 +1,9 @@
 # Neuhon
 
-Mini-thesis on key signature detection, where both accuracy and efficiency of 
-different algorithms are discussed. Python has been used for prototyping and research purposes only : the final end-user program is available in Clojure only.
-A Python version will be soon available.
+Mini-thesis on key detection, where 
+different algorithms are discussed according to their accuracy and speed. 
+Python has been used for prototyping and research purposes only : the final end-user program is available in Clojure only.
+A Python version will be available soon.
 
 ## How to use it
 
@@ -26,6 +27,16 @@ a single file, specify the filename.
                 "path/to/your/wave/file"
                 :threading? true
                 :overlap 0.40)
+				
+	;; Use the Direct Spectral Kernel Transform
+    user=> (process-all 
+                "path/to/your/wave/folder"
+                :use-cqt? true)
+				
+	;; Use the Lomb-Scargle least squares spectral estimation
+    user=> (process-all 
+                "path/to/your/wave/folder"
+                :use-cqt? false)
 ```
 
 ### Testing
@@ -41,11 +52,12 @@ Using Leiningen :
 ### Algorithm design
 
 0) Pre-processing : Averaging the channels, downsampling
-1) Spectral density estimation with Lomb-Scargle method
-2) Reshaping the Lomb-Scargle periodogram into a chromatic vector (12 elements)
-3) Computing the correlation between chromatic vectors and custom tone profiles
-4) Taking the tone profile that maximizes the Pearson correlation coefficient
-5) Combine local predictions using Markov chains
+1) Overlaying data samples from chunks that are contiguous
+2) Spectral density estimation with Lomb-Scargle method
+3) Reshaping the Lomb-Scargle periodogram into a chromatic vector (12 elements)
+4) Computing the correlation between chromatic vectors and custom tone profiles
+5) Taking the tone profile that maximizes the Pearson correlation coefficient
+6) Combine local predictions using Markov chains
 
 ### TODO
 
@@ -65,7 +77,7 @@ Using Leiningen :
 
 Spectral density estimation :
 - Fast Fourier Transform (FFT)
-- Constant-Q Transform (CQT)
+- Direct spectral kernel transform (DSKT)
 - Vaníček periodogram
 - Lomb-Scargle periodogram
 

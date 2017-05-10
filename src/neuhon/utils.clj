@@ -3,7 +3,7 @@
   (:gen-class)
   (:use [clojure.core.matrix]))
 
-
+(set! *warn-on-reflection* true)
 (set! *unchecked-math* true)
 
 ;; Number of channels in the wav files
@@ -16,7 +16,7 @@
 (def ^:const sampling-rate 44100.0)
 
 ;; Length of the sliding window
-(def ^:const window-size 16384)
+(def ^:const window-size 4096)
 
 ;; Lowest midi note to consider
 (def ^:const min-midi-note 8)
@@ -27,13 +27,21 @@
 ;; Number of octaves := (max-midi-node - min-midi-node) / 12
 (def ^:const n-octaves 6)
 
+;; Q bandwidth
+(def ^:const Q-constant 0.04757048)
+
 ;; Number of midi notes to consider
 (def ^:const n-midi-notes (- max-midi-note min-midi-note))
 (assert (= (/ (- max-midi-note min-midi-note) 12) n-octaves))
 
 ;; Proportion between highest amplitude and mean amplitude to build chromatic vectors
-(def ^:const chromatic-max-weight 0.8)
+(def ^:const chromatic-max-weight 0.0)
 
+;; Frequency bins
+(def frequency-bins
+  (mapv 
+    #(* %1 (/ target-sampling-rate window-size)) 
+    (range (/ window-size 2))))
 
 (defn arg-max
   "Finds the sequence index where the highest value is located"
@@ -47,9 +55,21 @@
         (arg-max data (+ begin 1) (nth data begin) begin)
         (arg-max data (+ begin 1) max-value best-index))))))
 
+(defn arg-min
+  "Finds the sequence index where the lowest value is located"
+  ([data] (arg-min data 0 Double/MAX_VALUE 0))
+  ([data begin end] (arg-min data begin Double/MAX_VALUE 0))
+  ([data begin min-value best-index] 
+  (do
+    (if (= (count data) begin)
+      best-index
+      (if (< (nth data begin) min-value)
+        (arg-min data (+ begin 1) (nth data begin) begin)
+        (arg-min data (+ begin 1) min-value best-index))))))
+
 (defn apply-sum
   "Sums the elements of an input sequence"
-  [data]
+  [^clojure.lang.ISeq data]
   (reduce + data))
 
 (defn log_2 
@@ -68,8 +88,8 @@
   (+ 69.0 (* 12.0 (log_2 (/ freq 440.0)))))
 
 (defn pow2
-  "Power of two of an input number"
-  [value]
+  "Power of two of an input integer"
+  [^Long value]
   (* value value))
 
 (defn ste
@@ -83,26 +103,15 @@
         (range start (+ start length))))))
 
 (defn inc-array-element
-  "Increment an array at a given index"
-  [arr i]
+  "Increment an integer array at a given index"
+  [^ints arr ^Long i]
   (aset arr i (+ 1 (aget arr i))))
 
-(defn convert-to-array
-  "Converts an input sequence to a Java array"
-  [sequence start length]
-  (let [new_array (make-array Double/TYPE length)]
-    (doall
-      (map
-        (fn [i] (aset new_array i (double (nth sequence (+ start i)))))
-        (range length)))
-    new_array))
-
-(defn convert-to-complex-array
-  "Converts an input sequence to a double-sized Java array"
-  [sequence start length]
-  (let [new_array (make-array Double/TYPE (* 2 length))]
-    (doall
-      (map
-        (fn [i] (aset new_array i (double (nth sequence (+ start i)))))
-        (range length)))
-    new_array))
+(defn complex-to-real-seq
+  [^doubles arr]
+  (map
+    #(Math/sqrt 
+      (+ 
+        (pow2 (aget arr %1))
+        (pow2 (aget arr (+ %1 1)))))
+    (range 0 (alength arr) 2)))

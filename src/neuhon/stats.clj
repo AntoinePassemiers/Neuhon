@@ -41,11 +41,16 @@
 (defn pearsonr
   "Pearson correlation coeffient between a chromatic vector and a tone profile"
   [chromatic-vector profile]
-  (/
-    (dot-product
-      (normalize chromatic-vector)
-      (normalize profile))
-    (*
-      (count chromatic-vector)
-      (stdv chromatic-vector)
-      (stdv profile))))
+  (try
+    (if 
+      (zero? (apply-sum chromatic-vector))
+      0.0
+      (/
+        (dot-product
+          (normalize chromatic-vector)
+          (normalize profile))
+        (*
+          (count chromatic-vector)
+          (stdv chromatic-vector)
+          (stdv profile))))
+    (catch ArithmeticException e (float 0.0))))

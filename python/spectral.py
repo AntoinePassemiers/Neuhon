@@ -127,22 +127,22 @@ def getPeriodograms(signal):
  	T = n_samples - Parameters.window_size
  	# blackman_win = np.blackman(Parameters.window_size)
 	periodograms = np.empty(
-		((T + Parameters.window_size) / Parameters.slide + 1, n_coefs), 
+		((T + Parameters.window_size) / (2 * Parameters.slide) + 1, n_coefs), 
 		dtype = np.double)
-	while i < T:
+	while i < T - Parameters.slide * 2:
 		frame = signal[i:i+Parameters.window_size]
-		periodograms[n_vectors, :] = regressor.fit(frame)
 		i += Parameters.slide
+		frame += signal[i:i+Parameters.window_size]
+		i += Parameters.slide
+		periodograms[n_vectors, :] = regressor.fit(frame)
 		n_vectors += 1
 	return periodograms
 
 
 if __name__ == "__main__":
 	sampling_rate = 4410.0
-	regressor = LombScargleRegressor(16384, sampling_rate)
-	# print([(freq, regressor.taus[i]) for i, freq in enumerate(Parameters.note_frequencies)])
-
-	window_size = Parameters.window_size
-	freq = 440.0
-	s = np.cos(2.0 * np.pi * np.arange(window_size) * freq / sampling_rate)
-	# print(list(regressor.fit(s)))
+	regressor = LombScargleRegressor(4096, sampling_rate)
+	omega = 2.0 * np.pi / sampling_rate
+	print(Parameters.note_frequencies[62])
+	frame = np.sin(440.0 * omega * (np.arange(4096)))
+	print(list(regressor.fit(frame)))

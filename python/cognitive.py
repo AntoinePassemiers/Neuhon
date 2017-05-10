@@ -10,6 +10,7 @@ from scipy.signal import butter, lfilter, freqz
 from scipy.stats import pearsonr
 from scipy.spatial.distance import cosine as cosine_similarity
 
+from bontempo import *
 from utils import *
 from spectral import *
 
@@ -52,7 +53,45 @@ CUSTOM_MINOR_BASE_PROFILE_8192 = np.array(
     [ 6.52646718,  3.33285153,  3.36638347,  3.99483838,  4.76466513,  5.85239725,
       2.96574636,  5.45032911,  0.22028792,  4.55233485,  2.01474569,  4.21566567])
 
-# 8192 : (154, 18, 10, 55, 40, 138)
+CUSTOM_MAJOR_BASE_PROFILE_12288 = np.array(
+    [ 8.99168964,  1.81071541,  4.44105919,  7.04221016,  3.83114769,  3.42865417,
+     -0.76578838,  6.30715069,  4.24797295, -0.86639359,  4.2135304,   5.22195534])
+CUSTOM_MINOR_BASE_PROFILE_12288 = np.array(
+    [ 6.27968744,  2.36048225,  2.99648225,  3.86702985,  5.55842947,  4.29812855,
+      2.81645625,  6.01846971,  1.03219647,  5.31454025,  1.6183446,   4.33754876])
+
+CUSTOM_MAJOR_BASE_PROFILE_16384 = np.array(
+    [ 9.76099503,  1.76680785,  3.55390977,  7.68233716,  4.05116658,  2.75528644,
+      0.18196855,  6.68043946,  3.43721581, -0.36641898,  3.75544749,  5.47563027])
+CUSTOM_MINOR_BASE_PROFILE_16384 = np.array(
+    [ 6.00835116,  3.2748862,   3.47497438,  3.16457523,  5.20081744,  5.04711892,
+      3.00172431,  6.39331657,  0.39891709,  5.18524393,  1.12219695,  4.5121723 ])
+
+CUSTOM_MAJOR_BASE_PROFILE_4096_OVERLAP2 = np.array(
+    [  9.28376660e+00,   4.74244626e+00,   4.68856758e+00,   6.46091384e+00,
+       4.91450998e+00,   3.56101998e+00,  -4.25175873e-03,   7.76621866e+00,
+       4.41611987e+00,   5.84291796e-01,   6.00089530e+00,   3.02445090e+00])
+CUSTOM_MINOR_BASE_PROFILE_4096_OVERLAP2 = np.array(
+    [ 3.97941074,  2.83186428,  3.47202171,  4.60659078,  2.93005446,  5.63382232,
+      2.63924404,  6.49747473, -0.78941772,  5.35740125,  1.35922185,  5.05482862])
+
+CUSTOM_MAJOR_BASE_PROFILE_4096_CQT = np.array(
+    [ 10.00643334,   4.13811934,   5.35888415,   6.56697766,   5.20696616,
+       3.5933301,   -0.01040525,   7.64893975,   4.38476923,   0.01892959,
+       7.28812808,   2.52406253])
+CUSTOM_MINOR_BASE_PROFILE_4096_CQT = np.array(
+    [ 3.54340645,  3.02966769,  3.4538301,   5.65823449,  2.9327288,   4.92434278,
+      2.52811186,  5.88819169, -0.40295669,  4.90074726,  0.36529196,  5.10784805])
+
+# CQT 4096 : (203, 18, 10, 56, 21, 107)
+# 4096 + overlap2 : (194, 14, 11, 57, 32, 107)
+# 4096 :  
+# 8192 :  (154, 18, 10, 55, 40, 138) -> 0.371
+# 12288 : (149, 13, 12, 60, 38, 143) -> 0.359
+# 16384 : (152, 16, 9, 61, 39, 138)
+
+CUSTOM_MAJOR_BASE_PROFILE = CUSTOM_MAJOR_BASE_PROFILE_4096_CQT
+CUSTOM_MINOR_BASE_PROFILE = CUSTOM_MINOR_BASE_PROFILE_4096_CQT
 
 MAJOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MAJOR_BASE_PROFILE)
 MINOR_PROFILE_MATRIX = createProfileMatrix(CUSTOM_MINOR_BASE_PROFILE)
@@ -148,18 +187,28 @@ def getSTEandZCRs(signal):
         n_vectors += 1
     return ste_sequence, zcr_sequence
 
-def getFFTs(signal):
+def getFFTs(signal, ticks = None):
     i, n_vectors = 0, 0
     n_coefs = Parameters.window_size
     n_samples = len(signal)
     T = n_samples - Parameters.window_size
     blackman_win = np.blackman(Parameters.window_size)
-    fft_matrix = np.empty((T / Parameters.window_size + 1, n_coefs), dtype = np.double)
-    while i < T:
-        frame = blackman_win * signal[i:i+Parameters.window_size]
-        fft_matrix[n_vectors, :] = np.abs(np.fft.fft(frame))
-        i += Parameters.window_size
-        n_vectors += 1
+    if ticks is None:
+        fft_matrix = np.empty((T / Parameters.window_size + 1, n_coefs), dtype = np.double)
+        while i < T:
+            frame = blackman_win * signal[i:i+Parameters.window_size]
+            i += Parameters.window_size
+            fft_matrix[n_vectors, :] = np.abs(np.fft.fft(frame))
+            n_vectors += 1
+    else:
+        fft_matrix = np.empty((len(ticks), n_coefs), dtype = np.double)
+        for tick in ticks:
+            try:
+                frame = blackman_win * signal[tick:tick+Parameters.window_size]
+            except ValueError:
+                pass
+            fft_matrix[n_vectors, :] = np.abs(np.fft.fft(frame))
+            n_vectors += 1
     return fft_matrix
 
 def getCQTs(fft_matrix, wins):
@@ -207,10 +256,10 @@ def findKey(filename, method = METHOD_CQT):
     """ Spectral windows for getting CQT from real spectrum """
     wins = getSpectralWindows(framerate = Parameters.target_sampling_rate)
     """ Computing Short-Term Energies """
-    ste_sequence, zcr_sequence = getSTEandZCRs(signal)
+    # ste_sequence, zcr_sequence = getSTEandZCRs(signal)
     extra_features = ExtraFeatures()
-    extra_features.STE = ste_sequence
-    extra_features.ZCR = zcr_sequence
+    # extra_features.STE = ste_sequence
+    # extra_features.ZCR = zcr_sequence
 
     chromatic_matrices = list()
     if method == METHOD_CQT:
@@ -242,7 +291,7 @@ def findKey(filename, method = METHOD_CQT):
 
     print(hist.reshape(2, 12))
     predicted_key_name = predictKeyFromHistogram(hist)
-    return predicted_key_name, chromatic_matrix, hist, extra_features
+    return predicted_key_name, feature_matrix, hist, extra_features
 
 def findKeyUsingCQT(filename): 
     return findKey(filename, method = METHOD_CQT)
@@ -264,12 +313,17 @@ def searchForBestProfile():
         minor = gamma * (CUSTOM_MINOR_BASE_PROFILE-epsilon) + (1.0 - gamma) * (CUSTOM_MINOR_BASE_PROFILE+epsilon)
         minor_profile_matrix = createProfileMatrix(minor)
 
+        p = np.random.rand(1)[0]
+        print("p : %s" % str(p))
         for i, row in enumerate(dataset):
             hist = np.zeros(24, dtype = np.int)
-            (chromatic_matrix, target_key) = row
-            for j in range(len(chromatic_matrix)):
+            (spectral_matrix, target_key) = row
+            for j in range(len(spectral_matrix)):
+                coefs = spectral_matrix[j]
+                coefs = np.reshape(coefs, (Parameters.n_octaves, 12))
+                coefs = p * coefs.max(axis = 0) + (1.0 - p) * coefs.sum(axis = 0)
                 hist[matchWithProfiles(
-                    chromatic_matrix[j],
+                    coefs,
                     major_profile_matrix,
                     minor_profile_matrix)] += 1
             predicted_key = predictKeyFromHistogram(hist)
@@ -298,4 +352,3 @@ def searchForBestProfile():
 
 if __name__ == "__main__":
     searchForBestProfile()
-    print("Finished")

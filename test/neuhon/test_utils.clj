@@ -6,8 +6,7 @@
 
 (defn is-all-true?
   [coll]
-  (every?
-    (true? coll)))
+  (every? true? coll))
 
 (defn is-almost-all-true?
   [coll fraction]

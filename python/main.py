@@ -51,13 +51,13 @@ def main(prediction_func):
     tp, fp, relatives, parallels, out_by_a_fifth, out_by_a_fourth, n_total = 0, 0, 0, 0, 0, 0, 0
     distances = np.zeros(24)
     chromatic_dataset = list()
-    for i in range(485): # 230
+    for i in range(1): # 230
         row = csv_file.readline().replace('\n', '').split(';')
         artist, title, target_key, filename = row[0], row[1], row[2], row[3]
 
         try:
-            predicted_key, chromatic_matrix, _, _ = prediction_func(filename)
-            chromatic_dataset.append((chromatic_matrix, target_key))
+            predicted_key, spectral_matrix, _, _ = prediction_func(filename)
+            chromatic_dataset.append((spectral_matrix, target_key))
             distance = getDistance(predicted_key, target_key)
             distances[distance] += 1
             n_total += 1
@@ -83,7 +83,7 @@ def main(prediction_func):
     print(distances)
 
 if __name__ == "__main__":
-    main(findKeyUsingLombScargle)
+    main(findKeyUsingCQT)
     # createTrainingSet()
     # fitModel()
     print("Finished")

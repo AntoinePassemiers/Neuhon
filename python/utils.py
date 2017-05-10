@@ -30,14 +30,14 @@ class Parameters:
     lowpass_filter_cutoff_freq = 5500.0
 
     """ Parameters of the sliding window """
-    window_size = 4096 * 3
-    slide       = 4096 * 3
+    window_size = 4096 * 1
+    slide       = 4096 * 1
 
     """ Hyper-parameters (for optimization or validation purposes) """
     min_midi_note = 8  # 15
     max_midi_note = 80 # 75
     n_octaves = 6      # 5
-    chromatic_max_weight = 0.8
+    chromatic_max_weight = 0.0
     note_frequencies = midiToHertz(np.arange(min_midi_note, max_midi_note) - 1)
     note_periods = np.rint(target_sampling_rate / note_frequencies).astype(int)
 
@@ -66,7 +66,7 @@ def showFinalResults(tp, out_by_a_fifth, out_by_a_fourth, parallels, relatives, 
     print("Wrong keys : %s" % str(fp))
     print("Total : %s" % str(n_total))
     print("Accuracy : %f" % (float(tp) / n_total))
-    print("MIREX : %f" % (tp + 0.5 * (out_by_a_fourth + out_by_a_fifth) + 0.2 * parallels + 0.3 * relatives) / float(n_total))
+    print("MIREX : %f" % (float(tp + 0.5 * (out_by_a_fourth + out_by_a_fifth) + 0.2 * parallels + 0.3 * relatives) / float(n_total)))
 
 def isDifferentToneType(predicted_key, target_key):
     if "m" in predicted_key and not "m" in target_key:

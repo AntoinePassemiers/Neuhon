@@ -15,16 +15,16 @@
   Source : https://en.wikipedia.org/wiki/Window_function#Blackman_windows"
   [N a0 a1 a2 a3]
   (fn [n]
-    (+ a0
+    (- a0
       (- (* a1 (Math/cos (/ (* 2 Math/PI n) (- N 1))))
-        (+ (* a2 (Math/cos (/ (* 4 Math/PI n) (- N 1))))
-          (- (* a3 (Math/cos (/ (* 6 Math/PI n) (- N 1))))))))))
+        (- (* a2 (Math/cos (/ (* 4 Math/PI n) (- N 1))))
+          (* a3 (Math/cos (/ (* 6 Math/PI n) (- N 1)))))))))
 
 (defn blackman-window-func 
   "Computes one coefficient of the Blackman window function,
   based on the input index"
   [N]
-  (generic-blackman-window N 0.42659 0.49656 0.076849 0.0))
+  (generic-blackman-window N 0.42 0.5 0.08 0.0))
 
 (defn nuttall-window-func 
   "Computes one coefficient of the Nuttal window function,
@@ -57,7 +57,7 @@
 
 (comment "A spectral window type for storing the window coefficients,
   as well of the left and right bounds of the window")
-(deftype Window [coefs lk rk])
+(deftype Window [coefs li ri])
 
 (comment "An abstract type for storing all the windows required by the CQT algorithm,
   where each of the windows will be convoluted with the spectrum to compute
@@ -89,50 +89,63 @@
     (nth (.lks matrix) n) 
     (nth (.rks matrix) n)))
 
-(defn- get-Q-from-p 
+(defn get-Q-from-p 
   "Computes the constant Q, based on an arbitrary parameter p"
   [p]
   (* p (- (Math/pow 2 (/ 1.0 12)) 1)))
 
-(defn- win-left-bound
+(defn win-left-bound
   "Left bound index of the spectral window that corresponds to fk"
   [Q fk N sampling-rate]
-  (double 
-    (Math/round 
-      (* 
-        (- 1 (/ (double Q) 2)) 
-        (/ 
-          (double (* fk N)) 
-          (double sampling-rate))))))
+  (* 
+    (- 1 (/ (double Q) 2)) 
+    (/ 
+      (double (* fk N)) 
+      (double sampling-rate))))
 
-(defn- win-right-bound
+(defn win-right-bound
   "Right bound index of the spectral window that corresponds to fk"
   [Q fk N sampling-rate] 
-  (double 
-    (Math/round 
-      (* 
-        (+ 1 (/ (double Q) 2)) 
-        (/ 
-          (double (* fk N)) 
-          (double sampling-rate))))))
+  (* 
+    (+ 1 (/ (double Q) 2)) 
+    (/ 
+      (double (* fk N)) 
+      (double sampling-rate))))
 
-(defn- cosine-win-element 
+(defn nearest-bin-index
+  "Index of the closest frequency found in the default frequency bins"
+  [freq]
+  (arg-min
+    (mapv
+      #(Math/abs (- %1 freq))
+      frequency-bins)))
+
+(defn cosine-win-element 
   "Computes one coefficient of the cosine temporal window"
   [x lk rk]
   (let [relative-pos (/ (double (- x lk)) (- rk lk))]
-    (- 1.0 (Math/cos (* 2 (double (* Math/PI relative-pos)))))))
+    (- 1.0 (Math/cos (* 2.0 (double (* Math/PI relative-pos)))))))
+
+(defn norm-window
+  "Divide the coefficients of a spectral window by their sum"
+  [coefs]
+  (mapv #(/ %1 (apply-sum coefs)) coefs))
 
 (defn cosine-win
   "Computes all the coefficients of the cosine temporal window"
   [Q fk N sampling-rate]
   (let [lk (win-left-bound Q fk N sampling-rate)
         rk (win-right-bound Q fk N sampling-rate)
-        win-size (- rk lk)
-        win (make-array win-coef-type win-size)]
+        li (nearest-bin-index lk)
+        ri (nearest-bin-index rk)
+        win-size (- (+ ri 1) li)]
     (Window. 
-      (map 
-        (fn [i] (cosine-win-element (+ lk i) lk rk)) 
-        (range 0 win-size)) lk rk)))
+      (norm-window
+        (map 
+          (fn [i] (cosine-win-element (+ li i) lk rk)) 
+          (range 0 win-size)))
+      li 
+      ri)))
 
 ;; Pre-computes a sequence of temporal cosine windows with fixed size
 (def cosine-windows 
@@ -140,23 +153,35 @@
     (map 
       (fn [d]
         (cosine-win 
-          (get-Q-from-p chromatic-max-weight) 
+          Q-constant 
           (midi-to-hertz d) window-size target-sampling-rate))
       (range min-midi-note max-midi-note))))
 
 ;; Converts a sequence of Windows into a WindowMatrix
 (def winmat (WindowMatrix. 
   (doall (map (fn [win] (.coefs win)) cosine-windows))
-  (doall (map (fn [win] (.lk win)) cosine-windows)) 
-  (doall (map (fn [win] (.rk win)) cosine-windows))))
+  (doall (map (fn [win] (.li win)) cosine-windows)) 
+  (doall (map (fn [win] (.ri win)) cosine-windows))))
 
 (defn apply-win-on-spectrum 
   "Computes a QCT coefficient by applying a spectral window,
   given the spectrum and a certain bin"
   [spectrum k]
   (let [win (win-nth winmat k)
-        lk (.lk win)
-        rk (.rk win)
+        li (.li win)
+        ri (.ri win)
         coefs (.coefs win)
-        convolution (fn [i] (* (nth spectrum (+ lk i)) (nth coefs i)))]
-    (apply-sum (map convolution (range (- rk lk))))))
+        convolution (fn [i] (* (nth spectrum (+ li i)) (nth coefs i)))]
+    (if
+      (< 0 (count coefs))
+      (apply-sum (map convolution (range (- (+ ri 1) li))))
+      0.0)))
+
+(defn dsk-transform
+  "Direct spectral kernel transform of an input signal,
+  given its Fourier transform"
+  [spectrum]
+  (doall
+    (map
+      (fn [i] (apply-win-on-spectrum spectrum i))
+      (range (count cosine-windows)))))
