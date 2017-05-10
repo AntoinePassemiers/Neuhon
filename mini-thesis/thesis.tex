@@ -67,7 +67,7 @@ if the file has been written in stereo. It is not required to take the pan into 
 channels or analysing the channels separately makes no difference in the spectral domain. Also, there is
 no indispensable need to consider the whole frequential spectrum given that notes are mainly characterised 
 by their fundamental frequency
-and that the harmonics of the highest notes are not relevant for estimating chroma vectors.
+and that the harmonics of the highest notes are not relevant for estimating chromagrams.
 The sampling rate is de facto resampled at a tenth of the standard sampling frequency (4410 Hz).
 Although this substantial downsampling is likely to create aliasing effects (which can be simply avoided by 
 applying a low-pass filter), no loss of accuracy has been pointed out during the evaluation phase.
@@ -114,7 +114,7 @@ Finally, the coefficients are given by the equation \ref{fig:linreg}. \citep{PS}
 
 This method is very similar to the matching pursuit algorithm. The idea of the matching pursuit is to represent the signal as a finite linear combination of given
 functions, referred as atoms. At iteration k, the atom that minimizes the least squares residuals is weighted and then subtracted from 
-the remainder of the signal. Once every trial frequencies has been treated, the weights constitute the spectral estimation vector.
+the remainder of the signal. Once every trial frequencies has been treated, the weights are grouped into a single spectral estimation vector.
 
 \subsubsection{Lomb-Scargle least-squares spectral estimation}
 
@@ -152,7 +152,8 @@ SS = \sum\limits_{j=1} \sin^{2} 2\pi f (t_{j} - \tau)
 \label{fig:ss}
 \end{align}
 
-[[Les valeurs YC et YS cherchent à mesurer respectivement les niveau d\textquotesingle orthogonalité du signal $y$ avec une sinusoïde déphasée de $\pi / 2$ et avec une sinusoïde de phase nulle. Ces sinusoïdes peuvent également être pré-calculées. Les formules permettant de calculer YC et YS sont : ]]
+YC and YS terms measure the correlation between the data samples and, respectively, a cosine wave and a sine wave of frequency $f$. Once again, we are
+benefitting from the fact that the sine and cosine waves can be pre-calculated and reused for each transform.
 
 \begin{align}
 YC = \sum\limits_{j=1} y_{j}\cos 2\pi f (t_{j} - \tau)
@@ -166,7 +167,7 @@ Therefore, the only remaining operations that cannot be processed at compile-tim
 reduces drastically the number of required operations to estimate the spectrum.\\
 
 Contrarily to Fourier-based
-estimators, the periodogram seems to suffer from spectral imbalance : this phenomenon is illustrated in the appendix B. When the periodogram consists of several peaks, the highest peak will always be relatively much higher than the others, compared to what we can get with the Fourier transform. This effect tend to diminish when the signal 
+estimators, the periodogram seems to suffer from spectral imbalance : this phenomenon is illustrated in the appendix B. When the periodogram consists of several peaks, the highest peak will always be relatively much higher than the others, compared to what we can get with the Fourier transform. This effect tend to diminish when the signal TODO \\
 
 This report proposes a simple solution to this issue. The idea consists in enriching the spectrum with musical notes located in a different chunk of data samples. In fact, an heptatonic musical scale is characterized by a set of seven notes, but it is
 not common to meet them all at the same moment. Because it is not possible to make a spectral analysis of contiguous notes, the alternative is to overlay them.
@@ -176,35 +177,39 @@ not common to meet them all at the same moment. Because it is not possible to ma
 Once the spectrum is approximated, it is reshaped into a chroma vector of twelve coefficients. In the frameworf of the algorithms assessment, it has been found that 6 octaves are sufficient to evaluate the spectrum : the addition of a seventh octave does not improve the accuracy of the predictions. With this knowledge, the spectrum - which has a resolution of 72 coefficients is reshaped into a matrix $M_{i, j}$ of dimension $(6 \times 12)$. Finally, the chroma vector is obtained by formalising the method developed by Sha\textquotesingle ath :
 
 \begin{align}
-C_{i} = (1 - p) * \max_{j} M_{i, j} + p * \sum_{j} M_{i, j}
+C_{i} = p * \max_{j} M_{i, j} + (1 - p) * \sum_{j} M_{i, j}
 \end{align}
 
-where p is a parameter determined during the evaluation / validation of the whole system. The last step consists in identifying the tonality locally,
+where p is a parameter determined during the evaluation / validation of the whole system.
+The last step consists in identifying the tonality locally,
 on the basis of this single chroma vector. We are going to discuss about different methods, the first one relies on the Maximum Key-Profile Correlation (MKC),
 while the others are based on machine learning algorithms.
 
-\subsubsection{Modèle cognitif}
+\subsubsection{Cognitive models}
 
-Cette solution repose sur les expériences menées par Carol L. Krumhansl et Lola L. Cuddy sur la perception des tonalités chez l\textquotesingle Homme.
-Des gammes incomplètes ont été jouées, suivies de notes additionnelles que les sujets devaient évaluer sur leur capacité à compéter ces gammes. 
-Les scores ont été moyennés pour donner les deux graphiques suivants :  TODO : Sha\textquotesingle ath \citep{IS} and \citep{SP} \citep{AT}
+This solution relies on the Maximum Key-Profile Correlation approach : the idea is to compare the chroma vector (obtained from the previous step) to
+tone profiles that have been pre-defined by experts. The profile that maximizes the correlation with the chroma vector indicates which key is the most probable
+for the current chunk of data samples. \citep{AT} This method is the ths most commonly accepted, and described also by S. Pauws. \citep{SP} Both of them use profiles coming from the experience conducting par Carol L. Krumhansl and Lola L. Cuddy on tonal hierarchies in music and their perception by man.\\
+
+In short, the experience was conducted as follows : incomplete scales were played in front of subjects, followed by additional notes that the latter were asked to rate according to their capacity to match scales. The scores obtained from this study were grouped into two chromagrams, showed by the figure \ref{krumhansl}. \\
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=3.1in,angle=0]{imgs/Krumhansl.png}
-\caption{Profils de tonalités dérivés de l\textquotesingle expérience de Krumhansl, et représentant respectivement la gamme do majeur
-et la gamme do mineur.}
-\label{fig1}
+\caption{Tone profiles derived from the experience conducted by Krumhansl, and representing the C major and the C minor scales, respectively.}
+\label{krumhansl}
 \end{center}
 \end{figure}
 
-Bien que ces deux profils de tonalités fournissent des résultats satisfaisants lorsque le spectre est estimé à l\textquotesingle aide de la CQT, il ne sont pas adaptés lorsque la méthode de Lomb-Scargle est utilisée, car il a été observé que les coefficients renvoyés par cette dernières sont globalement plus equidistribués. Cette distribution doit se refléter dans les profils de tonalité, c\textquotesingle est pourquoi l\textquotesingle algorithme a été évalué plusieurs fois jusqu\textquotesingle à obtenir les profils fournissant les meilleurs résultats, et donnés ci-dessous :
+Although these two tone profiles provide satisfactory results when the spectrum is approximated by the Constant-Q transform, they are no longer valid 
+when the Lomb-Scargle method is used, since it was observed that periodograms consist of coefficients that are broadly distributed more evenly. This distribution has to be reflected in the tone profiles and that is why the algorithm has been evaluated a sufficient number of times, until the tone profiles
+provide satisfying results. The adjusted tone profiles are shown in the figure \ref{profiles}.
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=3.1in,angle=0]{imgs/Custom.png}
-\caption{Meilleurs profils de tonalités, déterminés empiriquement}
-\label{fig1}
+\caption{Best tone profiles, determined empirically and adjusted for the Lomb-Scargle periodogram}
+\label{profiles}
 \end{center}
 \end{figure}
 
@@ -292,8 +297,8 @@ The database consists of 415 music tracks recorded in wav format, 44100 Hz stere
 All keys have been determined
 by experts and have been made available by Ibrahim Shat\textquotesingle ath as part of its work. For evaluating algorithms based on MKC,
 all the tracks have been used to tune the parameters to their best value. The latter consist of : the major and minor tone profile coefficients,
-the size of the sliding window, and the frequency range of the spectrum. For evaluating machine learning techniques,
-the dataset is split into a training set of 138 music tracks and a validation set of 277 tracks.
+the size of the sliding window, the frequency range of the spectrum, and the parameter $p$. For evaluating machine learning techniques,
+the dataset has been split into a training set of 138 music tracks and a validation set of 277 tracks.
 
 \subsubsection{Evaluation}
 
@@ -307,6 +312,10 @@ that are relative to the correct ones (R). The index is then given by : \\
 \noindent $ MIREX = (C + \frac{1}{2}.F + \frac{1}{2}.U + \frac{3}{10}.R + \frac{1}{5}.F) / TOTAL $
 
 \section{Results}
+
+It comes out of this study that the results are much better if we set the parameter $p$ to zero, regardless of the spectral estimation technique used.
+The optimal tone profile coefficients are shown in the figure \ref{profiles}. For both DSKT and LS methods, a window size of 4096 samples has provided good results, with an overlap of 4096 samples with the next chunk for the LS periodogram.
+Considering a frequency band bounded by $G\#_{-1}$ and $G\#_{5}$ seems to be sufficient to cover the whole spectrum : no significant accuracy improvement has been noticed while increasing the frequency range.
 
 \begin{table}
 \center{
@@ -363,14 +372,44 @@ Lomb-Scargle + MKC & Accuracy & MIREX \\ \hline\hline
 
 \section{Appendices}
 
-\subsection{Appendix A - more results}
+\subsection{Appendix A - IOHMM parameters}
+
+\begin{table}
+\center{
+\begin{tabular}{|c|c|}\hline
+Parameter & Value \\ \hline\hline
+Topology & linear \\
+Number of hidden states & 5 \\
+Number of iterations & 25 \\
+\hline
+\end{tabular}
+}
+\vskip 0.25cm
+\caption{Common parameters of the IO-HMM}
+\end{table}
+
+\begin{table}
+\center{
+\begin{tabular}{|c|c|c|c|}\hline
+Parameter & I & S & O \\ \hline\hline
+Number of hidden neurons & 20 & 20 & 30\\
+Epochs / iteration & 1 & 1 & 1 \\
+Hidden activation function & sigmoid & tanh & tanh \\
+Learning rate & 0,03 & 0,03 & 0,03 \\
+\hline
+\end{tabular}
+}
+\vskip 0.25cm
+\caption{Parameters by sub-network type, where $I$ stands for the initial state subnetwork,
+$S$ for the state transition sub-networks, and $O$ for the output sub-networks}
+\end{table}
 
 \subsection{Appendix B - plots}
 
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=3.1in,angle=0]{imgs/1frame.png}
-\caption{Dreadlock holiday - 10cc, frame located at }
+\caption{Dreadlock holiday - 10cc, frame located at 2 min 44,17 s}
 \label{}
 \end{center}
 \end{figure}
@@ -378,7 +417,7 @@ Lomb-Scargle + MKC & Accuracy & MIREX \\ \hline\hline
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=3.1in,angle=0]{imgs/2frames.png}
-\caption{Dreadlock holiday - 10cc, frame located at }
+\caption{Dreadlock holiday - 10cc, frames located at 2 min 44,17 s and 2 min 44,27 s}
 \label{}
 \end{center}
 \end{figure}

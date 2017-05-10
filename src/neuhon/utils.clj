@@ -18,6 +18,10 @@
 ;; Length of the sliding window
 (def ^:const window-size 4096)
 
+;; Number of bits required to adress the spectral space
+;; log_2(window-size) must be equal to spectral-space-n-bits
+(def ^:const spectral-space-n-bits 12)
+
 ;; Lowest midi note to consider
 (def ^:const min-midi-note 8)
 

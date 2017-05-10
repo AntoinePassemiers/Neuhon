@@ -13,6 +13,7 @@
         [neuhon.matrix]
         [neuhon.profiles]
         [neuhon.spectral]
+        [neuhon.fft]
         [neuhon.utils]))
 
 
@@ -59,7 +60,8 @@
         window-size
         (dsk-transform
           (complex-to-real-seq
-            frame-array))))))
+            ;; frame-array))))))
+            (iterative-radix2-fft (to-complex-array frame))))))))
 
 (defn extract-chromatic-vector
   "Compute the chromatic vector of a song's segment"
@@ -145,7 +147,7 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 10) ;; 230
+        (when (< i 30) ;; 230
           (try
             (let [line (nth csv-seq i)
                   artist (nth line 0)

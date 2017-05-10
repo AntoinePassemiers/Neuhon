@@ -28,12 +28,12 @@ a single file, specify the filename.
                 :threading? true
                 :overlap 0.40)
 				
-	;; Use the Direct Spectral Kernel Transform
+    ;; Use the Direct Spectral Kernel Transform
     user=> (process-all 
                 "path/to/your/wave/folder"
                 :use-cqt? true)
 				
-	;; Use the Lomb-Scargle least squares spectral estimation
+    ;; Use the Lomb-Scargle least squares spectral estimation
     user=> (process-all 
                 "path/to/your/wave/folder"
                 :use-cqt? false)

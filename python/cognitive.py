@@ -302,7 +302,7 @@ def findKeyUsingLombScargle(filename):
 def searchForBestProfile():
     dataset = pickle.load(open("profile_dataset.npy", "rb"))
 
-    for m in range(20):
+    for m in range(100):
         distances = np.zeros(24)
         tp, fp, relatives, parallels, out_by_a_fifth, out_by_a_fourth, n_total = 0, 0, 0, 0, 0, 0, 0
 
