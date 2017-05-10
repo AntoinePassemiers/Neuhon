@@ -2,7 +2,6 @@
   ^{:doc "Main features of the software"
     :author "Antoine Passemiers"}
   (:gen-class)
-  (:import  (org.jtransforms.fft DoubleFFT_1D))
   (:require [clojure.data.csv :as csv]
             [clojure.java.io :as io])
   (:use [clojure.java.io]
@@ -15,11 +14,6 @@
         [neuhon.spectral]
         [neuhon.fft]
         [neuhon.utils]))
-
-
-;; Instance of the JTransforms DoubleFFT_1D class,
-;; with a given spectral window size
-(def jtransformer (DoubleFFT_1D. window-size))
 
 ;; hardcoded path
 ;; Base folder where the wav files are located
@@ -53,15 +47,13 @@
   "Compute the direct spectral kernel transform of
   an input sequence"
   [frame]
-  (let [frame-array (double-array (* 2 window-size) frame)]
+  (let [frame-array (to-complex-array frame)]
     (do
-      (.realForwardFull jtransformer frame-array)
       (take
         window-size
         (dsk-transform
           (complex-to-real-seq
-            ;; frame-array))))))
-            (iterative-radix2-fft (to-complex-array frame))))))))
+            (iterative-radix2-fft frame-array)))))))
 
 (defn extract-chromatic-vector
   "Compute the chromatic vector of a song's segment"
@@ -170,7 +162,8 @@
                 (display-result metadata print)
                 (flush)
                 (display-result metadata (fn [s] (.write wrtr s)))))
-            (catch Exception e (println e)))
+            (catch java.io.FileNotFoundException e 
+              (println "Warning : file not found")))
           (recur (inc i))))
         (println (format "---> Perfect matches        : %4d" @perfect-matches))
         (println (format "---> Out-by-a-fifth matches : %4d" @out-by-a-fifth-matches))
