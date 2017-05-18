@@ -6,14 +6,13 @@
         [clojure.core.matrix]
         [neuhon.utils]))
 
-
-(deftype PreprocessedWaveforms
-  [^Double               freq
-   ^Double               tau
-   ^clojure.lang.LazySeq waveform-cos
-   ^clojure.lang.LazySeq waveform-sin
-   ^Double               den-cos
-   ^Double               den-sin])
+(deftype PreprocessedWaveArrays
+  [^Double  freq
+   ^Double  tau
+   ^doubles waveform-cos
+   ^doubles waveform-sin
+   ^Double  den-cos
+   ^Double  den-sin])
 
 ;; Number of different keys to consider
 (def ^:const keyboard-size
@@ -43,11 +42,6 @@
   [^clojure.lang.ISeq coll]
   (mapv #(Math/cos %1) coll))
 
-(defn vproduct
-  "Vectorized product between two sequences"
-  [^clojure.lang.ISeq A ^clojure.lang.ISeq B]
-  (mapv #(* %1 %2) A B))
-
 (defn freq-time-delay
   "Computes the phase change of a given frequency,
   based on the Lomb-Scargle method."
@@ -63,56 +57,72 @@
             (mapv #(* pulse-conversion-factor %1 freq) timeline)))))
     (* pulse-conversion-factor freq)))
 
-(defn cos-waveform
-  "Generates a cos-waveform with given phase change"
-  [^Double freq ^Double tau]
-  (mapv
-    #(Math/cos 
-      (* pulse-conversion-factor (- %1 tau) freq))
-    timeline))
+(defn arr-vproduct
+  "Elemwise product of two arrays"
+  [^doubles A ^doubles B]
+  (let [conv #(* (aget A %1) (aget B %1))]
+    (reduce
+      #(+ (conv %1) (conv %2))
+      (range (alength A)))))
 
-(defn sin-waveform
-  "Generates a sin-waveform with given phase change"
+(defn cosine-waveform
+  "Generates a cosine wave with given phase change (as Java array)"
   [^Double freq ^Double tau]
-  (mapv
-    #(Math/sin
-      (* pulse-conversion-factor (- %1 tau) freq))
-    timeline))
+  (let [arr (make-array Double/TYPE (count timeline))]
+    (do
+      (mapv
+        #(aset-double arr %1
+          (Math/cos 
+            (* pulse-conversion-factor (- %1 tau) freq)))
+        timeline)
+      arr)))
+
+(defn sine-waveform
+  "Generates a sine wave with given phase change (as Java array)"
+  [^Double freq ^Double tau]
+  (let [arr (make-array Double/TYPE (count timeline))]
+    (do
+      (mapv
+        #(aset-double arr %1
+          (Math/sin 
+            (* pulse-conversion-factor (- %1 tau) freq)))
+        timeline)
+      arr)))
 
 (defn lomb-scargle-preprocessing
   "Pre-computes what can be preprocessed during the
-  Lonm-Scargle least-squares regression"
+  Lomb-Scargle least-squares regression"
   []
   (for [i (range keyboard-size)]
-    (let [freq (nth note-frequencies i)
-          tau (freq-time-delay freq)
-          ^clojure.lang.LazySeq cos-wave (cos-waveform freq tau)
-          ^clojure.lang.LazySeq sin-wave (sin-waveform freq tau)]
-      (PreprocessedWaveforms.
-        freq
-        tau
-        cos-wave
-        sin-wave
+    (let [^Double freq (nth note-frequencies i)
+          ^Double tau (freq-time-delay freq)
+          ^doubles cos-wave (cosine-waveform freq tau)
+          ^doubles sin-wave (sine-waveform freq tau)]
+      (PreprocessedWaveArrays. freq tau cos-wave sin-wave
         (apply-sum (mapv #(pow2 %1) cos-wave))
         (apply-sum (mapv #(pow2 %1) sin-wave))))))
 
-(def ls-freqs (doall (lomb-scargle-preprocessing)))
+(def ^clojure.lang.LazySeq ls-freqs (doall (lomb-scargle-preprocessing)))
 
 (defn apply-lomb-scargle-on-one-frequency
   "Evaluates the Lomb-Scargle periodogram at a given frequency,
-  where freq-data is of PreprocessedWaveforms type"
-  [^clojure.lang.ISeq signal ^PreprocessedWaveforms freq-data]
+  where freq-data is of PreprocessedWaveArrays type"
+  [^doubles signal ^PreprocessedWaveArrays freq-data]
   (* 0.5 (+
-    (/ (pow2 
-      (apply-sum 
-        (vproduct (.waveform-cos freq-data) signal))) (.den-cos freq-data))
-    (/ (pow2 
-      (apply-sum 
-        (vproduct (.waveform-sin freq-data) signal))) (.den-sin freq-data)))))
+    (/ 
+      (pow2 
+        (arr-vproduct (.waveform-cos freq-data) signal))
+      (.den-cos freq-data))
+    (/ 
+      (pow2 
+        (arr-vproduct (.waveform-sin freq-data) signal))
+      (.den-sin freq-data)))))
 
 (defn compute-periodogram
   "Computes the Lomb-Scargle periodogram, given an input sequence"
-  [^clojure.lang.ISeq signal]
+  [signal]
   (mapv 
-    #(apply-lomb-scargle-on-one-frequency signal (nth ls-freqs %1))
-    (range n-midi-notes)))
+    #(apply-lomb-scargle-on-one-frequency signal %1)
+    ls-freqs))
+
+;; (doall (compute-periodogram (into-array Double/TYPE (range 4096))))

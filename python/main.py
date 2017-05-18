@@ -51,13 +51,15 @@ def main(prediction_func):
     tp, fp, relatives, parallels, out_by_a_fifth, out_by_a_fourth, n_total = 0, 0, 0, 0, 0, 0, 0
     distances = np.zeros(24)
     chromatic_dataset = list()
-    for i in range(490):
+    markov_dataset = list()
+    for i in range(480):
         row = csv_file.readline().replace('\n', '').split(';')
         artist, title, target_key, filename = row[0], row[1], row[2], row[3]
 
         try:
-            predicted_key, spectral_matrix, _, _ = prediction_func(filename)
+            predicted_key, spectral_matrix, _, extra = prediction_func(filename)
             chromatic_dataset.append((spectral_matrix, target_key))
+            markov_dataset.append((extra.obs_seq, target_key))
             distance = getDistance(predicted_key, target_key)
             distances[distance] += 1
             n_total += 1
@@ -80,6 +82,7 @@ def main(prediction_func):
     showFinalResults(tp, out_by_a_fifth, out_by_a_fourth, parallels, relatives, fp, n_total)
     csv_file.close()
     pickle.dump(chromatic_dataset, open("profile_dataset.npy", "wb"))
+    pickle.dump(markov_dataset, open("markov_dataset.npy", "wb"))
     print(distances)
 
 if __name__ == "__main__":

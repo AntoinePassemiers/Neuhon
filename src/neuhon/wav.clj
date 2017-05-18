@@ -88,17 +88,24 @@
           (= bytes-per-sample 3) le2c-bytes-to-int24
           (= bytes-per-sample 2) le2c-bytes-to-int16
           (= bytes-per-sample 1) le2c-bytes-to-int8
-          :else le2c-bytes-to-int16)]
+          :else le2c-bytes-to-int16)
+        stereo-to-mono (cond
+          (= number-of-channels 1) 
+            (fn [i] (float (int-converter data i)))
+          (= number-of-channels 2)
+            (fn [i] (float (/ 
+              (+ (int-converter data i) 
+                (int-converter data (+ i bytes-per-sample))) 2)))
+          :else
+            (fn [i] (float (/ 
+              (+ (int-converter data i) 
+                (int-converter data (+ i bytes-per-sample))) 2))))]
     (do
       ;; Assumes the sampling frequency (after resampling) is equal to 44100 Hz
       (assert (= (int sampling-frequency) 44100))
-      ;; Assumes the audio has been recorded in stereo mode (2 channels)
-      (assert (= number-of-channels 2))
       ;; Loads the audio samples and computes the mean of the two channels
       (map 
-        (fn [i] (float (/ 
-          (+ (int-converter data i) 
-            (int-converter data (+ i bytes-per-sample))) 2)))
+        stereo-to-mono
         (range 
           (+ 12 header-size)
           number-of-bytes

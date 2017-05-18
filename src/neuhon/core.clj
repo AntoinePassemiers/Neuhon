@@ -13,6 +13,7 @@
         [neuhon.profiles]
         [neuhon.spectral]
         [neuhon.fft]
+        [neuhon.markov]
         [neuhon.utils]))
 
 ;; hardcoded path
@@ -49,7 +50,7 @@
   [frame]
   (let [frame-array (to-complex-array frame)]
     (do
-      (take
+      (take ;; TODO
         window-size
         (dsk-transform
           (complex-to-real-seq
@@ -98,7 +99,6 @@
     (find-key-globally filepath false 0.0))
   ([filepath threading? use-cqt? overlap]
     (let [signal (load-wav filepath :rate target-sampling-rate)
-          key-counters (make-array Integer/TYPE 24)
           step (int (* window-size (- 1.0 overlap)))
           partitions (partition ;; TODO
             window-size
@@ -110,18 +110,17 @@
       (do
         (assert (<= 0.0 overlap 0.8))
         (init (+ 1 n-steps)) ;; Init progress bar
-        (doall
-          (umap
-            (fn [signal-partition]
-              (do
-                (inc-array-element key-counters
-                  (find-key-locally 
-                    signal-partition
-                    use-cqt?))
-                (tick))) ;; Update progress bar
-            partitions))
-        (println (seq key-counters))
-        (key-to-str (arg-max (seq key-counters)))))))
+          (key-to-str
+            (most-probable-key
+              (doall
+                (umap
+                  (fn [signal-partition]
+                    (do
+                      (tick) ;; Update progress bar
+                      (find-key-locally 
+                        signal-partition
+                        use-cqt?)))
+                  partitions))))))))
 
 (defn process-all-for-evaluation
   "Function for evaluating the final key prediction algorithm.
@@ -139,7 +138,7 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 30) ;; 230
+        (when (< i 2) ;; 230
           (try
             (let [line (nth csv-seq i)
                   artist (nth line 0)
@@ -156,8 +155,10 @@
                     (swap! perfect-matches inc)
                   (is-out-by-a-fifth? predicted-key target-key)
                     (swap! out-by-a-fifth-matches inc)
-                  ;; (is-relative? predicted-key target-key) 
-                  ;;   (swap! relative-matches inc)
+                  (is-relative? predicted-key target-key) 
+                    (swap! relative-matches inc)
+                  (is-parallel? predicted-key target-key) 
+                    (swap! parallel-matches inc)
                   :else (swap! wrong-keys inc))
                 (display-result metadata print)
                 (flush)

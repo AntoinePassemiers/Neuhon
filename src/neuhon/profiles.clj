@@ -43,8 +43,8 @@
     [ 3.97941074,  2.83186428,  3.47202171,  4.60659078,  2.93005446,  5.63382232,
       2.63924404,  6.49747473, -0.78941772,  5.35740125,  1.35922185,  5.05482862]))
 
-(def major-base-profile dsk-major-base-profile)
-(def minor-base-profile dsk-minor-base-profile)
+(def major-base-profile shaath-major-base-profile)
+(def minor-base-profile shaath-minor-base-profile)
 
 
 ;; Key signature names 
@@ -53,12 +53,12 @@
 ;; Mapping the key signature names to fixed constants, expressed in semi-tones
 (def key-values 
   (hash-map "C" 0 "C#" 1 "D" 2 "Eb" 3 "E" 4 "F" 5 "F#" 6 "G" 7 "G#" 8 "A" 9 "Bb" 10 "B" 11
-    "Cm" 0 "C#m" 1 "Dm" 2 "Ebm" 3 "Em" 4 "Fm" 5 "F#m" 6 "Gm" 7 "G#m" 8 "Am" 9 "Bbm" 10 "Bm" 11))
+    "Cm" 12 "C#m" 13 "Dm" 14 "Ebm" 15 "Em" 16 "Fm" 17 "F#m" 18 "Gm" 19 "G#m" 20 "Am" 21 "Bbm" 22 "Bm" 23))
 
 ;; Mapping the key signature names to 0 or 1
 ;; 0 corresponds to a major scale
 ;; 1 corresponds to a minor scale
-(def key-types
+(def key-modes
   (hash-map "C" 0 "C#" 0 "D" 0 "Eb" 0 "E" 0 "F" 0 "F#" 0 "G" 0 "G#" 0 "A" 0 "Bb" 0 "B" 0
     "Cm" 1 "C#m" 1 "Dm" 1 "Ebm" 1 "Em" 1 "Fm" 1 "F#m" 1 "Gm" 1 "G#m" 1 "Am" 1 "Bbm" 1 "Bm" 1))
 
@@ -80,8 +80,8 @@
         (rotate-right (concat [(last profile)] (drop-last 1 profile)) (- m 1))
         profile))))
 
-(defn key-distance 
-  "Computes the distance between two key signatures,
+(defn key-distance
+  "Computes the distance between two keys,
   expressed in semi-tones"
   [key-a key-b]
   (let [value-a (get key-values key-a)
@@ -115,16 +115,33 @@
         value-b (get key-values key-b)
         distance (mod (+ 12 (- value-a value-b)) 12)]
     (and 
-      (= (get key-types key-a) (get key-types key-b))
+      (= (get key-modes key-a) (get key-modes key-b))
+      (or (= distance 5) (= distance 7)))))
+
+(defn is-parallel? 
+  "Tells whether two keys correspond to parallel scales or not"
+  [key-a key-b]
+  (let [value-a (get key-values key-a)
+        value-b (get key-values key-b)
+        distance (mod (+ 12 (- value-a value-b)) 12)]
+    (and 
+      (not= (get key-modes key-a) (get key-modes key-b))
       (or (= distance 5) (= distance 7)))))
 
 (defn is-relative? 
-  "Tells whether two keys correspond to parallel scales or not"
+  "Tells whether two keys correspond to relative scales or not"
   [key-a key-b]
-  (let [distance (key-distance key-a key-b)]
-    (and 
-      (= (get key-types key-a) (get key-types key-b))
-      (or (= distance 5) (= distance 7)))))
+  (let [value-a (get key-values key-a)
+        value-b (get key-values key-b)
+        distance (mod (+ 12 (- value-a value-b)) 12)]
+    (if
+      (>= value-a 12)
+      (and 
+        (< value-b 12)
+        (= distance 9))
+      (and
+        (>= value-b 12)
+        (= distance 3)))))
 
 (comment 
   "Generate all the possible profiles by rotating the two existing ones :

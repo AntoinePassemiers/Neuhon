@@ -275,6 +275,7 @@ def findKey(filename, method = METHOD_CQT):
     obs_seq = list()
     n_samples = len(feature_matrix)
     chromatic_matrix = np.empty((n_samples, 12), dtype = np.double)
+    
     n_vectors = 0
     while n_vectors < n_samples:
         coefs = feature_matrix[n_vectors]
@@ -288,7 +289,7 @@ def findKey(filename, method = METHOD_CQT):
         hist[kk] += 1
         n_vectors += 1
     print(obs_seq)
-
+    extra_features.obs_seq = obs_seq
     print(hist.reshape(2, 12))
     predicted_key_name = predictKeyFromHistogram(hist)
     return predicted_key_name, feature_matrix, hist, extra_features

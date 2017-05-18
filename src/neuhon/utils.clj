@@ -49,8 +49,8 @@
 
 (defn arg-max
   "Finds the sequence index where the highest value is located"
-  ([data] (arg-max data 0 Double/MIN_VALUE 0))
-  ([data begin end] (arg-max data begin Double/MIN_VALUE 0))
+  ([data] (arg-max data 0 (- Double/MAX_VALUE) 0))
+  ([data begin end] (arg-max data begin (- Double/MAX_VALUE) 0))
   ([data begin max-value best-index] 
   (do
     (if (= (count data) begin)

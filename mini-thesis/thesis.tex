@@ -9,10 +9,17 @@
 \usepackage{graphicx}
 \usepackage{placeins}
 \usepackage{titlesec}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{url}
+
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
 
 \titlelabel{\thetitle.\quad}
 
-\title{Study of various algorithms for identifying tonalities \\ in music pieces, proposal of an alternative approach \\ and its implementation in Clojure}
+\title{Study of various algorithms for retrieving tonalities from music pieces, \\ proposal of different approaches for spectral estimation \\ and their implementation in Clojure}
 \author{Antoine Passemiers$$ \\
 \mbox{}\\
 $$Université Libre de Bruxelles \\
@@ -42,11 +49,13 @@ propose an efficient and custom Clojure implementation.
 
 The tone of a musical work is characterised by the set of sounds coming from a same diatonic scale.
 Unlike scales, where musical notes follow each other in a contiguous manner, tones assemble notes that can be
-disjoined or even overlapped. \citep{AD}
+disjoined or even overlapped \citep{AD}.
 Therefore, our central concern is the analysis of polyphonic melodies, which constitute the overwhelming
 majority of the modern musical works.\\
 
-More specifically, we will give consideration to two types of tonality prediction methods :
+Key finding algorithms rely on spectral estimation and expect to get a chroma vector as input. The chroma vector contains, for each musical note (the chromatic scale consists of twelve distinct notes), its corresponding strength. As a consequence, regardless of how we estimate the spectrum, the latter must be compacted in a vector of exactly twelve coefficients.\\
+
+More specifically, we will give consideration to two types of tonality prediction methods:
 those based on tone profiles, and those based on machine learning algorithms.
 The former aims to integrate the acquired knowledge on the cognitive theory, whereas the latter
 use statistical inference to extract the relevant information from the music tracks.
@@ -56,7 +65,7 @@ Ibrahim Sha\textquotesingle ath for the software KeyFinder.\\
 As regards the machine learning techniques, those presented from sections \ref{sssec:hmm} to \ref{sssec:iohmm}
 are mainly linked to hidden Markov models and neural networks. The cross-validation of these models is achieved by splitting
 the database in a training set and a validation set. Being intended to remain brief, the present report focuses on the methodology used,
-and short descriptions of the algorithms discussed, with emphasis on how the solution presented differs from these algorithms.
+and short descriptions of the algorithms discussed, with emphasis on how the proposed solution differs from these algorithms.
 
 \section{Theoretical considerations}
 
@@ -74,14 +83,14 @@ applying a low-pass filter), no loss of accuracy has been pointed out during the
 
 \subsection{Spectral estimation}
 
-There are two broad categories of spectral density estimation techniques : the parametric ones and the non-parametric ones. \citep{MHH} The techniques
-of which we will be speaking are all non-parametric algorithms. More specifically, we are going to discuss about methods based on the discrete-time Fourier transform (which are the most often used) and least-squares spectral estimation techniques. The latter have achieve comparable results, both in terms of speed and accuracy.
+There are two broad categories of spectral density estimation techniques: the parametric ones and the non-parametric ones \citep{MHH}. The techniques
+of which we will be speaking are all non-parametric algorithms. More specifically, we are going to discuss about methods based on the discrete-time Fourier transform (which are the most often used) and least-squares spectral estimation techniques. The latter have achieved comparable results, both in terms of speed and accuracy.
 
 \subsubsection{Direct Spectral Kernel Transform (DSKT)}
 
-This algorithm has been proposed by Ibrahim Sha\textquotesingle ath, and appeares to be a fast and efficient approximation of the Constant-Q Transform implementation as described by Brown and Puckette.
+This algorithm has been proposed by Ibrahim Sha\textquotesingle ath, and appeares to be a fast and efficient approximation of the Constant-Q Transform implementation as described by Brown and Puckette \citep{CQT}.
 The data samples are first multiplied by a Blackman window (to avoid spectral distortions). Then the spectrum is approximated by the Fast Fourier Transform.
-The spectral kernels are computed a posteriori by applying cosine windows in the spectral domain, centered on the frequencies of interest. The advantage is that each window can be pre-calculated and reused each time the DSKT needs to be applied. The particularity of the DSKT is that the bandwidth around each frequency of interest is constant, and determined by the parameter Q. To calculate the bounds of a kernel of central frequency $ f_k $, we refer to the following formulas :
+The spectral kernels are computed a posteriori by applying cosine windows in the spectral domain, centered on the frequencies of interest. The advantage is that each window can be pre-calculated and reused each time the DSKT needs to be applied. The particularity of the DSKT is that the bandwidth around each frequency of interest is constant, and determined by the parameter Q. To calculate the bounds of a kernel of central frequency $ f_k $, we refer to the following formulas:
 
 \begin{align}
 l_k  = (1 - \frac{Q}{2}) \cdot \frac{f_k \cdot N}{s}
@@ -95,22 +104,22 @@ r_k  = (1 + \frac{Q}{2}) \cdot \frac{f_k \cdot N}{s}
 
 \subsubsection{Van\'{\i}\v{c}ek least-squares spectral estimation}
 
-It is also possible to estimate the spectrum using dedicated regression techniques. We will give focus on the most popular of them :
+It is also possible to estimate the spectrum using dedicated regression techniques. We will give focus on the most popular of them:
 the Van\'{\i}\v{c}ek method and the Lomb-Scargle method. A spectrum approximated by one of the latter is called a periodogram.
 Handling missing data samples and non-uniform data is a rationale for the Van\'{\i}\v{c}ek method, since it has been developped in the fields of
 geology and astrophysics, where data are not received at regular intervals. Furthermore, unlike the Fast Fourier Transform which has a
 variable spectral resolution (depending on the size of the observation window), the least-squares methods output periodograms of a size
-that is equal to the number of trial frequencies. Theoretically, this is an interesting feature since the window size can be adjusted to the duration of a beat. This can not be achieved using FFT-based algorithms. The only constraint is that the number of data samples must be higher than the number of trial frequencies.
+that is equal to the number of trial frequencies. Theoretically, this is an interesting feature since the window size can be adjusted to the duration of a beat. This can not be achieved using FFT-based algorithms. The only constraint is that the number of data samples must be higher than the number of trial frequencies.\\
+
+According to the Van\'{\i}\v{c}ek method, the signal is assumed to be a linear combination of sine and cosine waves, with given frequencies of interest.
+The coefficients of the linear combination are stored in a vector $c$, and the signal is assumed to be $f \approx \phi.c$. 
+Each column of the matrix $\phi$ contains the data samples of the sine and cosine waves of a particular trial frequency.
+Finally, the coefficients are given by the equation \ref{fig:linreg} \citep{PS}.
 
 \begin{align}
 \hat{c} = (\phi^{T} \phi)^{-1} \phi^{T} f
 \label{fig:linreg}
 \end{align}
-
-According to the Van\'{\i}\v{c}ek method, the signal is assumed to be a linear combination of sine and cosine waves, with given frequencies of interest.
-The coefficients of the linear combination are stored in a vector $c$, and the signal is assumed to be $f \approx \phi.c$. 
-Each column of the matrix $\phi$ contains the data samples of the sine and cosine waves of a particular trial frequency.
-Finally, the coefficients are given by the equation \ref{fig:linreg}. \citep{PS}\\
 
 This method is very similar to the matching pursuit algorithm. The idea of the matching pursuit is to represent the signal as a finite linear combination of given
 functions, referred as atoms. At iteration k, the atom that minimizes the least squares residuals is weighted and then subtracted from 
@@ -120,7 +129,7 @@ the remainder of the signal. Once every trial frequencies has been treated, the 
 
 As we can see from formula \ref{fig:linreg}, the Van\'{\i}\v{c}ek\textquotesingle s strategy is lacking consideration for the phases of the trial sine waves.
 The consequence is that sinusoids of a same frequency can be highly correlated. The new approach requires that each pair of sinusoids at a given frequency
-is mutually orthogonal at each time $t_{j}$. Let\textquotesingle s set $\tau$ the phase change to apply to both the sine wave avd the cosine wave to make
+is mutually orthogonal at each time $t_{j}$. Let\textquotesingle s set $\tau$ the phase change to apply to both the sine wave and the cosine wave to make
 them mutually orthogonal for each data sample. Luckily, this phase change can be pre-calculated and is given by the equation \ref{fig:phases} \citep{LS}.
 
 \begin{align}
@@ -167,31 +176,36 @@ Therefore, the only remaining operations that cannot be processed at compile-tim
 reduces drastically the number of required operations to estimate the spectrum.\\
 
 Contrarily to Fourier-based
-estimators, the periodogram seems to suffer from spectral imbalance : this phenomenon is illustrated in the appendix B. When the periodogram consists of several peaks, the highest peak will always be relatively much higher than the others, compared to what we can get with the Fourier transform. This effect tend to diminish when the signal TODO \\
+estimators, the periodogram seems to suffer from spectral imbalance: this phenomenon is illustrated in the appendix B. When the periodogram consists of several peaks, the highest peak will always be relatively much higher than the others, compared to what we can get with the Fourier transform. This effect tend to diminish when the signal TODO \\
 
 This report proposes a simple solution to this issue. The idea consists in enriching the spectrum with musical notes located in a different chunk of data samples. In fact, an heptatonic musical scale is characterized by a set of seven notes, but it is
 not common to meet them all at the same moment. Because it is not possible to make a spectral analysis of contiguous notes, the alternative is to overlay them.
 
+\subsubsection{Other spectral estimation techniques}
+
+\citep{MA}
+
 \subsection{Key identification}
 
-Once the spectrum is approximated, it is reshaped into a chroma vector of twelve coefficients. In the frameworf of the algorithms assessment, it has been found that 6 octaves are sufficient to evaluate the spectrum : the addition of a seventh octave does not improve the accuracy of the predictions. With this knowledge, the spectrum - which has a resolution of 72 coefficients is reshaped into a matrix $M_{i, j}$ of dimension $(6 \times 12)$. Finally, the chroma vector is obtained by formalising the method developed by Sha\textquotesingle ath :
+Once the spectrum is approximated, it is reshaped into a chroma vector of twelve coefficients. In the frameworf of the algorithms assessment, it has been found that 6 octaves are sufficient to evaluate the spectrum: the addition of a seventh octave does not improve the accuracy of the predictions. With this knowledge, the spectrum - which has a resolution of 72 coefficients is reshaped into a matrix $M_{i, j}$ of dimension $(6 \times 12)$. Finally, the chroma vector is obtained by formalising the method developed by Sha\textquotesingle ath:
 
 \begin{align}
 C_{i} = p * \max_{j} M_{i, j} + (1 - p) * \sum_{j} M_{i, j}
+\label{chroma}
 \end{align}
 
 where p is a parameter determined during the evaluation / validation of the whole system.
 The last step consists in identifying the tonality locally,
-on the basis of this single chroma vector. We are going to discuss about different methods, the first one relies on the Maximum Key-Profile Correlation (MKC),
+on the basis of this single chroma vector. We are going to discuss different methods, the first one relies on the Maximum Key-Profile Correlation (MKC),
 while the others are based on machine learning algorithms.
 
 \subsubsection{Cognitive models}
 
-This solution relies on the Maximum Key-Profile Correlation approach : the idea is to compare the chroma vector (obtained from the previous step) to
+This solution relies on the Maximum Key-Profile Correlation approach: the idea is to compare the chroma vector (obtained from the previous step) to
 tone profiles that have been pre-defined by experts. The profile that maximizes the correlation with the chroma vector indicates which key is the most probable
-for the current chunk of data samples. \citep{AT} This method is the ths most commonly accepted, and described also by S. Pauws. \citep{SP} Both of them use profiles coming from the experience conducting par Carol L. Krumhansl and Lola L. Cuddy on tonal hierarchies in music and their perception by man.\\
+for the current chunk of data samples \citep{AT}. This method is the ths most commonly accepted, and described also by S. Pauws \citep{SP}. Both of them use profiles coming from the experience conducting par Carol L. Krumhansl and Lola L. Cuddy on tonal hierarchies in music and their perception by man.\\
 
-In short, the experience was conducted as follows : incomplete scales were played in front of subjects, followed by additional notes that the latter were asked to rate according to their capacity to match scales. The scores obtained from this study were grouped into two chromagrams, showed by the figure \ref{krumhansl}. \\
+In short, the experience was conducted as follows: incomplete scales were played in front of subjects, followed by additional notes that the latter were asked to rate according to their capacity to match scales. The scores obtained from this study were grouped into two chromagrams, showed by the figure \ref{krumhansl}. \\
 
 \begin{figure}
 \begin{center}
@@ -213,36 +227,50 @@ provide satisfying results. The adjusted tone profiles are shown in the figure \
 \end{center}
 \end{figure}
 
+\subsubsection{Spiral Array CEG Algorithm}
+
+The Spiral Array Center of Effect Generator solution has been proposed by Elaine Chew \citep{SPIRAL}, and solves the problem for both spectral estimation and key retrieval, by taking the geometric arrangement of notes into consideration.
+In a manner similar to the DSKT, the spectrum is divided into various pitch frequency bands, centered on the frequencies of interest. Then a heuristic peak detection algorithm is employed for each frequency band, where 
+at most one local maximum may be identified. The chroma vector is obtained by mapping the peak strengths using the formula \ref{chroma} with $p = 0$, and by normalizing the resulting vector along the time axis and then by normalizing the vector itself.\\
+
+The spiral array consists, in the three-dimensional space, of a sequence of twelve pitch classes arranged on a spiral, where adjacent pitch classe points are related by intervals of five semi-tones, and vertical neighbors are related by intervals of four semi-tones. Major and minor keys are described as linear combinations of the twelve pitch class points, and arranged inside the spiral beforehand. The key retrieval algorithm is explained as follows: the coefficients of each chroma vector are re-used as weights for linear combinations of the pitch class points, which results in a single point in the 3D space. This process is repeated cumulatively on a frame basis, and finally a nearest-neighbor search is employed to find the closest pitch class point to the previous single point \citep{MIDI}.\\
+
+In the context of our work, we simply used the euclidean distance as a criterion for the nearest-neighbor search. Unfortunately, the Spiral Array CEG algorithm did not provide as good results as the MKC-oriented techniques. Chew described many other ways to represent pitch classes in her book \textit{Mathematical and Computational Modeling of Tonality : Theory and Applications} \citep{CHEW}, such as the Krumhansl\textquotesingle s pitch cone and the Lerdahl\textquotesingle s pitch cone, which may be considered in a future work.
+
 \subsubsection{Hidden Markov Models (HMM)}
 \label{sssec:hmm}
 
 Hidden Markov Models are discrete state machines that represent multivariate series by their distributions and by
-the transition probailities between their states. Their states are called “hidden” because they are not observed directly,
+the transition probabilities between their states. Their states are called “hidden” because they are not observed directly,
 but can be inferred from the observation sequence using a parameter estimation method (such as the expectation-maximization algorithm
 or the Viterbi algorithm). Each hidden state distinguishes itself by its emission probabilities (or emission probability density function).
 Unlike more popular machine learning models such as neural networks or support vector machines (SVM), Hidden Markov Models are capable of
-processing input sequences of variable length. This characteristic is substantial given that music tracks are of variable length by nature.\\
+processing input sequences of variable length. This characteristic is substantial given that music tracks are of variable length by nature\citep{DR}. \\
 
 The old-fashioned way to classify keys using HMMs consists of training a HMM for each distinct music key, and to predict the most probable 
-key of an unlabelled music track by looking for the HMM that maximizes the track\textquotesingle s log-likelihood.
+key of an unlabelled music track by looking for the HMM that maximizes the probability of occurence.  \\
 
-TODO : \citep{JP} \citep{DR}
+According to J. Peeters \citep{JP}, if the training set is unbalanced (which is also the case in the present study), overfitting may occur on the specificities
+of each music track. The solution is to fit two mode-specific HMMs: one for the C major mode and one for the C minor mode. In order to do this, every chroma vector is circularly shifted of the number of semi-tones separating the ground-truth key and the root-node of C. Next, for both C major and C minor HMMs, a circular shift is applied on the mean vectors and covariance matrices of each hidden state to map them to a specific scale. Finally, the new HMMs are used as regular HMMs for classification.
 
 \subsubsection{Feedforward neural networks}
 
-Neural networks have already delivered good results for classifying chords inside a same piece of music. \citep{JO}
+Neural networks have already delivered good results for classifying chords inside a same piece of music \citep{JO}.
+The problem is that chroma vectors are too short to feed a neural network if the latter has to discriminate between 24 classes. In the study of Osmalskyj, 
+they are very few types of chords to classify, which eases the prediction task. Furthermore, neural networks cannot learn the variations of the pitch distribution over time, on the only basis of the key: the song must be labelled on frame basis. The solution is to take the time factor into account, as described in the next sub-section.
 
 \subsubsection{Input-Output Hidden Markov Models (IO-HMM)}
 \label{sssec:iohmm}
 
-The main deficiency of the standard HMM is that it has no discriminative capabilities : if one of the keys appears to be more frequent in the database or
+An IOHMM is a Markov model where each hidden state emitting probability distribution is actually a conditionnal probability distribution, inferred using a gradient descent algorithm, as well as the state transition probability distribution \citep{YB}. \\
+
+The main deficiency of the standard HMM is that it has no discriminative capabilities: if one of the keys appears to be more frequent in the database or
 if it seems to be easily explained by the HMM, the latter will present high risks of predicting the same key every time, regardless of the
 input sequence. On the other hand, feedforward neural networks have the defect that they are not suited for temporal data, since they must 
-process feature vectors of fixed size. [[ TODO : recurrent networks ]]
+process feature vectors of fixed size. \\
 
 The Input-Output Hidden Markov Model is well suited for our task because it is affected by none of these deficiencies.
-
-TODO : \citep{YB}
+However, we could not achieve good results with this model, due to overfitting problems. In a future work, it would be profitable to get a bigger and better balanced dataset.
 
 \section{Methodology}
 
@@ -265,7 +293,7 @@ In order to test the numerous features of the project, unit tests have been impl
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=3.1in,angle=0]{imgs/flowChart.png}
-\caption{Flowchart : solution design}
+\caption{Flowchart: solution design}
 \label{fig3}
 \end{center}
 \end{figure}
@@ -280,7 +308,7 @@ the same logic.
 
 \subsubsection{Lomb-Scargle periodogram}
 
-Considering the spectral estimation remains the performance-critical area of the code, regardless of the technique used, type hints have been added to the functions and var names involved. This is to help the compiler infer the type of return values at compile-time.
+Considering the fact that spectral estimation remains the performance-critical area of the code, regardless of the technique used, type hints have been added to the functions and var names involved. This is to help the compiler infer the type of return values at compile-time.
 At this stage of the code, we are only handling primitives and \textit{clojure.lang.LazySeq} objects (Clojure lazy sequences).\\
 
 We know from equations \ref{fig:cc} and \ref{fig:ss} that the terms CC and SS can be pre-calculated. As a consequence, they are computed at compile-time,
@@ -289,33 +317,44 @@ type regroups a specific trial frequency, the associated phase change, sine wave
 
 \subsubsection{Direct spectral kernel transform}
 
-TODO
+For the purpose of this work, the iterative radix-2 fast Fourier transform has been reimplemented according to the functional paradigm. An inplace version of the FFT is described in \textit{Introduction to algorithms} \citep{FFT}, and its pseudo-code is organized as given in appendix A. \\
+
+Some adjustments have been performed to implement it in a Clojure fashion. Java arrays have been used to store the spectral coefficients, but without relying on any temporary variable. To accomplish this, the first loop (line 4) and second loop (line 7) have been replaced by using the \textit{mapv} macro. The problem was that the complex number $\omega$ is changing state at each iteration of the third loop. In place of mutating $\omega$, the latter is returned by an anonymous function at every iteration $j$ and used as an input at iteration $j + 1$. This process is allowed to be very efficient in Clojure, and shown by the following picture:
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=3.1in,angle=0]{imgs/reduceconj.png}
+\caption{Dealing with the state of $\omega$ in the inplace FFT}
+\label{fig3}
+\end{center}
+\end{figure}
 
 \subsubsection{Datasets}
 
-The database consists of 415 music tracks recorded in wav format, 44100 Hz stereo, associated with a labelled key (determined beforehand). 
+The database consists of 415 music tracks recorded in wav format, 44100 Hz stereo, associated with an annotated key (determined beforehand). 
 All keys have been determined
 by experts and have been made available by Ibrahim Shat\textquotesingle ath as part of its work. For evaluating algorithms based on MKC,
-all the tracks have been used to tune the parameters to their best value. The latter consist of : the major and minor tone profile coefficients,
+all the tracks have been used to tune the parameters to their best value. The latter consist of: the major and minor tone profile coefficients,
 the size of the sliding window, the frequency range of the spectrum, and the parameter $p$. For evaluating machine learning techniques,
 the dataset has been split into a training set of 138 music tracks and a validation set of 277 tracks.
 
 \subsubsection{Evaluation}
 
 In the framework of this study, we consider only the twelve heptatonic major scales and the twelve heptatonic minor scales.
-Two different metrics are used to evaluate the accuracy of the algorithms :
-the raw accuracy (the ratio between the number of correct predictions to the number of analyzed files) and the MIREX index.
-The MIREX metric is a weighted sum of the number of correct predictions (C), the number of predictions that are out by a fifth (F), 
-out by a fourth (U), the number of predicted scales that are parallel to the correct ones (P), and the number of predicted scales
-that are relative to the correct ones (R). The index is then given by : \\
+Two different metrics are used to evaluate the accuracy of the algorithms:
+the raw accuracy (the ratio between the number of correct predictions to the number of analyzed files) and the metric invented for the Music Information Retrieval Evaluation eXchange \citep{MIREX}.
+The MIREX metric is a weighted sum of the number of correct predictions (C), the number of predictions that are out by a fifth (F), the number of predicted scales that are parallel to the correct ones (P), and the number of predicted scales
+that are relative to the correct ones (R). The index is then given by: \\
 
-\noindent $ MIREX = (C + \frac{1}{2}.F + \frac{1}{2}.U + \frac{3}{10}.R + \frac{1}{5}.F) / TOTAL $
+\noindent $ MIREX = (C + \frac{1}{2}.F + \frac{3}{10}.R + \frac{1}{5}.P) / TOTAL $
 
 \section{Results}
 
 It comes out of this study that the results are much better if we set the parameter $p$ to zero, regardless of the spectral estimation technique used.
 The optimal tone profile coefficients are shown in the figure \ref{profiles}. For both DSKT and LS methods, a window size of 4096 samples has provided good results, with an overlap of 4096 samples with the next chunk for the LS periodogram.
-Considering a frequency band bounded by $G\#_{-1}$ and $G\#_{5}$ seems to be sufficient to cover the whole spectrum : no significant accuracy improvement has been noticed while increasing the frequency range.
+Considering a frequency band bounded by $G^{\#}1$ and $G^{\#}6$ seems to be sufficient to cover the whole spectrum: no significant accuracy improvement has been noticed while increasing the frequency range.\\
+
+Despite the fact the Lomb-Scargle estimation method is well-suited for processing frames that have arbitrary sizes, we could not benefit from this feature since beat detection provided no greater accuracy.
 
 \begin{table}
 \center{
@@ -330,24 +369,6 @@ Lomb-Scargle (Clojure) & -  & - & - \\
 \vskip 0.25cm
 \caption{Accuracy assessment, according to the raw accuracy and the MIREX index}
 \end{table}
-
-\begin{table}
-\center{
-\begin{tabular}{|c|c|c|}\hline
-Method & Accuracy & MIREX \\ \hline\hline
-CQT + MKC & 30,7\%  & - \\
-Lomb-Scargle + MKC & 36,6\% & 49,4\% \\
-CQT + HMM & -- & -- \\
-FFT + IO-HMM & -- & -- \\
-CQT + IO-HMM & -- & -- \\ 
-Lomb-Scargle + IO-HMM & -- & -- \\ 
-\hline
-\end{tabular}
-}
-\vskip 0.25cm
-\caption{Accuracy assessment, according to the raw accuracy and the MIREX index}
-\end{table}
-
 
 \begin{table}
 \center{
@@ -372,37 +393,31 @@ Lomb-Scargle + MKC & Accuracy & MIREX \\ \hline\hline
 
 \section{Appendices}
 
-\subsection{Appendix A - IOHMM parameters}
+\subsection{Appendix A - Inplace radix-2 FFT pseudo-code}
 
-\begin{table}
-\center{
-\begin{tabular}{|c|c|}\hline
-Parameter & Value \\ \hline\hline
-Topology & linear \\
-Number of hidden states & 5 \\
-Number of iterations & 25 \\
-\hline
-\end{tabular}
-}
-\vskip 0.25cm
-\caption{Common parameters of the IO-HMM}
-\end{table}
-
-\begin{table}
-\center{
-\begin{tabular}{|c|c|c|c|}\hline
-Parameter & I & S & O \\ \hline\hline
-Number of hidden neurons & 20 & 20 & 30\\
-Epochs / iteration & 1 & 1 & 1 \\
-Hidden activation function & sigmoid & tanh & tanh \\
-Learning rate & 0,03 & 0,03 & 0,03 \\
-\hline
-\end{tabular}
-}
-\vskip 0.25cm
-\caption{Parameters by sub-network type, where $I$ stands for the initial state subnetwork,
-$S$ for the state transition sub-networks, and $O$ for the output sub-networks}
-\end{table}
+\begin{algorithm}
+\caption{Iterative radix-2 FFT}\label{fft}
+\begin{algorithmic}[1]
+\Procedure{FFT}{a}
+\State $BIT-REVERSE-COPY(a, A)$
+\State $n \gets a.length$
+\For{$(s \gets i) \text{ to } log_2(n)$}
+	\State $m \gets 2^{s}$
+	\State $\omega_m \gets e^{2\pi i / m} $
+	\For{$(k\gets 0) \text{ to } n - 1 \text{ by }$}
+		\State $\omega \gets 1$
+		\For{$(j \gets 0) \text{ to } m/2 - 1$}
+			\State $t \gets \omega \cdot A[k + j + m/2]$
+			\State $u \gets A[k + j]$
+			\State $A[k + j] \gets u + t$
+			\State $A[k + j + m/2] \gets u - t$
+			\State $\omega \gets \omega \cdot \omega_m$
+		\EndFor
+	\EndFor
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Appendix B - plots}
 
