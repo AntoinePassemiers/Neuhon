@@ -11,6 +11,7 @@ def rotateKey(key, shift):
     return (key + 24 - shift) % 24
 
 def predictKeyWithArgmax(obs):
+    print(list(obs))
     return KEY_NAMES[np.argmax(np.histogram(obs, np.arange(25))[0])]
 
 def predictKeyWithOneMatrix(obs, B):
@@ -25,7 +26,7 @@ def predictKeyWithOneMatrix(obs, B):
 if __name__ == "__main__":
     B = np.zeros((24, 24), dtype = np.float)
     dataset = pickle.load(open("markov_dataset.npy", "rb"))
-    for (observations, key) in dataset[:len(dataset)/2]:
+    for (observations, key) in dataset[:]:
         for i in range(1, len(observations)):
             k = KEY_DICT[key]
             x = rotateKey(observations[i - 1], k)
@@ -33,11 +34,12 @@ if __name__ == "__main__":
             B[x, y] += 1
     for i in range(24):
         B[i, :] /= B[i, :].sum()
+    for i in range(24):
+        B[:, i] /= B[:, i].sum()
+    print(B)
     tp = 0
-    for (observations, key) in dataset[len(dataset)/2:]:
+    for (observations, key) in dataset[:]:
         pred = predictKeyWithOneMatrix(observations, B)
         if pred == key:
             tp += 1
     print(tp)
-    print(list(B))
-    

@@ -66,7 +66,7 @@
       (extract-dsk-transform signal))
     ;; Compute the Lomb-Scargle periodogram
     (reshape-into-chromatic-vector
-      (compute-periodogram signal))))
+      (compute-periodogram (double-array signal)))))
 
 (defn find-key-locally
   "Predict the key signature of a song at a certain location of it.
@@ -138,7 +138,7 @@
             wrong-keys (atom 0)]
         (do (loop [i 1] ;; skip header
         ;; (when (< i (count csv-seq))
-        (when (< i 2) ;; 230
+        (when (< i 481) ;; 230
           (try
             (let [line (nth csv-seq i)
                   artist (nth line 0)

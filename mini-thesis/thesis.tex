@@ -17,10 +17,14 @@
 \def\BState{\State\hskip-\ALG@thistlm}
 \makeatother
 
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
 \titlelabel{\thetitle.\quad}
 
-\title{Study of various algorithms for retrieving tonalities from music pieces, \\ proposal of different approaches for spectral estimation \\ and their implementation in Clojure}
+\title{Study of various algorithms for identifying tonalities in music pieces, \\ proposal of different approaches for key retrieval \\ and their implementation in Clojure}
 \author{Antoine Passemiers$$ \\
+Promoteur: Bernard Fortz\\
 \mbox{}\\
 $$Université Libre de Bruxelles \\
 apassemi@ulb.ac.be}
@@ -37,12 +41,12 @@ apassemi@ulb.ac.be}
 \setcounter{secnumdepth}{3}
 
 \begin{abstract}
-The project involves the discussion of different approaches to automated tone detection in audio files,
+The project involves the discussion of different approaches to automated tonality retrieval from audio files,
 the prototyping of these methods, a reflexion on their consistency with functional programming,
 and the implementation of the most appropriate one in Clojure.
 State of the art comprises various maximum key-profile correlation (MKC) approaches and machine learning algorithms, and this
-report aims to implement all of them in Python to be able to discuss them according to their accuracy. Also, the second goal is to
-propose an efficient and custom Clojure implementation.
+project implies to implement all of them in Python for the purpose of the disussion. Also, the second goal is to
+assess the accuracy and speed of different MKC-based approaches in Clojure.
 \end{abstract}
 
 \section{Introduction}
@@ -53,30 +57,30 @@ disjoined or even overlapped \citep{AD}.
 Therefore, our central concern is the analysis of polyphonic melodies, which constitute the overwhelming
 majority of the modern musical works.\\
 
-Key finding algorithms rely on spectral estimation and expect to get a chroma vector as input. The chroma vector contains, for each musical note (the chromatic scale consists of twelve distinct notes), its corresponding strength. As a consequence, regardless of how we estimate the spectrum, the latter must be compacted in a vector of exactly twelve coefficients.\\
+Key finding algorithms rely on spectral estimation and are expected to get a chroma vector as input. The chroma vector contains, for each musical note (the chromatic scale consists of twelve distinct notes), its corresponding strength. As a consequence, regardless of how we estimate the spectrum, the latter must be compacted in a vector of exactly twelve coefficients.\\
 
 More specifically, we will give consideration to two types of tonality prediction methods:
 those based on tone profiles, and those based on machine learning algorithms.
 The former aims to integrate the acquired knowledge on the cognitive theory, whereas the latter
 use statistical inference to extract the relevant information from the music tracks.
-The cognitive approach used for identifying tones is partly dependent on the solution design proposed by
-Ibrahim Sha\textquotesingle ath for the software KeyFinder.\\
+The cognitive approach used for identifying tones is partly dependent on the solution design suggested by S. Pauws \citep{SP}, and later on by
+Ibrahim Sha\textquotesingle ath for the software KeyFinder \citep{IS}. \\
 
 As regards the machine learning techniques, those presented from sections \ref{sssec:hmm} to \ref{sssec:iohmm}
 are mainly linked to hidden Markov models and neural networks. The cross-validation of these models is achieved by splitting
 the database in a training set and a validation set. Being intended to remain brief, the present report focuses on the methodology used,
-and short descriptions of the algorithms discussed, with emphasis on how the proposed solution differs from these algorithms.
+and short descriptions of the algorithms discussed, with emphasis on how the proposed solution differs from the other solutions. Finally, only the results of the MKC-based algorithms will be presented.
 
 \section{Theoretical considerations}
 
 \subsection{Preprocessing}
 
-The audio signal is first extracted from the wav file, and then the average of its channels is calculated
+The audio signal is first extracted from the WAV file, and then the average of its channels is calculated
 if the file has been written in stereo. It is not required to take the pan into account given that mixing
-channels or analysing the channels separately makes no difference in the spectral domain. Also, there is
-no indispensable need to consider the whole frequential spectrum given that notes are mainly characterised 
+channels or analysing the channels separately makes no difference in the spectral domain, due to the property of linearity of the Fourier transform. Also, there is
+no indispensable need to consider the whole frequential bandwidth given that notes are mainly characterised 
 by their fundamental frequency
-and that the harmonics of the highest notes are not relevant for estimating chromagrams.
+and that the harmonics of the highest existing notes are not relevant for estimating chromagrams.
 The sampling rate is de facto resampled at a tenth of the standard sampling frequency (4410 Hz).
 Although this substantial downsampling is likely to create aliasing effects (which can be simply avoided by 
 applying a low-pass filter), no loss of accuracy has been pointed out during the evaluation phase.
@@ -137,8 +141,7 @@ them mutually orthogonal for each data sample. Luckily, this phase change can be
 \label{fig:phases}
 \end{align}
 
-Contrary to the formula \ref{fig:linreg}, which consider all the trial frequencies at once, Lomb\textquotesingle s approach suggests to consider only one
-trial frequency at a time, and consider the rest of the spectrum as being random noise. This process is repeated progressively for each trial frequency. The weight $R(f)$ of each trial frequency is then grouped together with the others, resulting in a periodogram. $R(f)$ is a linear combination of
+Contrary to the formula \ref{fig:linreg}, which consider all the trial frequencies at once, Lomb\textquotesingle s approach suggests to fit the signal to a single sinusoid at a time, and consider the rest of the spectrum as being random noise. This process is repeated progressively for each trial frequency. The weight $R(f)$ of each trial frequency is then grouped together with the others, resulting in a periodogram. $R(f)$ is a linear combination of
 the signal-cosine wave correlation and the signal-sine wave correlation, and results in the following equation:
 
 \begin{align}
@@ -176,14 +179,16 @@ Therefore, the only remaining operations that cannot be processed at compile-tim
 reduces drastically the number of required operations to estimate the spectrum.\\
 
 Contrarily to Fourier-based
-estimators, the periodogram seems to suffer from spectral imbalance: this phenomenon is illustrated in the appendix B. When the periodogram consists of several peaks, the highest peak will always be relatively much higher than the others, compared to what we can get with the Fourier transform. This effect tend to diminish when the signal TODO \\
+estimators, the periodogram seems to suffer from spectral imbalance: this phenomenon is illustrated in the appendix B. When the periodogram consists of several peaks, the highest peak will always be relatively much higher than the others, compared to what we can get with the Fourier transform.\\
 
 This report proposes a simple solution to this issue. The idea consists in enriching the spectrum with musical notes located in a different chunk of data samples. In fact, an heptatonic musical scale is characterized by a set of seven notes, but it is
 not common to meet them all at the same moment. Because it is not possible to make a spectral analysis of contiguous notes, the alternative is to overlay them.
+Let\textquotesingle s illustrate this effect. In figure \ref{fig:frame1}, 
+we can observe one dominant peak from the Lomb-Scargle periodogram. In figure \ref{fig:frame2} (representing the next frame), we can clearly distinguish two peaks. By summing the two frames, a complex shape appears, which highlights the non-linearity of the Lomb-Scargle periodogram.\\
 
 \subsubsection{Other spectral estimation techniques}
 
-\citep{MA}
+Various methods are not discussed in this report, such as the Pisarenko Harmonic Decomposition (PHD), the MUSIC algorithm or the EigenVector Method. All of them are summarized in the article of Al-Azzo and Al-Sabaawi and compared for the estimation of direction-of-arrival of utrasonic signals \citep{MA}. They may be considered in a future work and compared to the Lomb-Scargle method in terms of accuracy.
 
 \subsection{Key identification}
 
@@ -210,7 +215,7 @@ In short, the experience was conducted as follows: incomplete scales were played
 \begin{figure}
 \begin{center}
 \includegraphics[width=3.1in,angle=0]{imgs/Krumhansl.png}
-\caption{Tone profiles derived from the experience conducted by Krumhansl, and representing the C major and the C minor scales, respectively.}
+\caption{Krumhansl tone profiles representing the C major and the C minor scales, respectively.}
 \label{krumhansl}
 \end{center}
 \end{figure}
@@ -222,7 +227,7 @@ provide satisfying results. The adjusted tone profiles are shown in the figure \
 \begin{figure}
 \begin{center}
 \includegraphics[width=3.1in,angle=0]{imgs/Custom.png}
-\caption{Best tone profiles, determined empirically and adjusted for the Lomb-Scargle periodogram}
+\caption{Best tone profiles, determined empirically and adjusted for the Lomb-Scargle periodogram.}
 \label{profiles}
 \end{center}
 \end{figure}
@@ -251,7 +256,9 @@ The old-fashioned way to classify keys using HMMs consists of training a HMM for
 key of an unlabelled music track by looking for the HMM that maximizes the probability of occurence.  \\
 
 According to J. Peeters \citep{JP}, if the training set is unbalanced (which is also the case in the present study), overfitting may occur on the specificities
-of each music track. The solution is to fit two mode-specific HMMs: one for the C major mode and one for the C minor mode. In order to do this, every chroma vector is circularly shifted of the number of semi-tones separating the ground-truth key and the root-node of C. Next, for both C major and C minor HMMs, a circular shift is applied on the mean vectors and covariance matrices of each hidden state to map them to a specific scale. Finally, the new HMMs are used as regular HMMs for classification.
+of each music track. The solution is to fit two mode-specific HMMs: one for the C major mode and one for the C minor mode. In order to do this, every chroma vector is circularly shifted of the number of semi-tones separating the ground-truth key and the root-node of C. Next, for both C major and C minor HMMs, a circular shift is applied on the mean vectors and covariance matrices of each hidden state to map them to a specific scale. Finally, the new HMMs are used as regular HMMs for classification.\\
+
+In the article of Papadopoulos and Peeters \citep{PP}, the sequence of hidden states is inferred using the Viterbi decoding algorithm. The most probable sequence of hidden states gives the succession of local keys. It is then possible to segment a same music track in different keys if the latter contains multiple tonalities.
 
 \subsubsection{Feedforward neural networks}
 
@@ -262,7 +269,7 @@ they are very few types of chords to classify, which eases the prediction task. 
 \subsubsection{Input-Output Hidden Markov Models (IO-HMM)}
 \label{sssec:iohmm}
 
-An IOHMM is a Markov model where each hidden state emitting probability distribution is actually a conditionnal probability distribution, inferred using a gradient descent algorithm, as well as the state transition probability distribution \citep{YB}. \\
+An IOHMM is a Markov model where each hidden state emitting probability distribution is actually a conditionnal probability distribution, inferred using a gradient descent algorithm, as well as the state transition probability distribution \citep{YB}. This model has already been discussed in the framework of other tasks linked to  music pieces, such as chord predictions. \\
 
 The main deficiency of the standard HMM is that it has no discriminative capabilities: if one of the keys appears to be more frequent in the database or
 if it seems to be easily explained by the HMM, the latter will present high risks of predicting the same key every time, regardless of the
@@ -271,6 +278,17 @@ process feature vectors of fixed size. \\
 
 The Input-Output Hidden Markov Model is well suited for our task because it is affected by none of these deficiencies.
 However, we could not achieve good results with this model, due to overfitting problems. In a future work, it would be profitable to get a bigger and better balanced dataset.
+
+\subsubsection{Markov Chains of Local Key Predictions}
+
+Because a MKC algorithm has been employed to design the final Clojure architecture, we had to consider the factor of time. This report proposes a new approach to achieve this: view frame-based predictions as chords and taking only the probabilities of transition between chords into account. From now on, we call a frame-based prediction a sample. In a markovian process, all the information required to model the probability of realization of a future sequence is contained in the sample located at present time. As a consequence, we can model the probability of realization of the samples sequence as the product of the transition probabilties in all pairs of adjacent samples. For numerical stability purposes (because the sequence can be very long), the product of probabilities is replaced with a sum of log-probabilities. We set $T$ the number of samples and $P[i=s_t, j=s_{t-1} | k = c]$ the probability of transition from sample $s_{t-1}$ to sample $s_{t}$, where $c \in \{0, ..., 24\}$ is a global key. The most probable key is then given by:
+
+\begin{align}
+\hat{c} = \argmax_c \sum_{t=2}^{T} \log_2 P[i=s_{t-1}, j=s_{t} | k = c]
+\label{logproba}
+\end{align}
+
+This suggests that we determine a transition probability matrix for each $c \in \{0, ..., 24\}$, but it is preferable to prevent overfitting problems by adapting Peeter\textquotesingle s solution (as described in sub-section \ref{sssec:hmm}) to Markov chains. Instead, a single transition probability matrix is constructed for all keys. This implies that sample sequences are viewed as homogeneous Markov chains \citep{AUTOMATA}, and the process will be described with more details in sub-section \ref{sssec:A}.
 
 \section{Methodology}
 
@@ -321,6 +339,8 @@ For the purpose of this work, the iterative radix-2 fast Fourier transform has b
 
 Some adjustments have been performed to implement it in a Clojure fashion. Java arrays have been used to store the spectral coefficients, but without relying on any temporary variable. To accomplish this, the first loop (line 4) and second loop (line 7) have been replaced by using the \textit{mapv} macro. The problem was that the complex number $\omega$ is changing state at each iteration of the third loop. In place of mutating $\omega$, the latter is returned by an anonymous function at every iteration $j$ and used as an input at iteration $j + 1$. This process is allowed to be very efficient in Clojure, and shown by the following picture:
 
+\FloatBarrier
+
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=3.1in,angle=0]{imgs/reduceconj.png}
@@ -329,13 +349,47 @@ Some adjustments have been performed to implement it in a Clojure fashion. Java 
 \end{center}
 \end{figure}
 
+\FloatBarrier
+
+Type hints and Java data structures have been employed according to the Java interop guide of Clojure \citep{CL}.
+
+\subsubsection{Markov Chains of Frame-based Predictions}
+\label{sssec:A}
+
+We set $M_{i, j}$ the element $(i, j)$ of the transition probability matrix. The latter has been determined empirically during the evaluation process, by counting the occurences of each possible transition:
+
+\begin{align}
+M_{i, j} = \sum_f \sum_{t=2}^{T_f} \big[ i=rotate(s_{t-1}, k_f) \wedge j=rotate(s_t, k_f) \big]
+\label{MIJ}
+\end{align}
+
+$T_f$ is the length of the samples sequence extracted from file $f$ and $k_f$ is the ground-truth label corresponding to file $f$.
+Despite the fact that the probability matrix has been calibrated on the C major key, it is possible to get the 23 other keys by rotating this matrix along its two axes.
+This is made artificially by rotating the indices while accessing the matrix elements.
+
+\begin{align}
+rotate(s_t, k_f) = (s_t + 24 - k_f) \mod 24
+\label{rotate}
+\end{align}
+
+
+Once the matrix is built, the prediction process is such that the most probable key is the one that maximizes the product of the transition probabilities between adjacent samples, 
+where the samples are rotated for each $c \in \{0, ..., 24\}$ to simulate the existence of one transition probability matrix per key.
+
+\begin{align}
+\hat{c} = \argmax_c \sum_{t=2}^{T} \log_2 M_{rotate(s_{t-1}, c), rotate(s_{t}, c)}
+\label{logprobaclojure}
+\end{align}
+
+The transition probability matrix has been stored statically as a matrix object from the \textit{core.matrix} API. \textit{core.matrix} is a useful library for handling multi-dimensional arrays and applying efficient matrix operations. The transition probability matrix is shown in appendix C.
+
 \subsubsection{Datasets}
 
-The database consists of 415 music tracks recorded in wav format, 44100 Hz stereo, associated with an annotated key (determined beforehand). 
+The database consists of 415 music tracks recorded in wav format, 44100 Hz stereo, associated with annotated keys (determined beforehand).
 All keys have been determined
 by experts and have been made available by Ibrahim Shat\textquotesingle ath as part of its work. For evaluating algorithms based on MKC,
 all the tracks have been used to tune the parameters to their best value. The latter consist of: the major and minor tone profile coefficients,
-the size of the sliding window, the frequency range of the spectrum, and the parameter $p$. For evaluating machine learning techniques,
+the size of the sliding window, the frequency range of the spectrum, the parameter $p$, and the transition probabilities for modelling the Markov chains of frame-based predictions. For evaluating machine learning techniques,
 the dataset has been split into a training set of 138 music tracks and a validation set of 277 tracks.
 
 \subsubsection{Evaluation}
@@ -346,7 +400,9 @@ the raw accuracy (the ratio between the number of correct predictions to the num
 The MIREX metric is a weighted sum of the number of correct predictions (C), the number of predictions that are out by a fifth (F), the number of predicted scales that are parallel to the correct ones (P), and the number of predicted scales
 that are relative to the correct ones (R). The index is then given by: \\
 
-\noindent $ MIREX = (C + \frac{1}{2}.F + \frac{3}{10}.R + \frac{1}{5}.P) / TOTAL $
+\noindent $ MIREX = (C + \frac{1}{2}.F + \frac{3}{10}.R + \frac{1}{5}.P) / TOTAL $ \\
+
+Since the Markov chain predictor necessitates a transition probability matrix of 24 x 24 = 576 elements, it introduces a risk of overfitting the database. To ensure this is not the case, the dataset has been split into a group of 207 files (used for building the matrix) and a group of 208 files for evaluating the algorithm. An improvement of 3 \% in accuracy has been noted, compared to a naïve method such as taking the most frequent frame-based prediction. This validates the gain of accuracy the Markov chain provides. Lastly, the whole dataset has been re-used to fit the final transition probability matrix.
 
 \section{Results}
 
@@ -354,7 +410,7 @@ It comes out of this study that the results are much better if we set the parame
 The optimal tone profile coefficients are shown in the figure \ref{profiles}. For both DSKT and LS methods, a window size of 4096 samples has provided good results, with an overlap of 4096 samples with the next chunk for the LS periodogram.
 Considering a frequency band bounded by $G^{\#}1$ and $G^{\#}6$ seems to be sufficient to cover the whole spectrum: no significant accuracy improvement has been noticed while increasing the frequency range.\\
 
-Despite the fact the Lomb-Scargle estimation method is well-suited for processing frames that have arbitrary sizes, we could not benefit from this feature since beat detection provided no greater accuracy.
+Despite the fact the Lomb-Scargle estimation method is well-suited for processing frames that have arbitrary sizes, we could not benefit from this feature since beat detection provided no greater accuracy. In a future work, it would be preferable to evaluate the Lomb-Scargle technique by combining it with state-of-the-art tick detection algorithms.
 
 \begin{table}
 \center{
@@ -368,21 +424,6 @@ Lomb-Scargle (Clojure) & -  & - & - \\
 }
 \vskip 0.25cm
 \caption{Accuracy assessment, according to the raw accuracy and the MIREX index}
-\end{table}
-
-\begin{table}
-\center{
-\begin{tabular}{|c|c|c|}\hline
-Lomb-Scargle + MKC & Accuracy & MIREX \\ \hline\hline
-4096 samples & 30,7\%  & - \\
-8192 samples & 37,1\% & 48,9\% \\
-12288 samples & 35,9\% & 48,0\% \\
-16384 samples & 35,8\% & 48,9\% \\
-\hline
-\end{tabular}
-}
-\vskip 0.25cm
-\caption{Scores obtained using Lomb-Scargle + MKC, based on the temporal window size}
 \end{table}
 
 \footnotesize
@@ -421,20 +462,59 @@ Lomb-Scargle + MKC & Accuracy & MIREX \\ \hline\hline
 
 \subsection{Appendix B - plots}
 
+Due to the absence of linearity for the Lomb-Scargle spectral estimation, counter-intuitive effects seem to appear while plotting the periodograms. Indeed the different pitch strengths don\textquotesingle t have the same proportions between them, compared to the spectrum estimated with the Fast Fourier Transform.
+
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=3.1in,angle=0]{imgs/1frame.png}
 \caption{Dreadlock holiday - 10cc, frame located at 2 min 44,17 s}
-\label{}
+\label{fig:frame1}
 \end{center}
 \end{figure}
 
 \begin{figure}[h!]
 \begin{center}
+\includegraphics[width=3.1in,angle=0]{imgs/2frame.png}
+\caption{Dreadlock holiday - 10cc, frame located at 2 min 44,27 s}
+\label{fig:frame2}
+\end{center}
+\end{figure}
+
+After summing the two frames in the temporal domain, we can observe new peaks appearing in the Lomb-Scargle periodogram, while the resulting Fourier transform shows a linear combination of the two first FFTs. This is shown in figure \ref{fig:frame1and2}.
+
+\begin{figure}[h!]
+\begin{center}
 \includegraphics[width=3.1in,angle=0]{imgs/2frames.png}
-\caption{Dreadlock holiday - 10cc, frames located at 2 min 44,17 s and 2 min 44,27 s}
+\caption{Dreadlock holiday - 10cc, sum of the frames located at 2 min 44,17 s and 2 min 44,27 s}
+\label{fig:frame1and2}
+\end{center}
+\end{figure}
+
+\subsection{Appendix C - transition probability matrix}
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=3.1in,angle=0]{imgs/probs.png}
+\caption{Transition probability matrix inferred from the 415 files of the database}
 \label{}
 \end{center}
 \end{figure}
+
+\subsection{Appendix D - Accuracy assessment according to the frame size}
+
+\begin{table}
+\center{
+\begin{tabular}{|c|c|c|}\hline
+Lomb-Scargle + MKC & Accuracy & MIREX \\ \hline\hline
+4096 samples & 30,7\%  & - \\
+8192 samples & 37,1\% & 48,9\% \\
+12288 samples & 35,9\% & 48,0\% \\
+16384 samples & 35,8\% & 48,9\% \\
+\hline
+\end{tabular}
+}
+\vskip 0.25cm
+\caption{Scores obtained using Lomb-Scargle + MKC, based on the temporal window size}
+\end{table}
 
 \end{document}

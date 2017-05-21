@@ -5,7 +5,7 @@
 import sys
 import numpy as np
 
-sys.stdout = open('py_output.txt', 'w')
+# sys.stdout = open('py_output.txt', 'w')
 
 KEY_NAMES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B",
     "Cm", "C#m", "Dm", "Ebm", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "Bbm", "Bm"]
