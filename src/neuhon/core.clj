@@ -146,7 +146,7 @@
                   target-key (nth line 2)
                   audio-filename (nth line 3)
                   audio-filepath (clojure.string/join [db-path audio-filename])
-                  predicted-key (find-key-globally audio-filepath true true 0.0)
+                  predicted-key (find-key-globally audio-filepath true false 0.0)
                   metadata (Metadata. i artist title target-key predicted-key
                     (key-distance predicted-key target-key))]
               (do

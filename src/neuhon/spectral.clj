@@ -6,13 +6,14 @@
         [clojure.core.matrix]
         [neuhon.utils]))
 
-(deftype PreprocessedWaveArrays
-  [^Double  freq
-   ^Double  tau
-   ^doubles waveform-cos
-   ^doubles waveform-sin
-   ^Double  den-cos
-   ^Double  den-sin])
+
+(deftype PreprocessedWaveforms
+  [freq
+   tau
+   waveform-cos
+   waveform-sin
+   den-cos
+   den-sin])
 
 ;; Number of different keys to consider
 (def ^:const keyboard-size
@@ -34,95 +35,83 @@
 
 (defn vsin
   "Vectorized sinus function"
-  [^clojure.lang.ISeq coll]
-  (mapv #(Math/sin %1) coll))
+  [coll]
+  (map #(Math/sin %1) coll))
 
 (defn vcos
   "Vectorized cosinus function"
-  [^clojure.lang.ISeq coll]
-  (mapv #(Math/cos %1) coll))
+  [coll]
+  (map #(Math/cos %1) coll))
+
+(defn vproduct
+  "Vectorized product between two sequences"
+  [A B]
+  (map #(* %1 %2) A B))
 
 (defn freq-time-delay
   "Computes the phase change of a given frequency,
   based on the Lomb-Scargle method."
-  [^Double freq]
+  [freq]
   (/
     (Math/atan
       (/
         (apply-sum 
           (vsin 
-            (mapv #(* pulse-conversion-factor %1 freq) timeline)))
+            (map #(* pulse-conversion-factor %1 freq) timeline)))
         (apply-sum 
           (vcos 
-            (mapv #(* pulse-conversion-factor %1 freq) timeline)))))
+            (map #(* pulse-conversion-factor %1 freq) timeline)))))
     (* pulse-conversion-factor freq)))
 
-(defn arr-vproduct
-  "Elemwise product of two arrays"
-  [^doubles A ^doubles B]
-  (let [conv #(* (aget A %1) (aget B %1))]
-    (reduce
-      #(+ (conv %1) (conv %2))
-      (range (alength A)))))
+(defn cos-waveform
+  "Generates a cos-waveform with given phase change"
+  [freq tau]
+  (map
+    #(Math/cos 
+      (* pulse-conversion-factor (- %1 tau) freq))
+    timeline))
 
-(defn cosine-waveform
-  "Generates a cosine wave with given phase change (as Java array)"
-  [^Double freq ^Double tau]
-  (let [arr (make-array Double/TYPE (count timeline))]
-    (do
-      (mapv
-        #(aset-double arr %1
-          (Math/cos 
-            (* pulse-conversion-factor (- %1 tau) freq)))
-        timeline)
-      arr)))
-
-(defn sine-waveform
-  "Generates a sine wave with given phase change (as Java array)"
-  [^Double freq ^Double tau]
-  (let [arr (make-array Double/TYPE (count timeline))]
-    (do
-      (mapv
-        #(aset-double arr %1
-          (Math/sin 
-            (* pulse-conversion-factor (- %1 tau) freq)))
-        timeline)
-      arr)))
+(defn sin-waveform
+  "Generates a sin-waveform with given phase change"
+  [freq tau]
+  (map
+    #(Math/sin
+      (* pulse-conversion-factor (- %1 tau) freq))
+    timeline))
 
 (defn lomb-scargle-preprocessing
   "Pre-computes what can be preprocessed during the
-  Lomb-Scargle least-squares regression"
+  Lonm-Scargle least-squares regression"
   []
   (for [i (range keyboard-size)]
-    (let [^Double freq (nth note-frequencies i)
-          ^Double tau (freq-time-delay freq)
-          ^doubles cos-wave (cosine-waveform freq tau)
-          ^doubles sin-wave (sine-waveform freq tau)]
-      (PreprocessedWaveArrays. freq tau cos-wave sin-wave
-        (apply-sum (mapv #(pow2 %1) cos-wave))
-        (apply-sum (mapv #(pow2 %1) sin-wave))))))
+    (let [freq (nth note-frequencies i)
+          tau (freq-time-delay freq)
+          cos-wave (cos-waveform freq tau)
+          sin-wave (sin-waveform freq tau)]
+      (PreprocessedWaveforms.
+        freq
+        tau
+        cos-wave
+        sin-wave
+        (apply-sum (map #(pow2 %1) cos-wave))
+        (apply-sum (map #(pow2 %1) sin-wave))))))
 
-(def ^clojure.lang.LazySeq ls-freqs (doall (lomb-scargle-preprocessing)))
+(def ls-freqs (doall (lomb-scargle-preprocessing)))
 
 (defn apply-lomb-scargle-on-one-frequency
-  "Evaluates the Lomb-Scargle periodogram at a given frequency,
-  where freq-data is of PreprocessedWaveArrays type"
-  [^doubles signal ^PreprocessedWaveArrays freq-data]
-  (* 0.5 (+
-    (/ 
-      (pow2 
-        (arr-vproduct (.waveform-cos freq-data) signal))
-      (.den-cos freq-data))
-    (/ 
-      (pow2 
-        (arr-vproduct (.waveform-sin freq-data) signal))
-      (.den-sin freq-data)))))
+  [signal ith]
+  (let [freq-data (nth ls-freqs ith)
+        freq      (.freq freq-data)
+        cos-wave  (.waveform-cos freq-data)
+        sin-wave  (.waveform-sin freq-data)
+        den-cos   (.den-cos freq-data)
+        den-sin   (.den-sin freq-data)]
+    (* 0.5 (+
+      (/ (pow2 (apply-sum (vproduct cos-wave signal))) den-cos)
+      (/ (pow2 (apply-sum (vproduct sin-wave signal))) den-sin)))))
 
 (defn compute-periodogram
-  "Computes the Lomb-Scargle periodogram, given an input sequence"
   [signal]
-  (mapv 
+  (map 
     #(apply-lomb-scargle-on-one-frequency signal %1)
-    ls-freqs))
-
-;; (doall (compute-periodogram (into-array Double/TYPE (range 4096))))
+    (range n-midi-notes)))

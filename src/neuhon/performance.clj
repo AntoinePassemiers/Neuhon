@@ -20,31 +20,31 @@
   []
   (do
     (profile {}
-      (dotimes [_ 100]
+      (dotimes [_ 10]
         (p :jtransforms-fft 
           (.realForward 
             jtransformer
             (double-array 8192 frame)))))
     (profile {}
-      (dotimes [_ 100]
+      (dotimes [_ 10]
         (p :clojure-fft
           (iterative-radix2-fft
             (to-complex-array frame)))))
     (profile {}
-      (dotimes [_ 100]
+      (dotimes [_ 10]
         (p :lomb-scargle
-          (compute-periodogram
-            (into-array Double/TYPE frame)))))))
+          (doall
+            (compute-periodogram frame)))))))
 
 (defn profile-real-to-complex-conversion
   []
   (do
     (profile {}
-      (dotimes [_ 100]
+      (dotimes [_ 10]
         (p :double-array
           (double-array 8192 frame))))
     (profile {}
-      (dotimes [_ 100]
+      (dotimes [_ 10]
         (p :custom-conversion
           (to-complex-array frame))))))
 

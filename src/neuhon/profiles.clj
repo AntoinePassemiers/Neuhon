@@ -43,8 +43,8 @@
     [ 3.97941074,  2.83186428,  3.47202171,  4.60659078,  2.93005446,  5.63382232,
       2.63924404,  6.49747473, -0.78941772,  5.35740125,  1.35922185,  5.05482862]))
 
-(def major-base-profile dsk-major-base-profile)
-(def minor-base-profile dsk-minor-base-profile)
+(def major-base-profile ls-major-base-profile)
+(def minor-base-profile ls-minor-base-profile)
 
 
 ;; Key signature names 
