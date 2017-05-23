@@ -20,18 +20,18 @@
   []
   (do
     (profile {}
-      (dotimes [_ 10]
+      (dotimes [_ 1000]
         (p :jtransforms-fft 
           (.realForward 
             jtransformer
             (double-array 8192 frame)))))
     (profile {}
-      (dotimes [_ 10]
+      (dotimes [_ 1000]
         (p :clojure-fft
           (iterative-radix2-fft
             (to-complex-array frame)))))
     (profile {}
-      (dotimes [_ 10]
+      (dotimes [_ 1000]
         (p :lomb-scargle
           (doall
             (compute-periodogram frame)))))))

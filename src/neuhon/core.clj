@@ -44,6 +44,11 @@
   (print-function (format "Predicted key : %s (%s)\n\n"
     (.predicted-key metadata) (str (.distance metadata)))))
 
+(defn vaddition
+  "Vectorized addition between two sequences"
+  [A B]
+  (map #(* %1 %2) A B))
+
 (defn extract-dsk-transform
   "Compute the direct spectral kernel transform of
   an input sequence"
@@ -100,11 +105,20 @@
   ([filepath threading? use-cqt? overlap]
     (let [signal (load-wav filepath :rate target-sampling-rate)
           step (int (* window-size (- 1.0 overlap)))
-          partitions (partition ;; TODO
-            window-size
-            step
-            (repeat window-size padding-default-value)
-            signal)
+          clean-partitions (partition
+              window-size
+              step
+              (repeat window-size padding-default-value)
+              signal)
+          partitions (if 
+            use-cqt?
+            clean-partitions
+            ;;(map
+            ;;  #(vaddition
+            ;;    (nth clean-partitions %1)
+            ;;    (nth clean-partitions (+ 1 %1)))
+            ;;  (range 0 (count clean-partitions) 2)))
+            clean-partitions)
           n-steps (count partitions)
           umap (if threading? pmap map)]
       (do
@@ -189,5 +203,5 @@
     (file-seq
       (file folder-path))))
 
-(process-all-for-evaluation db-base-path)
+;; (process-all-for-evaluation db-base-path)
 ;; (process-all "D://KeyFinderDB/test" :threading? false :use-cqt? true :overlap 0.0)
